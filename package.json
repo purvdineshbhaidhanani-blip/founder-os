@@ -1,0 +1,45 @@
+{
+  "name": "agent-factory",
+  "version": "1.0.0",
+  "description": "AI Founder OS Agent Factory — the internal platform that designs, generates, validates and registers every Claude Code agent used across the organization.",
+  "private": true,
+  "type": "module",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=18.18.0"
+  },
+  "bin": {
+    "agent-factory": "./dist/cli/index.js"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "dev": "tsx src/cli/index.ts",
+    "factory": "tsx src/cli/index.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "eslint . --ext .ts",
+    "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\""
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "yaml": "^2.5.1",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.2",
+    "@typescript-eslint/eslint-plugin": "^7.13.1",
+    "@typescript-eslint/parser": "^7.13.1",
+    "eslint": "^8.57.0",
+    "prettier": "^3.3.2",
+    "tsx": "^4.16.0",
+    "typescript": "^5.5.2",
+    "vitest": "^1.6.0"
+  }
+}

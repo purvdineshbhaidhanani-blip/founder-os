@@ -1,0 +1,107 @@
+{
+  "schemaVersion": "1.0.0",
+  "updatedAt": "2026-06-27T19:16:43.515Z",
+  "agents": [
+    {
+      "id": "agent_f448d3a8-b4eb-4ee9-985d-e1b5fc75dad2",
+      "name": "backend-api-implementer",
+      "displayName": "Backend Api Implementer",
+      "category": "engineering",
+      "version": "1.0.0",
+      "owner": "platform-team",
+      "description": "Implements features and bug fixes with production-quality code and tests.",
+      "capabilities": [
+        "Implement requested features and bug fixes in the codebase",
+        "Write or update automated tests for every change",
+        "Keep changes minimal and scoped to the request",
+        "Follow existing code conventions and architecture"
+      ],
+      "dependencies": [
+        "qa-test-planner",
+        "code-reviewer"
+      ],
+      "status": "active",
+      "tags": [
+        "backend",
+        "api"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/backend-api-implementer.md",
+      "blueprintId": "backend-api-implementer",
+      "blueprintHash": "bf78b59037bc794a",
+      "createdAt": "2026-06-27T19:16:38.012Z",
+      "updatedAt": "2026-06-27T19:16:38.012Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:16:38.012Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_9e44a603-9c3f-4f8d-8e6c-d1553eeeb1ab",
+      "name": "release-plan-author",
+      "displayName": "Release Plan Author",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "platform-team",
+      "description": "Turns high-level goals into clear, sequenced, actionable plans.",
+      "capabilities": [
+        "Break down high-level goals into concrete tasks",
+        "Sequence tasks by dependency",
+        "Identify risks and open questions before work starts",
+        "Produce plans other agents/engineers can execute directly"
+      ],
+      "dependencies": [
+        "engineering-lead"
+      ],
+      "status": "active",
+      "tags": [],
+      "filePath": "/home/user/founder-os/.claude/agents/release-plan-author.md",
+      "blueprintId": "release-plan-author",
+      "blueprintHash": "4e2372a89b21d943",
+      "createdAt": "2026-06-27T19:16:42.515Z",
+      "updatedAt": "2026-06-27T19:16:42.515Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:16:42.515Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_0f1acf07-2e30-4816-a01c-09ed6996dc1f",
+      "name": "diff-reviewer",
+      "displayName": "Diff Reviewer",
+      "category": "review",
+      "version": "1.0.0",
+      "owner": "platform-team",
+      "description": "Reviews diffs for correctness, safety, style, and architectural fit.",
+      "capabilities": [
+        "Read every changed file in the diff before commenting",
+        "Identify correctness bugs, security issues, and unsafe patterns",
+        "Flag deviations from existing architecture and conventions",
+        "Recommend concrete improvements rather than vague critiques"
+      ],
+      "dependencies": [
+        "engineering-lead",
+        "qa-test-planner"
+      ],
+      "status": "active",
+      "tags": [],
+      "filePath": "/home/user/founder-os/.claude/agents/diff-reviewer.md",
+      "blueprintId": "diff-reviewer",
+      "blueprintHash": "3eb7885406c4c5b5",
+      "createdAt": "2026-06-27T19:16:43.515Z",
+      "updatedAt": "2026-06-27T19:16:43.515Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:16:43.515Z",
+          "action": "created"
+        }
+      ]
+    }
+  ]
+}
