@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "updatedAt": "2026-06-27T19:16:43.515Z",
+  "updatedAt": "2026-06-27T19:48:41.474Z",
   "agents": [
     {
       "id": "agent_f448d3a8-b4eb-4ee9-985d-e1b5fc75dad2",
@@ -99,6 +99,1448 @@
         {
           "version": "1.0.0",
           "timestamp": "2026-06-27T19:16:43.515Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_e51cd7ad-538e-4ab0-ad60-2fd8dd90bda9",
+      "name": "master-planner",
+      "displayName": "Master Planner",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Decomposes founder goals into department-level initiatives and sequences the whole delivery plan.",
+      "capabilities": [
+        "Translate founder requests into department-level initiatives",
+        "Sequence initiatives by dependency and business priority",
+        "Allocate initiatives to leadership agents for breakdown",
+        "Maintain the master roadmap in shared memory"
+      ],
+      "dependencies": [
+        "product-manager",
+        "project-manager",
+        "research-assistant",
+        "solution-architect"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "leadership",
+        "planning"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/master-planner.md",
+      "blueprintId": "master-planner",
+      "blueprintHash": "0fdf53563a3e44d9",
+      "createdAt": "2026-06-27T19:48:41.153Z",
+      "updatedAt": "2026-06-27T19:48:41.153Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.153Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_1253faca-0da7-4616-9478-d007c2e3f729",
+      "name": "solution-architect",
+      "displayName": "Solution Architect",
+      "category": "architecture",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Owns the end-to-end system shape and the highest-level technical trade-offs for an initiative.",
+      "capabilities": [
+        "Define the high-level system design for each initiative",
+        "Choose architectural patterns and integration boundaries",
+        "Reconcile competing quality attributes into one coherent design",
+        "Hand a vetted design to the technical architect for detailing"
+      ],
+      "dependencies": [
+        "architecture-reviewer",
+        "master-planner",
+        "research-assistant",
+        "technical-architect"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "leadership",
+        "architecture"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/solution-architect.md",
+      "blueprintId": "solution-architect",
+      "blueprintHash": "1eb30f628898e155",
+      "createdAt": "2026-06-27T19:48:41.160Z",
+      "updatedAt": "2026-06-27T19:48:41.160Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.160Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_23c5fa42-7e05-4996-b28d-3a0e76537ae1",
+      "name": "technical-architect",
+      "displayName": "Technical Architect",
+      "category": "architecture",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Turns the solution design into concrete component, data and interface specifications for engineers.",
+      "capabilities": [
+        "Detail components, data models and interface contracts",
+        "Define module boundaries and dependency rules",
+        "Assign implementation slices to engineering agents",
+        "Review engineering output for architectural conformance"
+      ],
+      "dependencies": [
+        "api-engineer",
+        "backend-engineer",
+        "database-engineer",
+        "dependency-analyzer",
+        "frontend-engineer",
+        "solution-architect"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "leadership",
+        "architecture"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/technical-architect.md",
+      "blueprintId": "technical-architect",
+      "blueprintHash": "aa1f80c1c15223fc",
+      "createdAt": "2026-06-27T19:48:41.167Z",
+      "updatedAt": "2026-06-27T19:48:41.167Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.167Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_45e32fec-eec0-414e-a33d-bafe95dcc9bd",
+      "name": "project-manager",
+      "displayName": "Project Manager",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Tracks scope, schedule and delivery risk across the engineering and quality workstreams.",
+      "capabilities": [
+        "Break initiatives into trackable milestones",
+        "Monitor progress and surface schedule risk early",
+        "Coordinate the quality and platform workstreams",
+        "Report delivery status back to leadership"
+      ],
+      "dependencies": [
+        "devops-engineer",
+        "master-planner",
+        "qa-engineer",
+        "workflow-manager"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "leadership",
+        "planning"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/project-manager.md",
+      "blueprintId": "project-manager",
+      "blueprintHash": "0e795faf0485dabb",
+      "createdAt": "2026-06-27T19:48:41.172Z",
+      "updatedAt": "2026-06-27T19:48:41.172Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.172Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_5ee39728-2eca-41b1-9e69-1fcd5079fae2",
+      "name": "workflow-manager",
+      "displayName": "Workflow Manager",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Designs and tunes the execution workflows the Master Orchestrator runs for each initiative.",
+      "capabilities": [
+        "Design execution graphs with correct task dependencies",
+        "Insert checkpoints and approval gates where risk warrants",
+        "Tune retry and branching policy for each workflow",
+        "Coordinate context handoff between workflow stages"
+      ],
+      "dependencies": [
+        "context-manager-agent",
+        "master-planner",
+        "memory-manager-agent",
+        "project-manager"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "leadership",
+        "planning",
+        "workflow"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/workflow-manager.md",
+      "blueprintId": "workflow-manager",
+      "blueprintHash": "e12e6fece65f38fb",
+      "createdAt": "2026-06-27T19:48:41.178Z",
+      "updatedAt": "2026-06-27T19:48:41.178Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.178Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_1cb3a131-9376-4a2c-8750-2da97d9d93b9",
+      "name": "backend-engineer",
+      "displayName": "Backend Engineer",
+      "category": "engineering",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Implements server-side business logic, services and persistence against the technical spec.",
+      "capabilities": [
+        "Implement server-side services and business logic",
+        "Integrate with databases and message infrastructure",
+        "Write unit and integration tests for backend code",
+        "Expose internal interfaces the API layer consumes"
+      ],
+      "dependencies": [
+        "api-engineer",
+        "code-reviewer",
+        "database-engineer",
+        "devops-engineer",
+        "qa-engineer",
+        "technical-architect"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "engineering",
+        "backend"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/backend-engineer.md",
+      "blueprintId": "backend-engineer",
+      "blueprintHash": "522daac1ec100d31",
+      "createdAt": "2026-06-27T19:48:41.189Z",
+      "updatedAt": "2026-06-27T19:48:41.189Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.189Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_71247afe-b737-4389-b59c-8607b62ba035",
+      "name": "frontend-engineer",
+      "displayName": "Frontend Engineer",
+      "category": "engineering",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Builds responsive web user interfaces and wires them to backend and API services.",
+      "capabilities": [
+        "Build component-based web user interfaces",
+        "Manage client-side state and data fetching",
+        "Implement responsive layouts and accessibility",
+        "Integrate UI with API endpoints"
+      ],
+      "dependencies": [
+        "api-engineer",
+        "code-reviewer",
+        "qa-engineer",
+        "technical-architect",
+        "ui-designer",
+        "ux-designer"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "engineering",
+        "frontend"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/frontend-engineer.md",
+      "blueprintId": "frontend-engineer",
+      "blueprintHash": "a71b4e547b7c8614",
+      "createdAt": "2026-06-27T19:48:41.195Z",
+      "updatedAt": "2026-06-27T19:48:41.195Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.195Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_9a4c7b5a-1555-4517-99b1-20ef919ef6c9",
+      "name": "mobile-engineer",
+      "displayName": "Mobile Engineer",
+      "category": "engineering",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Develops native and cross-platform mobile applications for iOS and Android.",
+      "capabilities": [
+        "Build mobile screens and navigation flows",
+        "Handle offline state, storage and push notifications",
+        "Optimize for battery, memory and varied screen sizes",
+        "Integrate mobile clients with backend APIs"
+      ],
+      "dependencies": [
+        "api-engineer",
+        "code-reviewer",
+        "qa-engineer",
+        "technical-architect",
+        "ui-designer"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "engineering",
+        "mobile"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/mobile-engineer.md",
+      "blueprintId": "mobile-engineer",
+      "blueprintHash": "ad0868ac2ff23575",
+      "createdAt": "2026-06-27T19:48:41.201Z",
+      "updatedAt": "2026-06-27T19:48:41.201Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.201Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_222ae968-6b0e-47a0-9a8b-3c5e4a2027c0",
+      "name": "desktop-engineer",
+      "displayName": "Desktop Engineer",
+      "category": "engineering",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Builds cross-platform desktop applications and native OS integrations.",
+      "capabilities": [
+        "Build desktop application windows and menus",
+        "Integrate with native OS file, tray and notification APIs",
+        "Package and sign installers per platform",
+        "Manage auto-update and local persistence"
+      ],
+      "dependencies": [
+        "code-reviewer",
+        "qa-engineer",
+        "technical-architect",
+        "ui-designer"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "engineering",
+        "desktop"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/desktop-engineer.md",
+      "blueprintId": "desktop-engineer",
+      "blueprintHash": "e0d040357a186e98",
+      "createdAt": "2026-06-27T19:48:41.208Z",
+      "updatedAt": "2026-06-27T19:48:41.208Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.208Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_ed8bf6b2-dbfe-48d2-8be5-6040ab347f23",
+      "name": "api-engineer",
+      "displayName": "API Engineer",
+      "category": "engineering",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Designs and implements REST and GraphQL APIs with versioning and contract tests.",
+      "capabilities": [
+        "Design REST and GraphQL endpoint contracts",
+        "Implement request validation and error semantics",
+        "Version APIs and preserve backward compatibility",
+        "Publish contract tests the clients depend on"
+      ],
+      "dependencies": [
+        "backend-engineer",
+        "frontend-engineer",
+        "integration-engineer",
+        "mobile-engineer",
+        "technical-architect"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "engineering",
+        "api"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/api-engineer.md",
+      "blueprintId": "api-engineer",
+      "blueprintHash": "09e7e292b5854521",
+      "createdAt": "2026-06-27T19:48:41.215Z",
+      "updatedAt": "2026-06-27T19:48:41.215Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.215Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_620dfcf9-c1a7-4bbf-85c1-dc31d732acb3",
+      "name": "database-engineer",
+      "displayName": "Database Engineer",
+      "category": "engineering",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Designs schemas, writes migrations and tunes queries for correctness and performance.",
+      "capabilities": [
+        "Design normalized, evolvable database schemas",
+        "Write forward and reversible migrations",
+        "Index and tune queries for hot paths",
+        "Guard data integrity and consistency constraints"
+      ],
+      "dependencies": [
+        "backend-engineer",
+        "performance-engineer",
+        "technical-architect"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "engineering",
+        "database"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/database-engineer.md",
+      "blueprintId": "database-engineer",
+      "blueprintHash": "31a7ec07e6740331",
+      "createdAt": "2026-06-27T19:48:41.222Z",
+      "updatedAt": "2026-06-27T19:48:41.222Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.222Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_98341985-ea32-4970-ac93-b1fbbfe3e7fe",
+      "name": "ai-engineer",
+      "displayName": "AI Engineer",
+      "category": "engineering",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Builds machine-learning features, data pipelines and model-serving infrastructure.",
+      "capabilities": [
+        "Build data pipelines for training and inference",
+        "Integrate and serve ML models behind stable interfaces",
+        "Evaluate model quality with held-out metrics",
+        "Monitor for drift and degradation in production"
+      ],
+      "dependencies": [
+        "llm-engineer",
+        "qa-engineer",
+        "technical-architect"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "engineering",
+        "ai",
+        "ml"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/ai-engineer.md",
+      "blueprintId": "ai-engineer",
+      "blueprintHash": "9b15ef77bdd70ccc",
+      "createdAt": "2026-06-27T19:48:41.229Z",
+      "updatedAt": "2026-06-27T19:48:41.229Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.229Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_521383da-45d7-4439-a562-feb5daf5ee57",
+      "name": "llm-engineer",
+      "displayName": "LLM Engineer",
+      "category": "engineering",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Builds LLM-powered features: retrieval, tool use, agent loops and evaluation harnesses.",
+      "capabilities": [
+        "Implement retrieval-augmented and tool-using LLM flows",
+        "Build evaluation harnesses for LLM output quality",
+        "Manage context windows, token budgets and caching",
+        "Harden flows against prompt injection and failure modes"
+      ],
+      "dependencies": [
+        "ai-engineer",
+        "prompt-engineer",
+        "qa-engineer"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "engineering",
+        "llm"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/llm-engineer.md",
+      "blueprintId": "llm-engineer",
+      "blueprintHash": "5a4af3f9953e12a3",
+      "createdAt": "2026-06-27T19:48:41.238Z",
+      "updatedAt": "2026-06-27T19:48:41.238Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.238Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_fd159cb4-954f-480d-b9e5-a55fcd3ac610",
+      "name": "integration-engineer",
+      "displayName": "Integration Engineer",
+      "category": "engineering",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Connects internal services to third-party systems with resilient, well-tested integrations.",
+      "capabilities": [
+        "Implement third-party service integrations and webhooks",
+        "Build retry, backoff and idempotency into external calls",
+        "Map and reconcile data across system boundaries",
+        "Mock external systems for deterministic tests"
+      ],
+      "dependencies": [
+        "api-engineer",
+        "code-reviewer",
+        "qa-engineer",
+        "technical-architect"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "engineering",
+        "integration"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/integration-engineer.md",
+      "blueprintId": "integration-engineer",
+      "blueprintHash": "5fe409b6aa2bc285",
+      "createdAt": "2026-06-27T19:48:41.245Z",
+      "updatedAt": "2026-06-27T19:48:41.245Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.245Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_3c163569-c84e-4c9c-9845-c42044030290",
+      "name": "qa-engineer",
+      "displayName": "QA Engineer",
+      "category": "qa",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Owns the overall quality plan and verifies features against acceptance criteria.",
+      "capabilities": [
+        "Translate acceptance criteria into test plans",
+        "Verify features against happy-path and edge cases",
+        "Coordinate test, automation and performance coverage",
+        "Gate releases on quality exit criteria"
+      ],
+      "dependencies": [
+        "automation-engineer",
+        "backend-engineer",
+        "code-reviewer",
+        "frontend-engineer",
+        "integration-engineer",
+        "mobile-engineer",
+        "project-manager",
+        "test-engineer"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "quality",
+        "qa"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/qa-engineer.md",
+      "blueprintId": "qa-engineer",
+      "blueprintHash": "ef5dbb91d0bd0921",
+      "createdAt": "2026-06-27T19:48:41.252Z",
+      "updatedAt": "2026-06-27T19:48:41.252Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.252Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_f0c0c4b0-912a-438b-9f94-e41f774c41af",
+      "name": "test-engineer",
+      "displayName": "Test Engineer",
+      "category": "qa",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Designs and writes detailed test cases and reproduces reported defects.",
+      "capabilities": [
+        "Design granular test cases from requirements",
+        "Reproduce defects with minimal failing cases",
+        "Maintain regression test coverage",
+        "Report defect severity and root-cause hints"
+      ],
+      "dependencies": [
+        "automation-engineer",
+        "qa-engineer"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "quality",
+        "testing"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/test-engineer.md",
+      "blueprintId": "test-engineer",
+      "blueprintHash": "5dc05721a2266fcc",
+      "createdAt": "2026-06-27T19:48:41.260Z",
+      "updatedAt": "2026-06-27T19:48:41.260Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.260Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_72e94e8e-c9f7-44c8-a5e7-356a233691d3",
+      "name": "automation-engineer",
+      "displayName": "Automation Engineer",
+      "category": "qa",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Builds and maintains the automated end-to-end and CI test suites.",
+      "capabilities": [
+        "Automate end-to-end and integration test flows",
+        "Stabilize flaky tests and keep suites fast",
+        "Wire test suites into the CI pipeline",
+        "Report coverage and trend metrics"
+      ],
+      "dependencies": [
+        "devops-engineer",
+        "qa-engineer",
+        "test-engineer"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "quality",
+        "automation"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/automation-engineer.md",
+      "blueprintId": "automation-engineer",
+      "blueprintHash": "e19408b32c87b292",
+      "createdAt": "2026-06-27T19:48:41.267Z",
+      "updatedAt": "2026-06-27T19:48:41.267Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.267Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_5eb6676e-c312-4998-bbb3-cfa53ed6fc38",
+      "name": "performance-engineer",
+      "displayName": "Performance Engineer",
+      "category": "qa",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Profiles systems, finds bottlenecks and verifies latency and throughput budgets.",
+      "capabilities": [
+        "Define performance budgets and load profiles",
+        "Profile and locate latency and throughput bottlenecks",
+        "Run load and stress tests against budgets",
+        "Recommend concrete optimizations with evidence"
+      ],
+      "dependencies": [
+        "backend-engineer",
+        "cost-optimization-engineer",
+        "database-engineer",
+        "qa-engineer"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "quality",
+        "performance"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/performance-engineer.md",
+      "blueprintId": "performance-engineer",
+      "blueprintHash": "5c70822b6b836815",
+      "createdAt": "2026-06-27T19:48:41.275Z",
+      "updatedAt": "2026-06-27T19:48:41.275Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.275Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_b270c274-b93a-43bf-b758-62ab1a9b83f6",
+      "name": "security-engineer",
+      "displayName": "Security Engineer",
+      "category": "review",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Audits code and design for vulnerabilities and enforces secure-by-default practices.",
+      "capabilities": [
+        "Review code and design for security vulnerabilities",
+        "Check authn, authz and secret-handling paths",
+        "Flag injection, exposure and escalation risks",
+        "Recommend concrete, prioritized remediations"
+      ],
+      "dependencies": [
+        "backend-engineer",
+        "code-reviewer",
+        "frontend-engineer",
+        "integration-engineer",
+        "qa-engineer"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "quality",
+        "security"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/security-engineer.md",
+      "blueprintId": "security-engineer",
+      "blueprintHash": "c98b7ccf923e09f6",
+      "createdAt": "2026-06-27T19:48:41.284Z",
+      "updatedAt": "2026-06-27T19:48:41.284Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.284Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_be0c05e2-f4a2-40c5-8f27-2f611d15665f",
+      "name": "code-reviewer",
+      "displayName": "Code Reviewer",
+      "category": "review",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Reviews diffs for correctness, readability and conformance to conventions.",
+      "capabilities": [
+        "Review diffs for correctness and clarity",
+        "Enforce naming, structure and convention consistency",
+        "Verify tests accompany behavioural changes",
+        "Deliver actionable, severity-tagged feedback"
+      ],
+      "dependencies": [
+        "backend-engineer",
+        "frontend-engineer",
+        "qa-engineer",
+        "refactoring-engineer",
+        "security-engineer"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "quality",
+        "review"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/code-reviewer.md",
+      "blueprintId": "code-reviewer",
+      "blueprintHash": "b9c188f50a2e3df4",
+      "createdAt": "2026-06-27T19:48:41.292Z",
+      "updatedAt": "2026-06-27T19:48:41.292Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.292Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_d3b0dfff-52fd-46c2-b441-a3b7880fa794",
+      "name": "refactoring-engineer",
+      "displayName": "Refactoring Engineer",
+      "category": "engineering",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Improves internal code structure without changing behaviour, guided by review findings.",
+      "capabilities": [
+        "Refactor code for clarity and maintainability",
+        "Extract abstractions and remove duplication",
+        "Preserve behaviour under existing tests",
+        "Reduce complexity flagged in review"
+      ],
+      "dependencies": [
+        "code-reviewer",
+        "qa-engineer"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "quality",
+        "refactoring"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/refactoring-engineer.md",
+      "blueprintId": "refactoring-engineer",
+      "blueprintHash": "614496d14b5d4574",
+      "createdAt": "2026-06-27T19:48:41.300Z",
+      "updatedAt": "2026-06-27T19:48:41.300Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.300Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_74b99e6c-4312-4520-afaf-89b2ada6e440",
+      "name": "product-manager",
+      "displayName": "Product Manager",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Defines product requirements, priorities and acceptance criteria for initiatives.",
+      "capabilities": [
+        "Define product requirements and acceptance criteria",
+        "Prioritize the backlog against user value",
+        "Coordinate design and documentation for features",
+        "Validate delivered features against intent"
+      ],
+      "dependencies": [
+        "documentation-engineer",
+        "master-planner",
+        "ui-designer",
+        "ux-designer"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "product",
+        "planning"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/product-manager.md",
+      "blueprintId": "product-manager",
+      "blueprintHash": "5ac0d06687d469d5",
+      "createdAt": "2026-06-27T19:48:41.309Z",
+      "updatedAt": "2026-06-27T19:48:41.309Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.309Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_f2b659cc-2b6b-4cf2-b016-d0e826854fd0",
+      "name": "ux-designer",
+      "displayName": "UX Designer",
+      "category": "documentation",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Designs user flows, information architecture and interaction models for features.",
+      "capabilities": [
+        "Map user flows and information architecture",
+        "Define interaction models and edge-case states",
+        "Produce wireframes and UX specifications",
+        "Validate flows against user needs"
+      ],
+      "dependencies": [
+        "frontend-engineer",
+        "product-manager",
+        "ui-designer"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "product",
+        "ux",
+        "design"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/ux-designer.md",
+      "blueprintId": "ux-designer",
+      "blueprintHash": "0c0b31fa6d870ec4",
+      "createdAt": "2026-06-27T19:48:41.322Z",
+      "updatedAt": "2026-06-27T19:48:41.322Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.322Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_41680fef-b5c3-43b0-8934-3900624e6c04",
+      "name": "ui-designer",
+      "displayName": "UI Designer",
+      "category": "documentation",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Produces visual designs, component specs and design tokens from UX flows.",
+      "capabilities": [
+        "Design visual layouts and component states",
+        "Define design tokens and a consistent visual system",
+        "Specify spacing, typography and color usage",
+        "Hand annotated specs to client engineers"
+      ],
+      "dependencies": [
+        "desktop-engineer",
+        "frontend-engineer",
+        "mobile-engineer",
+        "product-manager",
+        "ux-designer"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "product",
+        "ui",
+        "design"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/ui-designer.md",
+      "blueprintId": "ui-designer",
+      "blueprintHash": "08bb1b8fe3f664f6",
+      "createdAt": "2026-06-27T19:48:41.332Z",
+      "updatedAt": "2026-06-27T19:48:41.332Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.332Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_fb9732cb-8c15-4a6b-a3ad-2ee942b242c9",
+      "name": "documentation-engineer",
+      "displayName": "Documentation Engineer",
+      "category": "documentation",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Writes and maintains user and developer documentation accurate to the shipped system.",
+      "capabilities": [
+        "Document features, APIs and developer workflows",
+        "Keep examples runnable and current",
+        "Ensure new features ship with documentation",
+        "Fix unclear or outdated docs"
+      ],
+      "dependencies": [
+        "api-engineer",
+        "backend-engineer",
+        "frontend-engineer",
+        "product-manager"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "product",
+        "documentation"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/documentation-engineer.md",
+      "blueprintId": "documentation-engineer",
+      "blueprintHash": "9ae6ae7e23c83057",
+      "createdAt": "2026-06-27T19:48:41.345Z",
+      "updatedAt": "2026-06-27T19:48:41.345Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.345Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_71744745-2cf3-402c-a8ef-4a99348d8cbc",
+      "name": "prompt-engineer",
+      "displayName": "Prompt Engineer",
+      "category": "engineering",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Designs, tests and versions the prompts that power LLM features and agents.",
+      "capabilities": [
+        "Design and iterate prompts for LLM features",
+        "Build evaluation sets and grade prompt variants",
+        "Version prompts and document their contracts",
+        "Mitigate injection and undesired-output risks"
+      ],
+      "dependencies": [
+        "llm-engineer"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "product",
+        "prompt",
+        "llm"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/prompt-engineer.md",
+      "blueprintId": "prompt-engineer",
+      "blueprintHash": "326a5ed7e55a4617",
+      "createdAt": "2026-06-27T19:48:41.355Z",
+      "updatedAt": "2026-06-27T19:48:41.355Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.355Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_eb869b98-0f85-42cd-9545-7f7323630d71",
+      "name": "devops-engineer",
+      "displayName": "DevOps Engineer",
+      "category": "devops",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Owns CI/CD pipelines and infrastructure-as-code for the whole department.",
+      "capabilities": [
+        "Author and maintain CI/CD pipeline definitions",
+        "Manage infrastructure-as-code modules",
+        "Keep main builds green and reproducible",
+        "Apply security and reliability practices to pipelines"
+      ],
+      "dependencies": [
+        "automation-engineer",
+        "backend-engineer",
+        "deployment-engineer",
+        "github-manager",
+        "monitoring-engineer",
+        "project-manager"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "platform",
+        "devops"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/devops-engineer.md",
+      "blueprintId": "devops-engineer",
+      "blueprintHash": "efe8497d28057a4f",
+      "createdAt": "2026-06-27T19:48:41.364Z",
+      "updatedAt": "2026-06-27T19:48:41.364Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.364Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_c0a4352b-a922-400c-a55a-8019dcb8914e",
+      "name": "github-manager",
+      "displayName": "GitHub Manager",
+      "category": "devops",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Manages repositories, branch policies, pull requests and review automation.",
+      "capabilities": [
+        "Manage repository and branch protection policy",
+        "Automate pull-request and review workflows",
+        "Triage and label incoming issues and PRs",
+        "Keep repository metadata and CI checks consistent"
+      ],
+      "dependencies": [
+        "backend-engineer",
+        "devops-engineer",
+        "frontend-engineer",
+        "release-manager"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "platform",
+        "github"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/github-manager.md",
+      "blueprintId": "github-manager",
+      "blueprintHash": "e453ef93bee0d7d8",
+      "createdAt": "2026-06-27T19:48:41.374Z",
+      "updatedAt": "2026-06-27T19:48:41.374Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.374Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_dc0d0e99-74f4-4c3f-891f-c260847afcfc",
+      "name": "release-manager",
+      "displayName": "Release Manager",
+      "category": "devops",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Plans, cuts and tracks releases, coordinating versioning and changelogs.",
+      "capabilities": [
+        "Plan release scope and versioning",
+        "Assemble changelogs and release notes",
+        "Coordinate go/no-go quality gates",
+        "Track release status to completion"
+      ],
+      "dependencies": [
+        "deployment-engineer",
+        "devops-engineer",
+        "github-manager"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "platform",
+        "release"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/release-manager.md",
+      "blueprintId": "release-manager",
+      "blueprintHash": "38e055f998bfb975",
+      "createdAt": "2026-06-27T19:48:41.385Z",
+      "updatedAt": "2026-06-27T19:48:41.385Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.385Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_d3ca9051-f295-4adb-bfea-b95dac1010c5",
+      "name": "deployment-engineer",
+      "displayName": "Deployment Engineer",
+      "category": "devops",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Executes safe deployments with staged rollouts and fast rollback paths.",
+      "capabilities": [
+        "Execute staged deployments to each environment",
+        "Run health checks and gate promotion on them",
+        "Maintain fast, tested rollback procedures",
+        "Record deployment provenance and outcomes"
+      ],
+      "dependencies": [
+        "devops-engineer",
+        "monitoring-engineer",
+        "release-manager"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "platform",
+        "deployment"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/deployment-engineer.md",
+      "blueprintId": "deployment-engineer",
+      "blueprintHash": "20a9c1719a306ce9",
+      "createdAt": "2026-06-27T19:48:41.395Z",
+      "updatedAt": "2026-06-27T19:48:41.395Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.395Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_e93ac347-a044-417e-b5ae-5f6e518a44dd",
+      "name": "monitoring-engineer",
+      "displayName": "Monitoring Engineer",
+      "category": "devops",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Builds observability: metrics, logging, tracing and alerting on service health.",
+      "capabilities": [
+        "Instrument services with metrics, logs and traces",
+        "Define SLOs and alerting thresholds",
+        "Build dashboards for service health",
+        "Reduce alert noise and false positives"
+      ],
+      "dependencies": [
+        "cost-optimization-engineer",
+        "deployment-engineer",
+        "devops-engineer"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "platform",
+        "monitoring"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/monitoring-engineer.md",
+      "blueprintId": "monitoring-engineer",
+      "blueprintHash": "d31f4e0dd3f2cb01",
+      "createdAt": "2026-06-27T19:48:41.405Z",
+      "updatedAt": "2026-06-27T19:48:41.405Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.405Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_d9bd79ec-5b99-41fd-9270-9bf627140a56",
+      "name": "cost-optimization-engineer",
+      "displayName": "Cost Optimization Engineer",
+      "category": "devops",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Tracks infrastructure and token spend and recommends evidence-based savings.",
+      "capabilities": [
+        "Track infrastructure and LLM token spend",
+        "Attribute cost to services and workflows",
+        "Recommend savings with reliability trade-offs stated",
+        "Verify realized savings after changes"
+      ],
+      "dependencies": [
+        "devops-engineer",
+        "monitoring-engineer",
+        "performance-engineer"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "platform",
+        "cost"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/cost-optimization-engineer.md",
+      "blueprintId": "cost-optimization-engineer",
+      "blueprintHash": "ba6a9b61e6ebe69d",
+      "createdAt": "2026-06-27T19:48:41.415Z",
+      "updatedAt": "2026-06-27T19:48:41.415Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.415Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_6fa2f4dd-2d84-4a1d-909f-1695bea3db2c",
+      "name": "research-assistant",
+      "displayName": "Research Assistant",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Investigates open technical questions and synthesizes cited findings for leadership.",
+      "capabilities": [
+        "Frame and scope research questions precisely",
+        "Gather evidence from authoritative sources",
+        "Synthesize findings into cited, actionable reports",
+        "Separate well-supported claims from speculation"
+      ],
+      "dependencies": [
+        "master-planner",
+        "solution-architect"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "intelligence",
+        "research"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/research-assistant.md",
+      "blueprintId": "research-assistant",
+      "blueprintHash": "c61ff606af05ebc3",
+      "createdAt": "2026-06-27T19:48:41.424Z",
+      "updatedAt": "2026-06-27T19:48:41.424Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.424Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_c6b97898-d90b-4ccd-a622-d96292f52353",
+      "name": "context-manager-agent",
+      "displayName": "Context Manager",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Curates and routes the right context to each agent within token budgets.",
+      "capabilities": [
+        "Assemble task-relevant context for each agent",
+        "Route context slices to their intended audience",
+        "Trim and compress context to fit token budgets",
+        "Propagate inherited context across workflow stages"
+      ],
+      "dependencies": [
+        "master-planner",
+        "memory-manager",
+        "workflow-manager"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "intelligence",
+        "context"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/context-manager-agent.md",
+      "blueprintId": "context-manager-agent",
+      "blueprintHash": "a776b43f32416cd4",
+      "createdAt": "2026-06-27T19:48:41.435Z",
+      "updatedAt": "2026-06-27T19:48:41.435Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.435Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_1fc893cd-1d6a-4951-87de-ed4cc039c427",
+      "name": "memory-manager-agent",
+      "displayName": "Memory Manager",
+      "category": "engineering",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Curates shared memory: what is stored, indexed, retrieved and expired.",
+      "capabilities": [
+        "Decide what task and project memory to persist",
+        "Index memory for fast, relevant retrieval",
+        "Apply cleanup and expiry policies",
+        "Serve retrieval requests from other agents"
+      ],
+      "dependencies": [
+        "context-manager-agent",
+        "workflow-manager"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "intelligence",
+        "memory"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/memory-manager-agent.md",
+      "blueprintId": "memory-manager-agent",
+      "blueprintHash": "d698aa1fa1a18681",
+      "createdAt": "2026-06-27T19:48:41.445Z",
+      "updatedAt": "2026-06-27T19:48:41.445Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.445Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_15466486-65a3-4adf-834f-df30467ad95f",
+      "name": "dependency-analyzer",
+      "displayName": "Dependency Analyzer",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Maps code and task dependencies to surface risk, cycles and sequencing constraints.",
+      "capabilities": [
+        "Map dependencies across modules and tasks",
+        "Detect cycles and tight coupling",
+        "Surface sequencing constraints for planning",
+        "Flag risky or fragile dependency chains"
+      ],
+      "dependencies": [
+        "architecture-reviewer",
+        "technical-architect"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "intelligence",
+        "dependencies"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/dependency-analyzer.md",
+      "blueprintId": "dependency-analyzer",
+      "blueprintHash": "5623bb7ce52a4fd4",
+      "createdAt": "2026-06-27T19:48:41.456Z",
+      "updatedAt": "2026-06-27T19:48:41.456Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.456Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_e8146428-fb50-4617-9a40-a362912c196a",
+      "name": "architecture-reviewer",
+      "displayName": "Architecture Reviewer",
+      "category": "review",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Reviews implemented systems against the intended architecture and flags drift.",
+      "capabilities": [
+        "Compare implementation against the intended design",
+        "Flag architectural drift and boundary violations",
+        "Assess change impact on system structure",
+        "Recommend corrections to restore conformance"
+      ],
+      "dependencies": [
+        "dependency-analyzer",
+        "solution-architect",
+        "technical-architect"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "intelligence",
+        "architecture",
+        "review"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/architecture-reviewer.md",
+      "blueprintId": "architecture-reviewer",
+      "blueprintHash": "bc05691980f58578",
+      "createdAt": "2026-06-27T19:48:41.474Z",
+      "updatedAt": "2026-06-27T19:48:41.474Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-27T19:48:41.474Z",
           "action": "created"
         }
       ]

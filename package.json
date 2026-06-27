@@ -21,6 +21,7 @@
     "build": "tsc -p tsconfig.json",
     "dev": "tsx src/cli/index.ts",
     "factory": "tsx src/cli/index.ts",
+    "generate:engineering": "tsx src/departments/generate.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc -p tsconfig.json --noEmit",
