@@ -1,0 +1,14 @@
+export { reviewAsFounder } from "./founder.js";
+export { reviewAsCustomer } from "./customer.js";
+export { reviewAsCTO } from "./cto.js";
+export { reviewAsProduct } from "./product.js";
+export { reviewAsUX } from "./ux.js";
+export { reviewAsGrowth } from "./growth.js";
+export { reviewAsSales } from "./sales.js";
+export { reviewAsMarketing } from "./marketing.js";
+export { reviewAsInvestor } from "./investor.js";
+export { reviewAsCompetitor } from "./competitor.js";
+export { reviewAsSecurity } from "./security.js";
+export { reviewAsLegal } from "./legal.js";
+export { reviewAsOperations } from "./operations.js";
+export { reviewAsRealityGuardian } from "./reality-guardian.js";

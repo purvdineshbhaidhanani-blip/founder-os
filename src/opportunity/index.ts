@@ -8,3 +8,4 @@ export * from "./opportunity-store.js";
 export * from "./engine.js";
 export * from "./collectors/index.js";
 export * from "./intelligence/index.js";
+export * from "./decision/index.js";
