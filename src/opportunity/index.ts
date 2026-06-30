@@ -7,3 +7,4 @@ export * from "./repetition-engine.js";
 export * from "./opportunity-store.js";
 export * from "./engine.js";
 export * from "./collectors/index.js";
+export * from "./intelligence/index.js";
