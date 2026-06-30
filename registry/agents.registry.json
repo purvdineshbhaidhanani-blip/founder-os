@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "updatedAt": "2026-06-27T19:48:41.474Z",
+  "updatedAt": "2026-06-30T05:54:09.354Z",
   "agents": [
     {
       "id": "agent_f448d3a8-b4eb-4ee9-985d-e1b5fc75dad2",
@@ -1541,6 +1541,786 @@
         {
           "version": "1.0.0",
           "timestamp": "2026-06-27T19:48:41.474Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_964e5878-fe73-477a-b8aa-f529030fae9d",
+      "name": "reddit-intelligence",
+      "displayName": "Reddit Intelligence",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Mines Reddit for early signal on customer pain, workflows and emerging tools.",
+      "capabilities": [
+        "Track relevant subreddits for signal on pain and tools",
+        "Distill discussions into evidence-backed Insight envelopes",
+        "Surface high-frequency complaints and unmet needs",
+        "Flag emerging vocabulary and trends"
+      ],
+      "dependencies": [
+        "customer-pain-intelligence",
+        "opportunity-ranking",
+        "reality-checker",
+        "trend-detection"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "intelligence",
+        "market-intelligence",
+        "social"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/reddit-intelligence.md",
+      "blueprintId": "reddit-intelligence",
+      "blueprintHash": "dd35eee3f7ee55c6",
+      "createdAt": "2026-06-30T05:54:09.063Z",
+      "updatedAt": "2026-06-30T05:54:09.063Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-30T05:54:09.063Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_23ff524f-0426-44f4-a202-8e13bf2805ec",
+      "name": "github-intelligence",
+      "displayName": "GitHub Intelligence",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Tracks GitHub trends: rising repos, abandoned tools, open issues and ecosystem gaps.",
+      "capabilities": [
+        "Track stars, forks and activity across target ecosystems",
+        "Identify abandoned or unmaintained tools",
+        "Surface frequently-requested features and bugs",
+        "Detect rising libraries and frameworks"
+      ],
+      "dependencies": [
+        "market-gap-intelligence",
+        "reality-checker",
+        "trend-detection"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "intelligence",
+        "market-intelligence",
+        "open-source"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/github-intelligence.md",
+      "blueprintId": "github-intelligence",
+      "blueprintHash": "58d148fc67f496c6",
+      "createdAt": "2026-06-30T05:54:09.087Z",
+      "updatedAt": "2026-06-30T05:54:09.087Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-30T05:54:09.087Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_a6e697e2-bccc-434e-b446-a71173349c7e",
+      "name": "product-hunt-intelligence",
+      "displayName": "Product Hunt Intelligence",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Tracks Product Hunt launches: positioning, traction and category dynamics.",
+      "capabilities": [
+        "Monitor daily and weekly launches in target categories",
+        "Distill positioning, pricing and traction signal",
+        "Compare launch performance to historical baselines",
+        "Surface category saturation and emergent niches"
+      ],
+      "dependencies": [
+        "competitor-intelligence",
+        "reality-checker",
+        "trend-detection"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "intelligence",
+        "market-intelligence",
+        "launches"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/product-hunt-intelligence.md",
+      "blueprintId": "product-hunt-intelligence",
+      "blueprintHash": "c8eafe26523736f2",
+      "createdAt": "2026-06-30T05:54:09.105Z",
+      "updatedAt": "2026-06-30T05:54:09.105Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-30T05:54:09.105Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_b3366a36-9043-4ebb-900a-022567b89c99",
+      "name": "hacker-news-intelligence",
+      "displayName": "Hacker News Intelligence",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Surfaces tech-tribe signal: what builders read, build and complain about.",
+      "capabilities": [
+        "Monitor front-page and Show HN signal",
+        "Identify recurring topics and counter-narratives",
+        "Track sentiment toward tools and vendors",
+        "Flag posts that signal early-adopter concern"
+      ],
+      "dependencies": [
+        "reality-checker",
+        "trend-detection"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "intelligence",
+        "market-intelligence",
+        "social"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/hacker-news-intelligence.md",
+      "blueprintId": "hacker-news-intelligence",
+      "blueprintHash": "8f0bc3e3b038df56",
+      "createdAt": "2026-06-30T05:54:09.120Z",
+      "updatedAt": "2026-06-30T05:54:09.120Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-30T05:54:09.120Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_b2e50413-ff89-46d8-90d1-34b0f1ac0234",
+      "name": "g2-intelligence",
+      "displayName": "G2 Intelligence",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Mines G2 reviews for customer satisfaction, switching costs and dissatisfaction patterns.",
+      "capabilities": [
+        "Aggregate G2 reviews across target categories",
+        "Identify common complaints and missing features",
+        "Surface switching-cost and churn signal",
+        "Compare ratings across vendors"
+      ],
+      "dependencies": [
+        "competitor-intelligence",
+        "customer-pain-intelligence",
+        "reality-checker"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "intelligence",
+        "market-intelligence",
+        "reviews"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/g2-intelligence.md",
+      "blueprintId": "g2-intelligence",
+      "blueprintHash": "e12033bfa01dc468",
+      "createdAt": "2026-06-30T05:54:09.136Z",
+      "updatedAt": "2026-06-30T05:54:09.136Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-30T05:54:09.136Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_28265a1f-14e7-4669-86c5-cffdd36fb7f2",
+      "name": "capterra-intelligence",
+      "displayName": "Capterra Intelligence",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Mines Capterra reviews for SMB and mid-market signal across software categories.",
+      "capabilities": [
+        "Aggregate Capterra reviews by segment and category",
+        "Surface SMB-specific complaints and feature gaps",
+        "Track entrant momentum across categories",
+        "Cross-reference findings with G2 signal"
+      ],
+      "dependencies": [
+        "competitor-intelligence",
+        "customer-pain-intelligence",
+        "reality-checker"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "intelligence",
+        "market-intelligence",
+        "reviews"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/capterra-intelligence.md",
+      "blueprintId": "capterra-intelligence",
+      "blueprintHash": "45fc59cf7d0a17f8",
+      "createdAt": "2026-06-30T05:54:09.153Z",
+      "updatedAt": "2026-06-30T05:54:09.153Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-30T05:54:09.153Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_b97507cf-c492-488f-bf91-82b844cfd8be",
+      "name": "app-store-intelligence",
+      "displayName": "App Store Intelligence",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Tracks iOS App Store rankings, reviews and category dynamics.",
+      "capabilities": [
+        "Track top-ranked apps in target categories",
+        "Aggregate user reviews for sentiment and complaints",
+        "Surface recurring crash and UX issues",
+        "Compare monetization patterns across category leaders"
+      ],
+      "dependencies": [
+        "competitor-intelligence",
+        "feature-intelligence",
+        "reality-checker"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "intelligence",
+        "market-intelligence",
+        "mobile"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/app-store-intelligence.md",
+      "blueprintId": "app-store-intelligence",
+      "blueprintHash": "579d14c8184d5bc6",
+      "createdAt": "2026-06-30T05:54:09.169Z",
+      "updatedAt": "2026-06-30T05:54:09.169Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-30T05:54:09.169Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_9c63468c-10b7-42f3-9610-0d3fe9ec6e47",
+      "name": "google-play-intelligence",
+      "displayName": "Google Play Intelligence",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Tracks Google Play rankings, reviews and Android category dynamics.",
+      "capabilities": [
+        "Track top-ranked Android apps in target categories",
+        "Aggregate user reviews for sentiment and complaints",
+        "Surface install-base and update-cadence signal",
+        "Compare Android monetization patterns"
+      ],
+      "dependencies": [
+        "competitor-intelligence",
+        "feature-intelligence",
+        "reality-checker"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "intelligence",
+        "market-intelligence",
+        "mobile"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/google-play-intelligence.md",
+      "blueprintId": "google-play-intelligence",
+      "blueprintHash": "bdde84619db249e0",
+      "createdAt": "2026-06-30T05:54:09.184Z",
+      "updatedAt": "2026-06-30T05:54:09.184Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-30T05:54:09.184Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_d8dfa90d-703a-45ea-bd04-b630ba7e5bd9",
+      "name": "competitor-intelligence",
+      "displayName": "Competitor Intelligence",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Maintains a deep profile of each competitor: positioning, features, pricing and momentum.",
+      "capabilities": [
+        "Profile competitor positioning and target segments",
+        "Track competitor releases, pricing and packaging",
+        "Identify strengths, weaknesses and strategic moves",
+        "Maintain a comparable matrix across competitors"
+      ],
+      "dependencies": [
+        "app-store-intelligence",
+        "capterra-intelligence",
+        "feature-intelligence",
+        "g2-intelligence",
+        "google-play-intelligence",
+        "opportunity-ranking",
+        "pricing-intelligence",
+        "reality-checker"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "intelligence",
+        "market-intelligence",
+        "competition"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/competitor-intelligence.md",
+      "blueprintId": "competitor-intelligence",
+      "blueprintHash": "b1d0ef73dbd0d55e",
+      "createdAt": "2026-06-30T05:54:09.203Z",
+      "updatedAt": "2026-06-30T05:54:09.203Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-30T05:54:09.203Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_3b631d1e-af3d-4c3b-a370-00994bc1d396",
+      "name": "pricing-intelligence",
+      "displayName": "Pricing Intelligence",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Tracks pricing, packaging and discount patterns across competitors and adjacent markets.",
+      "capabilities": [
+        "Track pricing tiers and feature gating across vendors",
+        "Surface unusual discounts or packaging changes",
+        "Estimate per-segment willingness-to-pay from public signal",
+        "Maintain a pricing comparison matrix"
+      ],
+      "dependencies": [
+        "competitor-intelligence",
+        "opportunity-ranking",
+        "reality-checker"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "intelligence",
+        "market-intelligence",
+        "pricing"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/pricing-intelligence.md",
+      "blueprintId": "pricing-intelligence",
+      "blueprintHash": "0beeead01889417c",
+      "createdAt": "2026-06-30T05:54:09.217Z",
+      "updatedAt": "2026-06-30T05:54:09.217Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-30T05:54:09.217Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_9a25ab86-b9dc-41c9-a780-fd473c0ce19a",
+      "name": "customer-pain-intelligence",
+      "displayName": "Customer Pain Intelligence",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Aggregates pain signal across review sites, social and support forums into ranked complaint clusters.",
+      "capabilities": [
+        "Aggregate complaints across G2, Capterra, Reddit, HN, Trustpilot",
+        "Cluster complaints by underlying pain rather than wording",
+        "Rank clusters by frequency, severity and business value",
+        "Track movement of each cluster over time"
+      ],
+      "dependencies": [
+        "capterra-intelligence",
+        "g2-intelligence",
+        "market-gap-intelligence",
+        "opportunity-ranking",
+        "reality-checker",
+        "reddit-intelligence"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "intelligence",
+        "market-intelligence",
+        "pain"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/customer-pain-intelligence.md",
+      "blueprintId": "customer-pain-intelligence",
+      "blueprintHash": "c673db9dd65d513d",
+      "createdAt": "2026-06-30T05:54:09.231Z",
+      "updatedAt": "2026-06-30T05:54:09.231Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-30T05:54:09.231Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_a25841a4-d84f-436f-ac70-c8a7ad8d7977",
+      "name": "workflow-intelligence",
+      "displayName": "Workflow Intelligence",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Maps the real workflows users follow today so the company can design better replacements.",
+      "capabilities": [
+        "Reconstruct real user workflows from public artifacts",
+        "Identify tools chained together and their friction points",
+        "Surface manual steps that should be automated",
+        "Quantify time and cost of current workflows where possible"
+      ],
+      "dependencies": [
+        "customer-pain-intelligence",
+        "market-gap-intelligence",
+        "opportunity-ranking",
+        "reality-checker"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "intelligence",
+        "market-intelligence",
+        "workflows"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/workflow-intelligence.md",
+      "blueprintId": "workflow-intelligence",
+      "blueprintHash": "c178e58898475bfb",
+      "createdAt": "2026-06-30T05:54:09.246Z",
+      "updatedAt": "2026-06-30T05:54:09.246Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-30T05:54:09.246Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_8424cde8-0358-4e52-aae7-4db5a0ca5c80",
+      "name": "startup-intelligence",
+      "displayName": "Startup Intelligence",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Tracks new startups, funding rounds and market entrants across target sectors.",
+      "capabilities": [
+        "Track funding announcements and seed-stage entrants",
+        "Profile founding teams and stated theses",
+        "Surface adjacent entrants that could disrupt target markets",
+        "Maintain an entrants timeline by sector"
+      ],
+      "dependencies": [
+        "competitor-intelligence",
+        "reality-checker",
+        "trend-detection"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "intelligence",
+        "market-intelligence",
+        "startups"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/startup-intelligence.md",
+      "blueprintId": "startup-intelligence",
+      "blueprintHash": "77c9798ec5493548",
+      "createdAt": "2026-06-30T05:54:09.260Z",
+      "updatedAt": "2026-06-30T05:54:09.260Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-30T05:54:09.260Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_64e74cf8-0bbb-44e2-9c62-7aad63cd04ae",
+      "name": "market-gap-intelligence",
+      "displayName": "Market Gap Intelligence",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Identifies gaps where customer pain exists but no adequate solution does.",
+      "capabilities": [
+        "Cross-reference pain clusters against existing tool coverage",
+        "Identify under-served segments within target categories",
+        "Quantify the size and addressability of each gap",
+        "Surface gaps with stable demand and weak supply"
+      ],
+      "dependencies": [
+        "customer-pain-intelligence",
+        "github-intelligence",
+        "opportunity-ranking",
+        "reality-checker",
+        "workflow-intelligence"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "intelligence",
+        "market-intelligence",
+        "gaps"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/market-gap-intelligence.md",
+      "blueprintId": "market-gap-intelligence",
+      "blueprintHash": "bd999bb6c27aa2a2",
+      "createdAt": "2026-06-30T05:54:09.275Z",
+      "updatedAt": "2026-06-30T05:54:09.275Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-30T05:54:09.275Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_659c9e21-8355-4f91-9456-831ffe54d28d",
+      "name": "opportunity-ranking",
+      "displayName": "Opportunity Ranking",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Scores and ranks opportunities the rest of the department surfaces.",
+      "capabilities": [
+        "Aggregate signal from every intelligence agent",
+        "Score opportunities on pain depth, market size, competitive intensity and feasibility",
+        "Maintain a transparent, reproducible ranking method",
+        "Surface the top opportunities to leadership"
+      ],
+      "dependencies": [
+        "competitor-intelligence",
+        "customer-pain-intelligence",
+        "feature-intelligence",
+        "market-gap-intelligence",
+        "master-planner",
+        "pricing-intelligence",
+        "reality-checker",
+        "reddit-intelligence"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "intelligence",
+        "market-intelligence",
+        "ranking"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/opportunity-ranking.md",
+      "blueprintId": "opportunity-ranking",
+      "blueprintHash": "be1553270e4650d0",
+      "createdAt": "2026-06-30T05:54:09.289Z",
+      "updatedAt": "2026-06-30T05:54:09.289Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-30T05:54:09.289Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_9f902a36-9e85-48f5-babc-98e74a8cc8e4",
+      "name": "feature-intelligence",
+      "displayName": "Feature Intelligence",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Tracks specific features customers ask for, switch over, or abandon vendors for.",
+      "capabilities": [
+        "Identify feature requests and their frequency across vendors",
+        "Track which features drive churn or adoption",
+        "Surface emerging table-stakes vs differentiator features",
+        "Maintain a category-by-category feature matrix"
+      ],
+      "dependencies": [
+        "app-store-intelligence",
+        "competitor-intelligence",
+        "google-play-intelligence",
+        "opportunity-ranking",
+        "reality-checker"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "intelligence",
+        "market-intelligence",
+        "features"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/feature-intelligence.md",
+      "blueprintId": "feature-intelligence",
+      "blueprintHash": "87b27d4ed47f9f80",
+      "createdAt": "2026-06-30T05:54:09.308Z",
+      "updatedAt": "2026-06-30T05:54:09.308Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-30T05:54:09.308Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_1e671b07-7da3-4c18-a2b2-160baa5f9f5b",
+      "name": "trend-detection",
+      "displayName": "Trend Detection",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Surfaces emerging trends and dampens hype using cross-source signal.",
+      "capabilities": [
+        "Detect rising topics across the source feeds",
+        "Distinguish trend from spike using multi-source corroboration",
+        "Track trend lifecycle from emergence to peak to decline",
+        "Surface counter-evidence that may dampen apparent trends"
+      ],
+      "dependencies": [
+        "github-intelligence",
+        "hacker-news-intelligence",
+        "master-planner",
+        "opportunity-ranking",
+        "reality-checker",
+        "reddit-intelligence"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "intelligence",
+        "market-intelligence",
+        "trends"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/trend-detection.md",
+      "blueprintId": "trend-detection",
+      "blueprintHash": "76f1105bc2478136",
+      "createdAt": "2026-06-30T05:54:09.323Z",
+      "updatedAt": "2026-06-30T05:54:09.323Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-30T05:54:09.323Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_d5dc2d55-44fb-4319-9e1d-dd052b700bb1",
+      "name": "reality-checker",
+      "displayName": "Reality Checker",
+      "category": "review",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Audits every intelligence Insight envelope against the Reality Guard before it reaches leadership.",
+      "capabilities": [
+        "Verify each Insight has evidence, sources, assumptions and unknowns",
+        "Reject envelopes whose confidence exceeds their evidence",
+        "Flag conflicting findings across intelligence agents",
+        "Block recommendations that lack reproducible grounding"
+      ],
+      "dependencies": [
+        "app-store-intelligence",
+        "capterra-intelligence",
+        "competitor-intelligence",
+        "customer-pain-intelligence",
+        "feature-intelligence",
+        "g2-intelligence",
+        "github-intelligence",
+        "google-play-intelligence",
+        "hacker-news-intelligence",
+        "market-gap-intelligence",
+        "master-planner",
+        "opportunity-ranking",
+        "pricing-intelligence",
+        "product-hunt-intelligence",
+        "reddit-intelligence",
+        "startup-intelligence",
+        "trend-detection",
+        "workflow-intelligence"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "intelligence",
+        "market-intelligence",
+        "verification"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/reality-checker.md",
+      "blueprintId": "reality-checker",
+      "blueprintHash": "162b37e31b01f669",
+      "createdAt": "2026-06-30T05:54:09.338Z",
+      "updatedAt": "2026-06-30T05:54:09.338Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-30T05:54:09.338Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_c876540c-0f52-4ba9-85fd-d3476d23b7eb",
+      "name": "company-brain",
+      "displayName": "Company Brain",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "The founder's chief of staff — remembers everything and coordinates the entire company.",
+      "capabilities": [
+        "Remember every project, agent, department, workflow, connector, skill, artifact and decision",
+        "Recommend improvements based on accumulated company history",
+        "Prevent duplicate work by detecting reusable components and overlapping efforts",
+        "Allocate work intelligently and route tasks to the best-fit agents",
+        "Maintain long-term company intelligence and surface it on demand"
+      ],
+      "dependencies": [
+        "master-planner",
+        "opportunity-ranking",
+        "project-manager",
+        "reality-checker",
+        "solution-architect"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "leadership",
+        "brain",
+        "permanent"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/company-brain.md",
+      "blueprintId": "company-brain",
+      "blueprintHash": "8f0046ceadd81428",
+      "createdAt": "2026-06-30T05:54:09.354Z",
+      "updatedAt": "2026-06-30T05:54:09.354Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-06-30T05:54:09.354Z",
           "action": "created"
         }
       ]
