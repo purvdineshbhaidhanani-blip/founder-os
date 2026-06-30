@@ -15,6 +15,8 @@ import type { CollectedItem, CollectorSource } from "../types.js";
 import { loadCredentials } from "./env-loader.js";
 import { deduplicate } from "./deduplicator.js";
 import { ResearchStore } from "./research-store.js";
+import { AnalysisPipeline } from "./analysis-pipeline.js";
+import { SessionPersistence } from "./session-persistence.js";
 import type {
   ResearchPeriod,
   ResearchPeriodPreset,
@@ -22,6 +24,7 @@ import type {
   SourceStats,
 } from "./types.js";
 import { researchPeriodFromPreset, researchPeriodCustom } from "./types.js";
+import type { AnalysisResult } from "./analysis-types.js";
 
 // ---------------------------------------------------------------------------
 // Research Runner — production research session executor
@@ -43,19 +46,32 @@ export interface ResearchRunnerConfig {
   minClusterSize?: number;
   /** Called when a source finishes. */
   onSourceComplete?: (source: CollectorSource, stats: SourceStats) => void;
+  /** Whether to run the full analysis pipeline after collection. Default: true. */
+  runAnalysis?: boolean;
+}
+
+export interface ResearchRunResult {
+  session: ResearchSession;
+  analysis: AnalysisResult | null;
 }
 
 export class ResearchRunner {
   private readonly registry: CollectorRegistry;
   private readonly opportunityStore: OpportunityStore;
   readonly researchStore: ResearchStore;
+  readonly analysisPipeline: AnalysisPipeline;
+  private readonly persistence: SessionPersistence;
 
   constructor(
     opportunityStore?: OpportunityStore,
     researchStore?: ResearchStore,
+    analysisPipeline?: AnalysisPipeline,
+    cwd?: string,
   ) {
     this.opportunityStore = opportunityStore ?? new OpportunityStore();
     this.researchStore = researchStore ?? new ResearchStore();
+    this.analysisPipeline = analysisPipeline ?? new AnalysisPipeline();
+    this.persistence = new SessionPersistence(cwd ?? process.cwd());
     this.registry = new CollectorRegistry();
     this.registerCollectors();
   }
@@ -71,6 +87,11 @@ export class ResearchRunner {
   }
 
   async run(config: ResearchRunnerConfig = {}): Promise<ResearchSession> {
+    const { session } = await this.runFull(config);
+    return session;
+  }
+
+  async runFull(config: ResearchRunnerConfig = {}): Promise<ResearchRunResult> {
     const sessionId = generateId("session");
     const startedAt = nowIso();
     const startMs = Date.now();
@@ -197,11 +218,25 @@ export class ResearchRunner {
         : "completed";
 
     this.researchStore.save(session);
-    return session;
+
+    // Run full analysis pipeline (unless explicitly disabled)
+    let analysis: AnalysisResult | null = null;
+    if (config.runAnalysis !== false && upserted.length > 0) {
+      analysis = await this.analysisPipeline.run(this.opportunityStore, sessionId);
+    }
+
+    // Persist to disk
+    this.persistence.save(session, analysis);
+
+    return { session, analysis };
   }
 
   getOpportunityStore(): OpportunityStore {
     return this.opportunityStore;
+  }
+
+  getPersistence(): SessionPersistence {
+    return this.persistence;
   }
 }
 

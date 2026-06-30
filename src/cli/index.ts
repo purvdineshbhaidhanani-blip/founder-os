@@ -9,6 +9,7 @@ import { generateCommand } from "./commands/generate.js";
 import { validateCommand } from "./commands/validate.js";
 import { registryCommand } from "./commands/registry.js";
 import { templateCommand } from "./commands/template.js";
+import { researchCommand } from "./commands/research.js";
 
 export function buildCli(): Command {
   const program = new Command();
@@ -27,6 +28,7 @@ export function buildCli(): Command {
   program.addCommand(validateCommand);
   program.addCommand(registryCommand);
   program.addCommand(templateCommand);
+  program.addCommand(researchCommand);
 
   return program;
 }
