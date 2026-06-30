@@ -1,0 +1,14 @@
+export { RedditCollector } from "./reddit.js";
+export { GitHubIssuesCollector } from "./github-issues.js";
+export { GitHubDiscussionsCollector } from "./github-discussions.js";
+export { StackOverflowCollector } from "./stackoverflow.js";
+export { ProductHuntCollector } from "./product-hunt.js";
+export { HackerNewsCollector } from "./hacker-news.js";
+export { G2Collector } from "./g2.js";
+export { CapterraCollector } from "./capterra.js";
+export { TrustpilotCollector } from "./trustpilot.js";
+export { GooglePlayCollector } from "./google-play.js";
+export { AppleStoreCollector } from "./apple-store.js";
+export { YouTubeCollector } from "./youtube.js";
+export { ProfessionalBlogsCollector } from "./professional-blogs.js";
+export { ProfessionalForumsCollector } from "./professional-forums.js";
