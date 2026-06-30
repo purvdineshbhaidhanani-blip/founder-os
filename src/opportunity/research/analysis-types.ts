@@ -1,5 +1,6 @@
 import type { CourtDecision, CourtVerdict } from "../decision/types.js";
 import type { OpportunityIntelligence } from "../intelligence/types.js";
+import type { BusinessBlueprint } from "../blueprint/types.js";
 import type { Opportunity } from "../types.js";
 
 // ---------------------------------------------------------------------------
@@ -11,6 +12,8 @@ export interface RankedOpportunity {
   opportunity: Opportunity;
   intelligence: OpportunityIntelligence;
   decision: CourtDecision;
+  /** Business Blueprint — generated for non-rejected opportunities */
+  blueprint?: BusinessBlueprint;
   /** Composite ranking score: 0–1 */
   finalScore: number;
 }
@@ -19,6 +22,11 @@ export interface RankedOpportunity {
 // Analysis stats
 // ---------------------------------------------------------------------------
 
+export interface BlueprintStats {
+  generated: number;
+  skipped: number;
+}
+
 export interface AnalysisStats {
   opportunitiesAnalyzed: number;
   opportunitiesAccepted: number;
@@ -26,6 +34,7 @@ export interface AnalysisStats {
   verdictBreakdown: Partial<Record<CourtVerdict, number>>;
   avgConfidence: number;
   durationMs: number;
+  blueprints: BlueprintStats;
 }
 
 // ---------------------------------------------------------------------------

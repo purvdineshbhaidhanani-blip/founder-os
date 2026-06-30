@@ -17,6 +17,9 @@ import { deduplicate } from "./deduplicator.js";
 import { ResearchStore } from "./research-store.js";
 import { AnalysisPipeline } from "./analysis-pipeline.js";
 import { SessionPersistence } from "./session-persistence.js";
+import { ConnectorHealthTracker } from "./connector-health.js";
+import { OpportunityHistoryTracker } from "./opportunity-history.js";
+import { CheckpointManager } from "./checkpoint.js";
 import type {
   ResearchPeriod,
   ResearchPeriodPreset,
@@ -48,6 +51,16 @@ export interface ResearchRunnerConfig {
   onSourceComplete?: (source: CollectorSource, stats: SourceStats) => void;
   /** Whether to run the full analysis pipeline after collection. Default: true. */
   runAnalysis?: boolean;
+  /**
+   * Restrict which sources to run. Useful for retrying specific failed sources.
+   * Default: all registered sources.
+   */
+  enabledSources?: CollectorSource[];
+  /**
+   * Session ID to resume from checkpoint.
+   * If set, already-completed sources in the checkpoint are skipped.
+   */
+  resumeSessionId?: string;
 }
 
 export interface ResearchRunResult {
@@ -61,6 +74,10 @@ export class ResearchRunner {
   readonly researchStore: ResearchStore;
   readonly analysisPipeline: AnalysisPipeline;
   private readonly persistence: SessionPersistence;
+  private readonly healthTracker: ConnectorHealthTracker;
+  private readonly oppHistory: OpportunityHistoryTracker;
+  private readonly checkpointMgr: CheckpointManager;
+  private readonly cwd: string;
 
   constructor(
     opportunityStore?: OpportunityStore,
@@ -68,22 +85,25 @@ export class ResearchRunner {
     analysisPipeline?: AnalysisPipeline,
     cwd?: string,
   ) {
+    this.cwd = cwd ?? process.cwd();
     this.opportunityStore = opportunityStore ?? new OpportunityStore();
     this.researchStore = researchStore ?? new ResearchStore();
     this.analysisPipeline = analysisPipeline ?? new AnalysisPipeline();
-    this.persistence = new SessionPersistence(cwd ?? process.cwd());
+    this.persistence = new SessionPersistence(this.cwd);
+    this.healthTracker = new ConnectorHealthTracker(this.cwd);
+    this.oppHistory = new OpportunityHistoryTracker(this.cwd);
+    this.checkpointMgr = new CheckpointManager(this.cwd);
     this.registry = new CollectorRegistry();
     this.registerCollectors();
   }
 
   private registerCollectors(): void {
-    // The 5 production connectors required by Phase 6A:
     this.registry.register(new GitHubIssuesCollector());
     this.registry.register(new GitHubDiscussionsCollector());
-    this.registry.register(new HackerNewsCollector());       // no auth needed
-    this.registry.register(new StackOverflowCollector());    // optional key
-    this.registry.register(new YouTubeCollector());          // needs YOUTUBE_API_KEY
-    this.registry.register(new ProfessionalBlogsCollector()); // RSS, no auth
+    this.registry.register(new HackerNewsCollector());
+    this.registry.register(new StackOverflowCollector());
+    this.registry.register(new YouTubeCollector());
+    this.registry.register(new ProfessionalBlogsCollector());
   }
 
   async run(config: ResearchRunnerConfig = {}): Promise<ResearchSession> {
@@ -92,7 +112,7 @@ export class ResearchRunner {
   }
 
   async runFull(config: ResearchRunnerConfig = {}): Promise<ResearchRunResult> {
-    const sessionId = generateId("session");
+    const sessionId = config.resumeSessionId ?? generateId("session");
     const startedAt = nowIso();
     const startMs = Date.now();
 
@@ -103,11 +123,16 @@ export class ResearchRunner {
         : researchPeriodFromPreset(config.preset ?? "30d"));
 
     // Load credentials from .env.local / process.env
-    const creds = loadCredentials(config.cwd);
-
-    // Build per-collector config options
+    const creds = loadCredentials(config.cwd ?? this.cwd);
     const limitPerSource = config.limitPerSource ?? 30;
     const collectorOptions = buildCollectorOptions(creds);
+
+    // Load checkpoint if resuming
+    const checkpoint = config.resumeSessionId
+      ? this.checkpointMgr.load(config.resumeSessionId)
+      : undefined;
+    const alreadyDone = new Set<CollectorSource>(checkpoint?.completedSources ?? []);
+    const priorItems: CollectedItem[] = checkpoint?.collectedItems ?? [];
 
     const session: ResearchSession = {
       sessionId,
@@ -121,19 +146,29 @@ export class ResearchRunner {
       totalOpportunitiesUpserted: 0,
       durationMs: 0,
       sourceStats: [],
-      successfulSources: [],
+      successfulSources: checkpoint?.completedSources ?? [],
       failedSources: [],
       errors: [],
     };
 
     this.researchStore.save(session);
 
-    const allItems: CollectedItem[] = [];
+    const allItems: CollectedItem[] = [...priorItems];
     const sourceStatsList: SourceStats[] = [];
 
-    // Run all collectors in parallel — failure in one does not stop others
-    const collectors = this.registry.list();
-    const tasks = collectors.map(async (collector) => {
+    // Determine which collectors to run
+    let collectors = this.registry.list();
+    if (config.enabledSources && config.enabledSources.length > 0) {
+      const enabled = new Set(config.enabledSources);
+      collectors = collectors.filter((c) => enabled.has(c.source));
+    }
+    // Skip already-completed sources from checkpoint
+    const pendingCollectors = collectors.filter((c) => !alreadyDone.has(c.source));
+
+    const sessionAt = startedAt;
+
+    // Run pending collectors in parallel — failure in one does not stop others
+    const tasks = pendingCollectors.map(async (collector) => {
       const t0 = Date.now();
       const opts = collectorOptions[collector.source] ?? {};
       const credentialed = hasCredential(collector.source, creds);
@@ -148,8 +183,8 @@ export class ResearchRunner {
         const stats: SourceStats = {
           source: collector.source,
           itemsCollected: result.items.length,
-          itemsDeduplicated: 0,  // filled after global dedup
-          signalsExtracted: 0,    // filled after signal extraction
+          itemsDeduplicated: 0,
+          signalsExtracted: 0,
           errors: result.errors,
           durationMs: Date.now() - t0,
           credentialed,
@@ -157,13 +192,25 @@ export class ResearchRunner {
 
         allItems.push(...result.items);
         sourceStatsList.push(stats);
-        config.onSourceComplete?.(collector.source, stats);
 
         if (result.errors.length > 0 && result.items.length === 0) {
           session.failedSources.push(collector.source);
         } else {
           session.successfulSources.push(collector.source);
         }
+
+        // Save checkpoint after each successful source
+        this.checkpointMgr.save({
+          sessionId,
+          period,
+          limitPerSource,
+          completedSources: [...session.successfulSources],
+          collectedItems: allItems,
+          failedSources: [...session.failedSources],
+          savedAt: nowIso(),
+        });
+
+        config.onSourceComplete?.(collector.source, stats);
       } catch (err) {
         const errMsg = err instanceof Error ? err.message : String(err);
         const stats: SourceStats = {
@@ -184,6 +231,9 @@ export class ResearchRunner {
 
     await Promise.all(tasks);
 
+    // Update connector health for this run
+    this.healthTracker.update(sourceStatsList, sessionAt);
+
     // Deduplicate across all sources
     const { items: uniqueItems, duplicatesRemoved } = deduplicate(allItems);
 
@@ -203,6 +253,8 @@ export class ResearchRunner {
     const upserted = clusters.map((c) => this.opportunityStore.upsert(c, uniqueItems));
 
     // Finalize session
+    const totalCollectors = collectors.length;
+    const totalFailed = session.failedSources.length;
     const durationMs = Date.now() - startMs;
     session.totalItemsCollected = allItems.length;
     session.totalItemsAfterDedup = uniqueItems.length;
@@ -211,9 +263,9 @@ export class ResearchRunner {
     session.durationMs = durationMs;
     session.sourceStats = sourceStatsList;
     session.completedAt = nowIso();
-    session.status = session.failedSources.length === collectors.length
+    session.status = totalFailed === totalCollectors && pendingCollectors.length > 0
       ? "failed"
-      : session.failedSources.length > 0
+      : totalFailed > 0
         ? "partial"
         : "completed";
 
@@ -223,10 +275,17 @@ export class ResearchRunner {
     let analysis: AnalysisResult | null = null;
     if (config.runAnalysis !== false && upserted.length > 0) {
       analysis = await this.analysisPipeline.run(this.opportunityStore, sessionId);
+      // Track opportunity history
+      this.oppHistory.record(analysis);
     }
 
     // Persist to disk
     this.persistence.save(session, analysis);
+
+    // Clear checkpoint on successful or partial completion
+    if (session.status !== "failed") {
+      this.checkpointMgr.clear(sessionId);
+    }
 
     return { session, analysis };
   }
@@ -237,6 +296,18 @@ export class ResearchRunner {
 
   getPersistence(): SessionPersistence {
     return this.persistence;
+  }
+
+  getHealthTracker(): ConnectorHealthTracker {
+    return this.healthTracker;
+  }
+
+  getOpportunityHistory(): OpportunityHistoryTracker {
+    return this.oppHistory;
+  }
+
+  getCheckpointManager(): CheckpointManager {
+    return this.checkpointMgr;
   }
 }
 
@@ -269,5 +340,5 @@ function hasCredential(source: CollectorSource, creds: ReturnType<typeof loadCre
   if (source === "github-issues" || source === "github-discussions") return !!creds.githubToken;
   if (source === "youtube") return !!creds.youtubeApiKey;
   if (source === "stackoverflow") return !!creds.stackexchangeApiKey;
-  return true;  // HN, blogs, forums need no credential
+  return true;
 }

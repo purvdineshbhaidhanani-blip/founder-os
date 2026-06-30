@@ -99,4 +99,49 @@ export class SessionPersistence {
       return 0;
     }
   }
+
+  /**
+   * Champion opportunity — highest finalScore top opportunity across all
+   * sessions that have an analysis result.
+   */
+  getChampion(): { record: PersistedResearchRecord; finalScore: number } | undefined {
+    const analyzed = this.listAnalyzed();
+    let best: { record: PersistedResearchRecord; finalScore: number } | undefined;
+    for (const r of analyzed) {
+      const top = r.analysis?.topOpportunity;
+      if (!top) continue;
+      if (!best || top.finalScore > best.finalScore) {
+        best = { record: r, finalScore: top.finalScore };
+      }
+    }
+    return best;
+  }
+
+  /**
+   * Search opportunities across all sessions by keyword.
+   * Returns matched ranked opportunities with their session context.
+   */
+  search(
+    query: string,
+    opts: { maxResults?: number; sessionId?: string } = {},
+  ): Array<{ sessionId: string; rank: import("./analysis-types.js").RankedOpportunity }> {
+    const lq = query.toLowerCase();
+    const records = opts.sessionId
+      ? [this.load(opts.sessionId)].filter(Boolean) as PersistedResearchRecord[]
+      : this.listAnalyzed();
+
+    const results: Array<{ sessionId: string; rank: import("./analysis-types.js").RankedOpportunity }> = [];
+    for (const r of records) {
+      if (!r.analysis) continue;
+      for (const ranked of r.analysis.all) {
+        const text = ranked.opportunity.problemSummary.toLowerCase();
+        if (text.includes(lq)) {
+          results.push({ sessionId: r.session.sessionId, rank: ranked });
+        }
+      }
+    }
+
+    const max = opts.maxResults ?? 20;
+    return results.slice(0, max);
+  }
 }

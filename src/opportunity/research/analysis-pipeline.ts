@@ -1,11 +1,12 @@
 import { generateId, nowIso } from "../../utils/id.js";
 import { scoreOpportunity } from "../intelligence/scorer.js";
 import { runDecisionCourt } from "../decision/court.js";
+import { generateBlueprint } from "../blueprint/blueprint-engine.js";
 import { IntelligenceDatabase } from "../intelligence/database.js";
 import { DecisionHistory } from "../decision/decision-history.js";
 import type { OpportunityStore } from "../opportunity-store.js";
 import type { CourtVerdict } from "../decision/types.js";
-import type { RankedOpportunity, AnalysisResult, AnalysisStats } from "./analysis-types.js";
+import type { RankedOpportunity, AnalysisResult, AnalysisStats, BlueprintStats } from "./analysis-types.js";
 
 // ---------------------------------------------------------------------------
 // Verdict ranking weight — drives final score tiebreaking
@@ -22,7 +23,7 @@ const VERDICT_WEIGHT: Record<CourtVerdict, number> = {
 // ---------------------------------------------------------------------------
 // Analysis Pipeline
 // Takes opportunities from an OpportunityStore, runs the full Intelligence +
-// Decision Court pipeline, ranks results, and returns an AnalysisResult.
+// Decision Court + Business Blueprint pipeline, ranks results, returns AnalysisResult.
 // ---------------------------------------------------------------------------
 
 export class AnalysisPipeline {
@@ -47,6 +48,7 @@ export class AnalysisPipeline {
 
     const opportunities = opportunityStore.list();
     const ranked: RankedOpportunity[] = [];
+    let blueprintsGenerated = 0;
 
     for (const opportunity of opportunities) {
       const intelligence = scoreOpportunity(opportunity);
@@ -61,11 +63,19 @@ export class AnalysisPipeline {
         decision.confidence * 0.4 +
         vw * 0.2;
 
+      // Generate Business Blueprint for accepted, non-rejected opportunities
+      let blueprint = undefined;
+      if (!intelligence.rejected && decision.verdict !== "REJECT") {
+        blueprint = generateBlueprint(intelligence, decision);
+        blueprintsGenerated++;
+      }
+
       ranked.push({
         rank: 0,  // assigned below after sort
         opportunity,
         intelligence,
         decision,
+        blueprint,
         finalScore,
       });
     }
@@ -93,6 +103,11 @@ export class AnalysisPipeline {
         ? ranked.reduce((s, r) => s + r.intelligence.overallConfidence, 0) / ranked.length
         : 0;
 
+    const blueprintStats: BlueprintStats = {
+      generated: blueprintsGenerated,
+      skipped: ranked.length - blueprintsGenerated,
+    };
+
     const stats: AnalysisStats = {
       opportunitiesAnalyzed: ranked.length,
       opportunitiesAccepted: accepted.length,
@@ -100,6 +115,7 @@ export class AnalysisPipeline {
       verdictBreakdown,
       avgConfidence,
       durationMs: Date.now() - t0,
+      blueprints: blueprintStats,
     };
 
     const evidenceSummary = buildEvidenceSummary(top10);
