@@ -11,3 +11,4 @@ export * from "./intelligence/index.js";
 export * from "./decision/index.js";
 export * from "./blueprint/index.js";
 export * from "./runtime/index.js";
+export * from "./research/index.js";
