@@ -1,0 +1,412 @@
+{
+  "$schema": "product-discovery-package/v1",
+  "subject": "AI Expense Tracker for Students",
+  "generatedAt": "2026-07-01T00:00:00.000Z",
+  "packageOwner": "product-discovery-report-generator",
+  "handoffTarget": "Architecture Department",
+
+  "executiveSummary": "Discovery converged on a single defensible wedge: pacing a lump-sum financial-aid refund into a per-week 'safe-to-spend' number for aid-dependent US undergraduates ('Refund-Runway Rae'), delivered ambiently (low/no engagement required) rather than as an active budgeting dashboard. This wedge is well-evidenced at the population level (MDRC RCT, Hope Center, NASFAA literacy data) and has a clear competitive gap (no incumbent paces a lump-sum refund). However, the entire user-side evidence base is SECONDARY/DESK RESEARCH ONLY — no primary interviews were conducted (user-research-agent self-rated confidence 0.48) — and two load-bearing issues are unresolved: (1) a documented CONTRADICTION between the anxiety that motivates the product and the avoidance behavior that could prevent anyone from ever opening or trusting it, and (2) LOW direct-consumer willingness-to-pay in the primary (aid-dependent) segment, pushing the business model toward an unproven B2B2C institutional channel with a multi-month sales cycle. Recommendation: proceed to a narrow, manual-entry-only MVP (no bank linking, no SOC2 scope, no institutional integration) explicitly designed as a validation vehicle for the anxiety/avoidance and bundle-demand questions, gated on running real primary interviews (n>=5 per persona) before any institutional or bank-integration investment.",
+
+  "problemStatement": {
+    "core": "Undergraduate and graduate students (~18-24, including international students) must self-manage money for the first time on irregular income (part-time wages + lump-sum financial-aid refunds disbursed once or twice a term) while lacking budgeting skills. This produces measurable harm: ~68% of students run out of money at least once a year (1 in 5 do so 8+ times), 59% have considered dropping out over money, ~80% report financial stress harms mental health, ~16% say it directly harmed academic performance. The unmet need is not generic tracking but converting a large, front-loaded, lumpy inflow into a steady spendable amount ('runway pacing'), staying aware of small recurring drains, and reducing money anxiety — an emotional job as much as an arithmetic one.",
+    "wedgeStatement": "No mainstream budgeting app (YNAB, Rocket Money, Monarch, Copilot, PocketGuard, Goodbudget) models financial-aid disbursement cadence — turning a lump-sum refund into a paced 'runway to end of term' allowance is student-native and structurally unaddressed by incumbents.",
+    "problemSegments": [
+      { "segment": "Aid-dependent students on lump-sum disbursements", "severity": "high", "frequency": "acute 1-2x/term at disbursement, chronic daily" },
+      { "segment": "First-time money managers with no budgeting habit", "severity": "high", "frequency": "daily/continuous" },
+      { "segment": "Students sharing costs with roommates/friend groups", "severity": "medium", "frequency": "weekly to monthly" },
+      { "segment": "Subscription-heavy Gen Z spenders", "severity": "medium", "frequency": "monthly recurring, often unnoticed" },
+      { "segment": "International students (multi-currency)", "severity": "medium", "frequency": "continuous with remittance spikes" }
+    ],
+    "confidence": 0.74,
+    "sourceAgents": ["problem-discovery-agent", "idea-validator"]
+  },
+
+  "targetAudience": {
+    "primaryPersona": {
+      "name": "Refund-Runway Rae (Aid-Dependent, Lump-Sum Disbursement)",
+      "description": "US undergraduate, 18-24, Pell-eligible/receives lump-sum aid refund at least once per term, part-time wage income, first-time money manager, high financial anxiety, feast-or-famine spending pattern.",
+      "willingnessToPay": "LOW absolute WTP but real need; monetization more likely via B2B2C (institutional) than direct consumer subscription."
+    },
+    "secondaryPersonas": [
+      { "name": "First-Budget Finn", "description": "First-time money manager, 18-20, adopts free apps readily, churns fast, WTP spent on entertainment not finance." },
+      { "name": "Splitwise Sam", "description": "Cost-sharing roommate/friend-group user; strongest existing paid-market proof (Splitwise Pro, ~35M users) but a siloed job from personal budgeting." },
+      { "name": "Subscription-Stack Sky", "description": "Subscription-heavy Gen Z spender; ~8+ subscriptions, clearest 'save-me-money' ROI hook; moderate-to-high relative WTP." },
+      { "name": "Currency-Crossing Camila", "description": "International student; multi-currency budgeting, forex/remittance pain, no US credit history; smaller segment, higher per-user need." }
+    ],
+    "sourceAgents": ["target-audience-agent"],
+    "confidence": 0.72
+  },
+
+  "icp": {
+    "description": "A US undergraduate (18-22) who receives a lump-sum financial-aid refund each term AND earns irregular part-time wages, is a first-time money manager, and already pays for consumer subscriptions (proving WTP exists elsewhere) — giving both acute lump-sum-runway pain and a 'save-me-money-on-subscriptions' monetization hook. Reachable via campus financial-aid offices and first-year onboarding.",
+    "criteria": [
+      "Enrolled undergraduate, age 18-22, in the US",
+      "Pell-eligible / receives lump-sum aid refund at least once per term",
+      "Has part-time wage income (irregular cash flow)",
+      "No established budgeting habit (first-time manager)",
+      "Holds multiple paid subscriptions (WTP proxy)",
+      "Smartphone-first, comfortable with AI-driven automation",
+      "Reachable via financial-aid office, first-year seminars, or campus partnerships"
+    ],
+    "sizingRationale": "Pell recipients used as best available proxy for lump-sum-refund dependence (exact refund population unmeasured).",
+    "sourceAgents": ["target-audience-agent"]
+  },
+
+  "tam": {
+    "value": "~$1.5B-$1.85B narrow US-addressable share of global budgeting-app segment (global $1.5-1.85B in 2024, NA ~35% share). Broad ceiling: global personal-finance-apps market ~$31.7B (2025) — flagged as too broad to be load-bearing.",
+    "reliabilityNote": "Estimates vary 5-10x across analyst firms ($421M-$1.85B) due to inconsistent market definitions.",
+    "sourceAgents": ["market-research-agent"]
+  },
+  "sam": {
+    "value": "~$150M-$300M/yr revenue-serviceable (US student-focused budgeting), built bottom-up from ~8-10M reachable aid-dependent students across two revenue streams: D2C freemium (~$100-200M ceiling) and B2B2C institutional (~$7.5-100M range).",
+    "sourceAgents": ["market-research-agent"]
+  },
+  "som": {
+    "value": "~$0.3M-$1.2M ARR by end of Year 1; ~$1.5M-$5M ARR by end of Year 2 (conservative, logo-driven via institutional channel, not consumer conversion).",
+    "sourceAgents": ["market-research-agent", "business-model-agent"]
+  },
+
+  "competitorAnalysis": {
+    "directCompetitors": [
+      { "name": "YNAB", "threatLevel": "high", "gap": "Rigid zero-based budgeting for salaried adults; no aid-refund/irregular-income modeling; free student year is acquisition not retention." },
+      { "name": "Cleo AI", "threatLevel": "high", "gap": "Engagement-maximizing gamified chatbot; FTC $17M settlement (Mar 2025) for deceptive cash-advance/cancellation practices — opposite of ambient/trust positioning needed here." },
+      { "name": "Finny", "threatLevel": "high", "gap": "Closest philosophical competitor: privacy-first, no bank-link, student/traveler oriented, multi-currency — but education-first, not refund-runway-paced." },
+      { "name": "PocketGuard", "threatLevel": "medium", "gap": "Simplicity-first 'one number' concept close to ambient design, but minimal AI, no aid-refund pacing." },
+      { "name": "Goodbudget", "threatLevel": "low", "gap": "No AI, manual envelope system, feels dated." }
+    ],
+    "indirectCompetitors": [
+      { "name": "Rocket Money", "threatLevel": "medium" },
+      { "name": "Monarch Money", "threatLevel": "medium", "gap": "Priced/positioned for affluent adults; mismatched to Pell-eligible students." },
+      { "name": "Copilot Money", "threatLevel": "low", "gap": "Best-in-class AI categorization but Apple-only, premium-priced, no student features." },
+      { "name": "Splitwise", "threatLevel": "high", "gap": "35M+ users, owns shared/roommate bill-splitting outright — high threat if it adds budgeting; recommend NOT competing here." }
+    ],
+    "keyGaps": [
+      "Term-runway pacing of lump-sum aid refunds: NO incumbent converts a one-time disbursement into a per-week/per-month runway.",
+      "Unified personal-budget + split-expenses: Splitwise owns splitting, siloed from budgeting.",
+      "Native irregular/lumpy income modeling: every incumbent assumes steady monthly income.",
+      "Emotional/avoidance job unaddressed without upselling debt-like products (Cleo's approach was FTC-sanctioned).",
+      "Price-and-privacy fit for Pell-eligible users: strongest tools too expensive ($75-199/yr); cheap/free tools lack aid-runway/split integration."
+    ],
+    "sourceAgents": ["competitor-intelligence-agent"],
+    "confidence": 0.78
+  },
+
+  "swot": {
+    "strengths": [
+      "Defensible wedge feature (aid-refund runway pacing) no incumbent offers",
+      "AI-native input/coaching combined with budgeting engine (neither Cleo nor Finny fully deliver this)",
+      "Can unify budgeting + splitting, currently split across two apps (though deferred at launch)",
+      "ICP-native design vs incumbents built for salaried adults"
+    ],
+    "weaknesses": [
+      "No brand, funding, or distribution vs YNAB, Rocket Money, Splitwise (35M users), Monarch",
+      "Bank-link trust/Plaid coverage costly; privacy-first no-link approach sacrifices auto-tracking",
+      "Low WTP and high churn (graduation) pressuring monetization",
+      "AI coaching invites same regulatory scrutiny that hit Cleo (FTC)"
+    ],
+    "opportunities": [
+      "Mint's 2024 shutdown (3.6M+ displaced users) left an unowned free/beginner tier",
+      "YNAB's free student year is acquisition not retention — students churn at graduation, dislike learning curve",
+      "Campus/financial-aid-office and .edu distribution tied to disbursement calendars",
+      "Multi-currency underserved for international students"
+    ],
+    "threats": [
+      "Splitwise adding budgeting, or Cleo/Monarch deepening AI + student SKU, erases the wedge",
+      "YNAB's free student year undercuts price-based entry",
+      "Incumbents already ship real AI; 'AI-native' framing alone is not durably unique",
+      "JPMorgan/BofA agentic banking assistants embedding in-app savings advice may close the wedge within 18-24 months",
+      "Regulatory risk on AI financial advice/cash-advance monetization aimed at young adults",
+      "Bank data-access fees (JPMorgan-Plaid precedent, up to ~$300M/yr for Plaid) threaten unit economics for high-frequency polling needed for runway pacing",
+      "CFPB Section 1033 open-banking rule stayed/under rewrite — legal 'right to data' uncertain"
+    ],
+    "sourceAgents": ["competitor-intelligence-agent", "trend-intelligence-agent"]
+  },
+
+  "userPersonas": [
+    { "name": "Refund-Runway Rae", "role": "primary", "keyPain": "No tool converts lump-sum refund into per-week/per-month term runway; runs out of money before next disbursement." },
+    { "name": "First-Budget Finn", "role": "secondary", "keyPain": "Doesn't know how to start a budget; existing apps assume prior financial literacy." },
+    { "name": "Splitwise Sam", "role": "secondary", "keyPain": "Shared costs live in Splitwise; personal budget lives elsewhere — no unified view." },
+    { "name": "Subscription-Stack Sky", "role": "secondary", "keyPain": "Loses money to forgotten/unwanted subscriptions." },
+    { "name": "Currency-Crossing Camila", "role": "secondary", "keyPain": "Multi-currency budgeting and forex-fee tracking; no US credit history." }
+  ],
+
+  "painPoints": [
+    { "pain": "Lump-sum refunds are not paced to term length; students spend early and run short before next disbursement.", "evidenceStrength": "confirmed (multiple independent surveys, MDRC RCT)" },
+    { "pain": "Financial anxiety triggers avoidance rather than action — students don't open budgeting tools when stressed.", "evidenceStrength": "confirmed at population level; CONTRADICTS product-adoption assumption (see riskReport)" },
+    { "pain": "Low baseline financial literacy — students don't know how to budget or interpret aid vs loan money.", "evidenceStrength": "confirmed (NASFAA, Forbes, Inside Higher Ed)" },
+    { "pain": "Splitting shared costs with roommates causes conflict and awkwardness (73% argued about shared expenses).", "evidenceStrength": "confirmed as real pain; unconfirmed whether it should bundle with budgeting" },
+    { "pain": "Forgotten/unused subscriptions silently drain limited student budgets (~$276/yr wasted, 55% forget).", "evidenceStrength": "confirmed" },
+    { "pain": "Distrust of AI/finance-influencer content could suppress adoption of an AI expense tracker.", "evidenceStrength": "inferred, not directly evidenced for AI budgeting tools specifically" }
+  ],
+
+  "jobsToBeDone": [
+    "When I receive a lump-sum aid/loan refund at the start of the term, I want to know how much I can safely spend per week, so I can make the money last until the next disbursement instead of running out mid-semester.",
+    "When I'm managing my own money for the first time, I want simple guidance on where my money is going, so I can build a budgeting habit without feeling overwhelmed.",
+    "When I share rent, utilities and groceries with roommates, I want a fair, transparent record of who owes what, so I can settle up without awkward money conversations or arguments.",
+    "When I sign up for streaming/app subscriptions, I want to be reminded of what I'm still paying for, so I can cancel the ones I forgot and stop wasting money.",
+    "When I look for money advice, I want a source I can actually trust, so I don't get burned by acting on low-quality financial content."
+  ],
+
+  "uniqueValueProposition": "Against YNAB (rigid zero-based budgeting built for salaried adults), Cleo (engagement-maximizing, gamified chat under FTC scrutiny for dark patterns), and Finny (financial-literacy education, not operational cash-flow tooling): the defensible edge is being the only tool that natively models a lump-sum aid refund as a depleting term runway and delivers the answer passively — one 'safe-to-spend' number, no daily categorization required. None of the three incumbents solves aid-refund runway pacing.",
+
+  "productPositioning": {
+    "statement": "For financially anxious college students living off lump-sum aid refunds, [Product] is the runway tracker that tells you exactly how much you can safely spend this week so your refund lasts the whole term — without the daily budgeting homework other apps demand. Unlike engagement-driven finance apps, it works quietly in the background and respects your privacy, because we make money when your refund lasts, not when you open the app.",
+    "productVision": "Every student who receives a lump-sum aid refund should feel calm confidence about money lasting the whole term — a quiet number they can trust, not a spreadsheet.",
+    "coreCompetencies": [
+      "Refund-pacing engine (lump-sum -> rolling per-week safe-to-spend, self-correcting)",
+      "Ambient/low-touch UX tuned against anxiety-avoidance rather than for daily engagement",
+      "Passive bank-transaction ingestion and auto-classification (deferred post-MVP)",
+      "Institutional distribution and integration (financial-aid offices, SSO/roster-aware)",
+      "Trust and security posture: SOC2 Type II as both deal prerequisite and brand pillar",
+      "Academic-calendar and aid-disbursement domain modeling"
+    ],
+    "sourceAgents": ["opportunity-discovery-agent", "product-strategy-agent"]
+  },
+
+  "featurePriority": {
+    "P0": [
+      { "name": "Academic-calendar & aid-disbursement term modeling (manual/guided setup)", "riceScore": 130.7 },
+      { "name": "Refund-pacing runway engine (per-week safe-to-spend number)", "riceScore": 113.4 },
+      { "name": "Ambient one-number surface (low-touch home view + passive nudge)", "riceScore": 108.0 },
+      { "name": "Passive bank-transaction ingestion + auto-classification", "riceScore": 72.0, "note": "P0-scored but EXCLUDED from actual MVP build scope by mvp-planning-agent due to technical/compliance risk; sequenced to v1.1" }
+    ],
+    "P1": [
+      { "name": "Predictive shortfall alerts", "riceScore": 76.8 },
+      { "name": "Subscription detection & cancel-reminder ('save-me-money' hook)", "riceScore": 61.3 },
+      { "name": "Institutional onboarding: SSO + roster-aware deployment", "riceScore": 54.0 },
+      { "name": "SOC2 Type II compliance & student-data privacy posture", "riceScore": 42.0 }
+    ],
+    "P2": [
+      { "name": "First-timer budgeting scaffolding / light literacy guidance", "riceScore": 52.5 },
+      { "name": "Student Plus tier depth (personalization, safety-cushion goals, export)", "riceScore": 31.3 },
+      { "name": "Institutional analytics dashboard (anonymized outcome reporting)", "riceScore": 30.0 },
+      { "name": "Multi-refund / multi-term & irregular-income modeling", "riceScore": 30.0 },
+      { "name": "Aid-disbursement / SIS integration (auto refund-schedule sync)", "riceScore": 22.5 }
+    ],
+    "explicitlyDeferredIndefinitely": [
+      { "name": "Expense splitting", "reason": "Splitwise owns the category (35M+ users); budget+split bundle demand is UNCONFIRMED per user-research-agent. Do not build without a dedicated validation experiment (e.g., fake-door/Splitwise-import test) proving it lifts core-runway retention." }
+    ],
+    "methodologyNote": "RICE scoring is ORDINAL/relative, not derived from a real funnel — no quantified reach-per-institution or engineering-effort inputs were supplied upstream. Treat ordering as directional.",
+    "sourceAgents": ["feature-planning-agent", "mvp-planning-agent"]
+  },
+
+  "mvpScope": {
+    "included": [
+      "Academic-calendar / aid-disbursement term modeling (manual/guided setup, not SIS-integrated)",
+      "Refund-pacing runway engine (self-correcting weekly safe-to-spend calculation)",
+      "Ambient one-number surface (low-touch home view, <=2 taps to reach)"
+    ],
+    "explicitlyExcluded": [
+      "Passive bank-transaction ingestion (highest technical/compliance risk; manual/guided input used instead to test if bank-linking is a hard requirement)",
+      "Institutional SSO onboarding (not needed for direct-to-student learning launch)",
+      "SOC2 compliance (deferred until bank ingestion or institutional distribution is pursued — flagged as a gating prerequisite at that point)",
+      "Predictive shortfall alerts (depends on a trustworthy runway signal being validated first)",
+      "Subscription detection (depends on transaction ingestion, out of v1)",
+      "All P2 items",
+      "Expense splitting (explicitly deferred, see featurePriority)"
+    ],
+    "estimatedTimeline": "~8-12 weeks order-of-magnitude ESTIMATE ONLY, explicitly PENDING FOUNDER/HUMAN APPROVAL — not a committed delivery date per upstream constraint.",
+    "launchCriteria": [
+      ">=80% guided-setup completion rate in usability testing without support intervention",
+      "Runway engine produces output for every completed setup with zero unhandled-error states across tested disbursement patterns",
+      "Ambient one-number surface reachable in <=2 taps from app open",
+      "Every included feature instrumented before launch (no dark features)",
+      "Manual/guided term model validated against real academic calendars for the pilot cohort",
+      "Defined, consented pilot cohort provisioned for data collection"
+    ],
+    "keyLearningExperiments": [
+      "Value hypothesis: does a single 'runway' number change how students perceive/manage aid money?",
+      "Input-friction hypothesis: will students tolerate manual/guided setup, or is passive bank ingestion actually a hard requirement?",
+      "Accuracy-trust hypothesis: does the runway figure match students' lived reality closely enough to be trusted?",
+      "Persona-fit hypothesis: is aid-disbursement/refund-pacing framing the right core problem for the primary persona vs general expense tracking?",
+      "Demand signal for deferred bundle: passively observe (do not build) whether users request splitting/subscription features."
+    ],
+    "sourceAgents": ["mvp-planning-agent", "user-story-generator"]
+  },
+
+  "v2Roadmap": [
+    "Passive bank-transaction ingestion + auto-classification (v1.1, once manual-entry demand is proven)",
+    "Predictive shortfall alerts (once pacing engine trust is established)",
+    "Subscription detection & cancel-reminder (monetization hook for Student Plus)",
+    "Institutional SSO onboarding + SOC2 Type II compliance (gates B2B2C channel)",
+    "First-timer budgeting scaffolding / light literacy guidance",
+    "Multi-refund / multi-term & irregular-income modeling (staggered disbursements, work-study income)",
+    "Aid-disbursement / SIS integration (auto refund-schedule sync, zero-setup at institutional scale)",
+    "Institutional analytics dashboard (anonymized outcome reporting for renewal/expansion)",
+    "Student Plus tier depth (personalization, safety-cushion goals, export)",
+    "DEFERRED INDEFINITELY, not scheduled: expense splitting — revisit only after a dedicated validation experiment proves retention lift"
+  ],
+
+  "pricingRecommendation": {
+    "model": "B2B2C-primary hybrid with a permanently-free direct student tier. Explicitly reject a Copilot/Monarch-style paid consumer subscription ($95-199/yr) as structurally mismatched to LOW WTP in the primary (Pell-eligible) audience.",
+    "tiers": [
+      { "name": "Student Free (forever)", "price": "$0", "purpose": "Removes WTP barrier; matches low-touch/ambient design; is the distribution asset, not a revenue line." },
+      { "name": "Student Plus (secondary segment only)", "price": "$1.99/mo or $17.99/yr (anchored to Finny)", "purpose": "Upside/validation signal for higher-WTP subscription-heavy Gen Z segment, NOT core Y1-Y2 ARR." },
+      { "name": "Institutional / Campus License (PRIMARY revenue)", "price": "$2-8 per enrolled student/year, tiered down by enrollment", "purpose": "Load-bearing revenue line; comparable to iGrad/Enrich ($2-10/student/yr, 600+ institutions)." }
+    ],
+    "unitEconomicsSummary": "A single mid-size campus contract (~10k students @ ~$3 = ~$30k ARR) outweighs consumer-conversion revenue from ~15,000+ free students at typical freemium rates. Break-even is logo-driven (institutional CAC $8k-20k/school), not consumer-conversion-driven.",
+    "keyCaveat": "iGrad/Enrich exact quote sheet is not public (403 on pricing page); the $2-10/student/yr band is aggregated-search-derived, not a verified rate card.",
+    "sourceAgents": ["pricing-strategy-agent"],
+    "confidence": 0.68
+  },
+
+  "businessModelRecommendation": {
+    "revenueStreams": [
+      "Institutional/Campus License (PRIMARY, recurring ARR)",
+      "Student Plus consumer subscription (SECONDARY, upside only)",
+      "Free-forever student tier (NON-revenue, distribution/land-and-expand asset)",
+      "UNVALIDATED, deferred: anonymized institutional reporting add-on; referral/affiliate revenue (flagged as high compliance/brand risk given trust-first positioning — recommend deferring)"
+    ],
+    "costStructure": {
+      "majorCategories": "People/payroll 60-70% of opex; S&M 30-50%+ of revenue early (institutional CAC $8k-20k/school, multi-month sales cycle); G&A 14-20%; COGS/Plaid-class aggregation ~$0.60-0.90/active user/mo early, ~$0.40 at scale; SOC2 Type II ~$25k-60k all-in Year 1, recurring annually.",
+      "complianceNote": "SOC2 is non-optional and a deal prerequisite for institutional sales; additional obligations include FERPA (student education records), GLBA/Safeguards Rule (financial data), and state privacy laws."
+    },
+    "breakEvenLogic": "Logo-driven, not consumer-conversion-driven. Plausibly requires ~15-40 signed institutional logos to cover SOC2 + baseline eng/hosting + S&M burn, landing in SOM Y2 range ($1.5-5M ARR). MODERATE confidence — precise logo count depends on a fully-loaded burn model not yet specified upstream.",
+    "cashFlowPositiveEstimate": "Realistically Year 2-3, gated by 6-12 month higher-ed procurement cycles and front-loaded Year 1 compliance cost.",
+    "keyPartnerships": ["Plaid/Yodlee/MX (deferred until bank ingestion in scope)", "Financial-aid offices (buyer + channel)", "Campus financial-wellness / bursar / orientation programs", "Ellucian-type SIS integrator networks (later-stage)", "Compliance tooling (Vanta/Drata-class, for SOC2 cost/time compression)"],
+    "sourceAgents": ["business-model-agent"],
+    "confidence": 0.7
+  },
+
+  "riskReport": {
+    "criticalContradictions": [
+      {
+        "id": "RISK-01",
+        "title": "Anxiety-avoidance contradiction (load-bearing, unresolved)",
+        "description": "The same financial anxiety that motivates this product also drives avoidance: >50% of Gen Z scroll social media, binge TV, or 'bed rot' instead of confronting finances rather than engaging with a budgeting tool; 43-49% of Gen Z avoid checking balances entirely. A tool requiring proactive engagement risks non-use precisely when it is needed most. This assumption is explicitly marked 'CONTRADICTED' (not merely unconfirmed) by user-research-agent.",
+        "mitigationInProduct": "Product/design has responded by committing to an ambient, low-touch, passive-nudge design (one number, widget/glance-first, no daily categorization) rather than an engagement-heavy dashboard. This is a DESIGN HYPOTHESIS, not validated fact.",
+        "status": "UNRESOLVED — no behavioral evidence yet exists that a passive tool actually retains avoidant students rather than being ignored entirely.",
+        "sourceAgents": ["user-research-agent", "opportunity-discovery-agent"]
+      },
+      {
+        "id": "RISK-02",
+        "title": "Unconfirmed budget + expense-splitting bundle assumption",
+        "description": "Both halves of a potential 'budget + split expenses' bundle are independently validated as real pain (73% of roommates argue about shared expenses; Splitwise proves splitting demand), but there is NO secondary evidence that students want them bundled together versus using a dedicated splitter (Splitwise) plus a separate budget view. This is explicitly marked 'unconfirmed' by user-research-agent.",
+        "mitigationInProduct": "Feature-planning, product-strategy, and MVP-planning agents all independently concluded: do NOT build native splitting at launch or in v2. Splitwise (35M+ users) owns the category. Only revisit after a dedicated validation experiment (fake-door test or Splitwise-import test) proves it lifts core-runway retention.",
+        "status": "UNRESOLVED, correctly deferred rather than guessed at.",
+        "sourceAgents": ["user-research-agent", "opportunity-discovery-agent", "product-strategy-agent", "mvp-planning-agent"]
+      }
+    ],
+    "primaryResearchGap": {
+      "id": "RISK-03",
+      "title": "Zero primary interviews conducted — entire user-side evidence base is secondary/desk research",
+      "description": "user-research-agent explicitly states: 'This validation-demo run had no access to real student interview subjects. No live interviews conducted, no quotes attributed to named individuals, no n=X interview count claimed.' Confidence deliberately capped at 0.48. All JTBD, pain points, and assumption checks are directional hypotheses from published surveys (NASFAA, Trellis, Edvisors/Money, Intuit Credit Karma, etc.), not primary validation.",
+      "downstreamImpact": "Every subsequent agent (opportunity-discovery, product-strategy, feature-planning, mvp-planning, user-story-generator, success-metrics) inherited this 0.48-confidence foundation and explicitly flagged it as capping their own confidence. This is the single largest compounding risk in the package.",
+      "sourceAgents": ["user-research-agent"]
+    },
+    "lowWillingnessToPay": {
+      "id": "RISK-04",
+      "title": "Low direct-consumer willingness-to-pay in the primary (highest-severity) segment",
+      "description": "The highest-severity persona (aid-dependent, Pell-eligible students) is need-based BY DEFINITION and has the LOWEST willingness to pay of all five personas identified. YNAB already gives this population a free year, signaling the category treats students as free/low-margin. This creates a structural size-vs-monetization tension: the segment with the most acute pain has the weakest direct revenue potential, pushing the entire business model onto an unproven B2B2C institutional channel with 6-12 month sales cycles.",
+      "sourceAgents": ["target-audience-agent", "market-research-agent", "pricing-strategy-agent"]
+    },
+    "otherFlaggedRisks": [
+      { "id": "RISK-05", "title": "No founder profile / founder-market fit assessment provided", "description": "idea-validator explicitly marked founderFit as 'unknown' — no founder profile was supplied at any point in the pipeline.", "sourceAgents": ["idea-validator"] },
+      { "id": "RISK-06", "title": "TAM estimates vary 5-10x across analyst firms ($421M-$1.85B for 2024)", "description": "Market-size reliability concern; the $1.5-1.85B figure used is a median of credible reports, not a single authoritative source.", "sourceAgents": ["market-research-agent"] },
+      { "id": "RISK-07", "title": "Bank data-access cost/regulatory uncertainty threatens unit economics", "description": "CFPB Section 1033 open-banking rule is stayed/under rewrite (legal 'right to free data access' uncertain); JPMorgan has begun charging aggregators for data access (Plaid facing up to ~$300M/yr), and continuous runway-pacing implies frequent polling — exactly the high-frequency access now being priced. This threatens unit economics for low-ARPU student users if/when bank ingestion is built.", "sourceAgents": ["trend-intelligence-agent"] },
+      { "id": "RISK-08", "title": "Agentic banking assistants may close the wedge within 18-24 months", "description": "JPMorgan/BofA agentic AI assistants (Erica: 3.2B interactions) are increasingly suggesting savings strategies inside bank apps where aid refunds land, potentially closing this wedge before a standalone app can differentiate. Timing risk asserted but NOT quantified against actual incumbent roadmaps.", "sourceAgents": ["trend-intelligence-agent", "opportunity-discovery-agent"] },
+      { "id": "RISK-09", "title": "AI financial-advice regulatory exposure", "description": "Over half of Gen Z/millennials who used AI for financial advice reported making a poor decision as a result. No AI-specific rule exists yet, but SEC/FINRA apply existing fiduciary/disclosure frameworks; Cleo's $17M FTC settlement (Mar 2025) demonstrates real enforcement risk for deceptive money-availability claims or hard-to-cancel subscriptions. Product must be positioned as an informational pacing tool, not investment/financial advice.", "sourceAgents": ["idea-validator", "trend-intelligence-agent"] },
+      { "id": "RISK-10", "title": "No feasibility confirmation that aid-disbursement data is machine-readable", "description": "No evidence exists on whether financial-aid disbursement data is accessible via Plaid/bank feeds or campus-card/aid-disbursement providers (BankMobile/BMTX, Nelnet) versus requiring manual entry — this determines whether the 'passive/ambient' promise is achievable at all, or whether the MVP's manual-entry approach is a permanent constraint rather than a temporary v1 simplification.", "sourceAgents": ["opportunity-discovery-agent", "trend-intelligence-agent"] },
+      { "id": "RISK-11", "title": "Institutional (B2B2C) pricing and sales-cycle assumptions are unverified", "description": "iGrad/Enrich pricing page returned HTTP 403; the $2-8/student/yr band and $8k-20k institutional CAC are aggregated-search estimates, not a verified rate card or direct discovery-call data. No confirmation that financial-aid offices will buy a single-purpose tool versus only full-curriculum suites (substitution risk).", "sourceAgents": ["pricing-strategy-agent", "business-model-agent"] },
+      { "id": "RISK-12", "title": "No quantified RICE inputs — feature prioritization is ordinal, not decision-grade", "description": "Reach and Effort scores in the feature backlog have no real funnel data or engineering estimates behind them; ordering is directional only and could shift materially once real inputs exist.", "sourceAgents": ["feature-planning-agent", "product-strategy-agent"] },
+      { "id": "RISK-13", "title": "Pacing-accuracy tolerance and minimum ambient-UX interaction threshold undefined", "description": "The weekly variance students would tolerate before losing trust in the runway number, and the minimum interaction level that avoids anxiety-driven churn, are both undefined — yet are central to the core Impact assumption of the P0 feature set.", "sourceAgents": ["product-strategy-agent", "feature-planning-agent", "mvp-planning-agent"] },
+      { "id": "RISK-14", "title": "8-12 week MVP timeline is an estimate only, not a commitment", "description": "mvp-planning-agent explicitly flags this timeline as ROUGH ORDER-OF-MAGNITUDE, PENDING FOUNDER/HUMAN APPROVAL, with no resource/team-capacity data supplied. Must not be treated as a delivery date.", "sourceAgents": ["mvp-planning-agent", "product-strategy-agent"] },
+      { "id": "RISK-15", "title": "No fully-loaded burn model for break-even logo count", "description": "business-model-agent's 15-40 signed institutional logos to reach operating break-even is an estimate, not modeled bottom-up against real headcount/burn.", "sourceAgents": ["business-model-agent"] },
+      { "id": "RISK-16", "title": "Outcome-metric fidelity depends on unresolved manual-vs-bank-linked input question", "description": "success-metrics-agent explicitly flags that the 'runway-lasting rate' outcome metric's fidelity depends on resolving whether input stays manual or becomes bank-linked — an open dependency at the time of this report.", "sourceAgents": ["success-metrics-agent"] }
+    ]
+  },
+
+  "successMetrics": {
+    "activation": [
+      { "metric": "Guided-setup completion rate (install -> term dates + refund amount -> first runway number viewed, same session)", "target": ">=80%" },
+      { "metric": "Time-to-first-number (median seconds from install to first safe-to-spend value rendered)", "target": "median <=2 minutes, <=2 taps" },
+      { "metric": "Setup abandonment rate by step", "target": "no single step >10% absolute drop-off; overall <=20%" },
+      { "metric": "Zero-unhandled-error activation quality", "target": "100% of completed setups yield a valid number" }
+    ],
+    "retention": [
+      { "metric": "Decision-moment return rate (NOT daily-active-user)", "target": ">=50% check the number at least once in the week following disbursement or a spending decision" },
+      { "metric": "Per-term / cross-disbursement retention", "target": ">=40% remain active through one full disbursement-to-disbursement cycle" },
+      { "metric": "Ambient-surface reliance ratio (widget/glance vs full app open)", "target": ">=30% of views via widget/glance, rising over the term" },
+      { "metric": "Passive-active health (minimal-effort logging sustained)", "target": ">=45% of retained users log/import >=1 spend entry per active week" }
+    ],
+    "outcome": [
+      { "metric": "Runway-lasting rate", "target": ">=60% of active users reach next disbursement without depleting runway early, vs ~64-68% baseline of students who run out of money" },
+      { "metric": "Behavior-change / on-pace adherence", "target": "measurable drop in overspend-driven downward recalculations after week 2" },
+      { "metric": "Perceived accuracy / trust score", "target": ">=70% rate the number 'about right' or better" },
+      { "metric": "Self-reported financial-confidence lift (pre/post-term)", "target": "net positive shift in 'I feel in control of my money this term'" }
+    ],
+    "business": [
+      { "metric": "Institutional pilot/design-partner logos signed", "target": "1-3 during MVP, pathway to 15-40 for operating break-even" },
+      { "metric": "Institutional ARR proxy", "target": "e.g., 10k-student school @ $3/student = ~$30k ARR, toward $1.5-5M SOM Y2" },
+      { "metric": "Deferred-bundle demand signal (in-app requests for bank-sync/subscription/splitting)", "target": "capture volume only, to gate v1.1 decisions" }
+    ],
+    "criticalNote": "Retention metrics deliberately avoid DAU/engagement-volume framing because rewarding daily opens would optimize for the WRONG behavior given the anxiety-avoidance contradiction (RISK-01). All metrics are directional targets pending real instrumentation and a validated baseline for this specific cohort — the ~64-68% 'runway-lasting' baseline is population-level secondary data, not measured for this product.",
+    "sourceAgents": ["success-metrics-agent"],
+    "confidence": 0.68
+  },
+
+  "goToMarketRecommendations": [
+    "Do not lead with paid consumer acquisition (Meta/Google fintech CAC of $50-105+/paying user is not viable against low student WTP); prioritize low-cost channels: TikTok app-install ($0.50-1.80/install), creator/influencer partnerships (~$3.50 CPI), and campus/financial-aid-office partnerships (near-zero marginal CAC).",
+    "Treat institutional/B2B2C as the primary revenue engine: pursue 1-3 design-partner campus pilots before broader rollout; position on outcome metrics (persistence, dropout reduction, disbursement stewardship) rather than app features when selling to financial-aid offices.",
+    "Use the free-forever student tier as a distribution and land-and-expand asset (usage data becomes the institutional sales case), not as a revenue line.",
+    "Sequence SOC2 Type II compliance work to begin BEFORE institutional sales outreach — it is a stated deal prerequisite for financial-aid-office procurement.",
+    "Defer all paid consumer acquisition spend for 'Student Plus' until freemium conversion is validated with real cohort data — treat as upside, not core Y1-Y2 ARR.",
+    "Do not attach any GTM date/deadline without explicit founder/human approval — flagged as a required gate by product-strategy-agent and mvp-planning-agent.",
+    "Before scaling GTM spend, close the two critical open questions (anxiety-avoidance and bundle-demand) via the MVP's built-in learning experiments; scaling acquisition ahead of these validations risks paying to acquire users into an unvalidated retention model."
+  ],
+
+  "overallConfidence": 0.42,
+  "overallConfidenceRationale": "This is a weighted synthesis, deliberately LOWER than any single upstream confidence score (which range 0.48-0.78), because: (1) the entire user-evidence foundation (user-research-agent) is capped at 0.48 due to zero primary interviews, and every downstream agent (opportunity-discovery 0.55, feature-planning 0.60, mvp-planning 0.62, user-story-generator 0.72, success-metrics 0.68) explicitly inherited and re-flagged this ceiling rather than independently validating it — so confidence compounds downward rather than averaging; (2) two unresolved load-bearing contradictions (anxiety-avoidance, RISK-01) and unconfirmed assumptions (bundle demand, RISK-02) sit directly beneath the core wedge and monetization model; (3) the primary revenue model (B2B2C institutional) itself rests on an unverified pricing comparable (iGrad/Enrich, 403 on pricing page) and unvalidated sales-cycle assumptions; (4) technical feasibility of the 'passive/ambient' promise is not yet confirmed (RISK-10). The package is coherent and internally consistent, but should be read as a well-reasoned hypothesis set, not a validated plan.",
+
+  "openQuestions": [
+    "Has the anxiety-avoidance contradiction been tested with real users — will an ambient, low-touch design actually retain avoidant students, or will it simply be ignored like every other tool? (No behavioral evidence exists either way.)",
+    "Do students actually want a unified budget + expense-splitting experience, or are these genuinely two separate jobs best served by two separate tools? (Explicitly unconfirmed.)",
+    "What is the founder's background/domain expertise? Founder-market fit was never assessed (idea-validator marked it 'unknown').",
+    "Is financial-aid disbursement data accessible via Plaid, bank feeds, or campus-card/aid-disbursement providers (BankMobile/BMTX, Nelnet), or does the product permanently require manual entry? This determines whether the ambient/passive value proposition is achievable at scale.",
+    "What is the real, measured direct-consumer willingness-to-pay for this specific product among Pell-eligible students? (Currently inferred from adjacent spending categories, not measured.)",
+    "What are verified institutional per-student pricing figures from iGrad, Enrich, Sqwire, or CashCourse? (Public pricing page returned HTTP 403; current $2-8/student/yr band is aggregated-search-derived.)",
+    "Will financial-aid offices buy a single-purpose runway tool, or only full-curriculum financial-wellness suites? (Substitution risk with iGrad/Enrich not yet tested.)",
+    "What is the actual engineering effort (person-months) for each P0/P1 feature, and what is the true addressable reach per institution? (RICE scores are currently ordinal placeholders.)",
+    "What weekly pacing-accuracy variance will students tolerate before losing trust in the safe-to-spend number?",
+    "What is the minimum interaction threshold for the 'ambient' surface that avoids feeling neglectful/untrustworthy vs. avoids anxiety-driven avoidance?",
+    "How quickly are JPMorgan/BofA and other agentic banking assistants likely to ship a comparable in-bank-app runway/pacing feature, closing the asserted 18-24 month window? (Timing risk asserted, not quantified against real incumbent roadmaps.)",
+    "What is the fully-loaded burn/headcount plan needed to convert the 15-40-logo break-even estimate into a modeled (not estimated) figure?",
+    "Will CFPB Section 1033's outcome (rule re-write in progress) and/or bank data-access fees (JPMorgan-Plaid precedent) materially change the cost or legality of the data access this product may eventually need?"
+  ],
+
+  "sources": [
+    { "type": "report", "description": "Idea Validator — technical feasibility (high), market viability (medium), founder-fit (unknown), recommendation: proceed", "credibility": 0.62 },
+    { "type": "report", "description": "Problem Discovery Agent — problem statement, segments, underserved gaps, evidence of existence", "credibility": 0.74 },
+    { "type": "report", "description": "Target Audience Agent — five personas, ICP, primary/secondary audience sizing", "credibility": 0.72 },
+    { "type": "report", "description": "Market Research Agent — TAM/SAM/SOM, market trend, acquisition economics", "credibility": 0.6 },
+    { "type": "report", "description": "Competitor Intelligence Agent — direct/indirect competitors, gap analysis, SWOT", "credibility": 0.78 },
+    { "type": "report", "description": "Trend Intelligence Agent — regulatory/technology/cultural/macro trend scan", "credibility": 0.78 },
+    { "type": "report", "description": "User Research Agent — JTBD, pain points, assumption checks (SECONDARY/DESK RESEARCH ONLY, self-rated 0.48)", "credibility": 0.48 },
+    { "type": "report", "description": "Opportunity Discovery Agent — opportunity statement, UVP, positioning, risk framing", "credibility": 0.55 },
+    { "type": "report", "description": "Pricing Strategy Agent — recommended B2B2C-primary model, tiers, unit economics", "credibility": 0.68 },
+    { "type": "report", "description": "Business Model Agent — revenue streams, cost structure, break-even logic", "credibility": 0.7 },
+    { "type": "report", "description": "Product Strategy Agent — vision, positioning, core competencies, RICE framework", "credibility": 0.78 },
+    { "type": "report", "description": "Feature Planning Agent — scored P0/P1/P2 backlog", "credibility": 0.6 },
+    { "type": "report", "description": "MVP Planning Agent — MVP scope, launch criteria, learning experiments, instrumentation plan", "credibility": 0.62 },
+    { "type": "report", "description": "User Story Generator — 10 sequenced user stories with acceptance criteria", "credibility": 0.72 },
+    { "type": "report", "description": "Success Metrics Agent — activation/retention/outcome/business metrics and leading indicators", "credibility": 0.68 }
+  ],
+
+  "gaps": [
+    "No primary user research exists anywhere in this package — entire user-evidence chain traces back to a single 0.48-confidence desk-research artifact.",
+    "No founder profile / founder-market fit assessment.",
+    "No verified institutional pricing (iGrad/Enrich pricing page inaccessible).",
+    "No confirmed technical feasibility for passive/ambient aid-disbursement data access.",
+    "No quantified engineering effort or addressable-reach data behind feature prioritization.",
+    "No fully-loaded burn/headcount model behind break-even logo estimate."
+  ],
+
+  "nextSteps": [
+    "MANDATORY before further investment: run real primary interviews (n>=5 per persona) explicitly testing the anxiety-avoidance contradiction and the bundle-demand question.",
+    "Build the narrow 3-feature MVP (term modeling, runway engine, ambient surface) with manual entry only — no bank linking, no SOC2, no institutional integration — as a validation vehicle, not a full product.",
+    "Do not commit any GTM spend, institutional sales motion, or delivery date until MVP learning experiments produce data.",
+    "Verify institutional pricing directly with iGrad/Enrich/Sqwire/CashCourse via discovery calls, not aggregated search.",
+    "Confirm technical feasibility of aid-disbursement data access (Plaid, BankMobile/BMTX, Nelnet) before promising a passive/ambient product.",
+    "Escalate all above open questions to the subject-matter expert / founder before Architecture Department begins detailed technical design."
+  ]
+}
