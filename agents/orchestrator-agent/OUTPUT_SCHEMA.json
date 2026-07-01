@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Orchestrator Agent Output",
+  "description": "Output contract for the Orchestrator Agent agent.",
+  "type": "object",
+  "required": [
+    "taskId",
+    "status",
+    "result"
+  ],
+  "properties": {
+    "taskId": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "succeeded",
+        "failed",
+        "escalated"
+      ]
+    },
+    "result": {
+      "type": "object",
+      "description": "Task-specific result payload.",
+      "additionalProperties": true
+    },
+    "artifactIds": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "IDs of artifacts published to the Artifact Manager."
+    },
+    "nextSteps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Recommended follow-on tasks."
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Structured errors, if status is failed."
+    }
+  }
+}

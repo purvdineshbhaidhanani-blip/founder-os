@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "updatedAt": "2026-06-30T05:54:09.354Z",
+  "updatedAt": "2026-07-01T06:26:20.488Z",
   "agents": [
     {
       "id": "agent_f448d3a8-b4eb-4ee9-985d-e1b5fc75dad2",
@@ -229,35 +229,42 @@
       "category": "planning",
       "version": "1.0.0",
       "owner": "engineering-department",
-      "description": "Tracks scope, schedule and delivery risk across the engineering and quality workstreams.",
+      "description": "Tracks scope, schedule and delivery risk across engineering and quality workstreams.",
       "capabilities": [
-        "Break initiatives into trackable milestones",
-        "Monitor progress and surface schedule risk early",
-        "Coordinate the quality and platform workstreams",
-        "Report delivery status back to leadership"
+        "Maintain the project plan with milestone dates, owners and acceptance criteria",
+        "Track task completion rates and flag schedule risk when velocity drops",
+        "Coordinate cross-department dependencies and resolve sequencing conflicts",
+        "Produce weekly progress summaries for the founder dashboard",
+        "Escalate unresolved blockers to the orchestrator within one business cycle"
       ],
       "dependencies": [
-        "devops-engineer",
-        "master-planner",
-        "qa-engineer",
-        "workflow-manager"
+        "orchestrator-agent",
+        "report-generator",
+        "task-planner"
       ],
       "status": "active",
       "tags": [
         "engineering-department",
-        "leadership",
+        "platform",
+        "foundation",
+        "project",
         "planning"
       ],
       "filePath": "/home/user/founder-os/.claude/agents/project-manager.md",
       "blueprintId": "project-manager",
-      "blueprintHash": "0e795faf0485dabb",
+      "blueprintHash": "edea432e612f60d8",
       "createdAt": "2026-06-27T19:48:41.172Z",
-      "updatedAt": "2026-06-27T19:48:41.172Z",
+      "updatedAt": "2026-07-01T06:26:20.350Z",
       "updateHistory": [
         {
           "version": "1.0.0",
           "timestamp": "2026-06-27T19:48:41.172Z",
           "action": "created"
+        },
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T06:26:20.350Z",
+          "action": "regenerated"
         }
       ]
     },
@@ -2321,6 +2328,629 @@
         {
           "version": "1.0.0",
           "timestamp": "2026-06-30T05:54:09.354Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_2443ab97-4784-49a2-84b8-63cc6c672863",
+      "name": "orchestrator-agent",
+      "displayName": "Orchestrator Agent",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Decomposes founder goals into department-level initiatives and sequences the whole delivery plan.",
+      "capabilities": [
+        "Receive goals from the founder and translate them into sequenced initiatives",
+        "Decompose initiatives into concrete subtasks with explicit dependencies",
+        "Dispatch subtasks to the correct department agents via the Task Queue",
+        "Monitor execution progress and surface blockers to the founder",
+        "Coordinate across Foundation, Engineering, Intelligence and Org departments"
+      ],
+      "dependencies": [
+        "agent-generator",
+        "agent-registry",
+        "project-manager",
+        "task-planner",
+        "workflow-engine"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "platform",
+        "foundation",
+        "orchestration",
+        "core"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/orchestrator-agent.md",
+      "blueprintId": "orchestrator-agent",
+      "blueprintHash": "7e01bec32040020d",
+      "createdAt": "2026-07-01T06:26:20.184Z",
+      "updatedAt": "2026-07-01T06:26:20.184Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T06:26:20.184Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_9c814099-338c-4a89-9229-697d4df558c0",
+      "name": "agent-generator",
+      "displayName": "Agent Generator",
+      "category": "engineering",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Turns AgentSpec blueprints into fully validated, registered Claude Code agent files.",
+      "capabilities": [
+        "Accept AgentSpec definitions and validate their structure against the Zod schema",
+        "Build AgentBlueprint objects via buildDepartmentBlueprint()",
+        "Run generateAgentFile() to produce YAML-frontmatter Markdown agent files",
+        "Invoke validateGeneratedAgent() and block on any validation failure",
+        "Write agent files via writeGeneratedAgent() and register via registerAgent()"
+      ],
+      "dependencies": [
+        "agent-registry",
+        "orchestrator-agent",
+        "quality-controller",
+        "requirement-analyzer"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "platform",
+        "foundation",
+        "generation",
+        "factory"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/agent-generator.md",
+      "blueprintId": "agent-generator",
+      "blueprintHash": "2e03a989e7cd563a",
+      "createdAt": "2026-07-01T06:26:20.208Z",
+      "updatedAt": "2026-07-01T06:26:20.208Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T06:26:20.208Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_1844940b-f7cf-40fe-9697-e246d1d7d161",
+      "name": "agent-registry",
+      "displayName": "Agent Registry",
+      "category": "engineering",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Maintains the canonical registry of all generated agents with idempotent upsert semantics.",
+      "capabilities": [
+        "Store and version every registered agent in registry/agents.registry.json",
+        "Upsert entries idempotently — same hash + status + path produces changed: false",
+        "Provide list, search and status-filter queries to the runtime",
+        "Emit agent.registered and agent.status-changed events on the Event Bus",
+        "Enforce schema validity on every write via the Registry Zod schema"
+      ],
+      "dependencies": [
+        "agent-generator",
+        "orchestrator-agent",
+        "workflow-engine"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "platform",
+        "foundation",
+        "registry",
+        "catalog"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/agent-registry.md",
+      "blueprintId": "agent-registry",
+      "blueprintHash": "30f936147596fd57",
+      "createdAt": "2026-07-01T06:26:20.230Z",
+      "updatedAt": "2026-07-01T06:26:20.230Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T06:26:20.230Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_eb1cf4d0-b4e6-4752-8cfd-0ac3e947cdf2",
+      "name": "workflow-engine",
+      "displayName": "Workflow Engine",
+      "category": "engineering",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Executes multi-step workflows as directed acyclic graphs with checkpoint and rollback support.",
+      "capabilities": [
+        "Accept workflow definitions and compile them into validated DAGs via buildGraph()",
+        "Start workflow instances and track node state through queued/running/done/failed",
+        "Complete individual nodes and unlock downstream dependents automatically",
+        "Checkpoint workflow state to durable storage for crash recovery",
+        "Roll back failed workflows to the last clean checkpoint"
+      ],
+      "dependencies": [
+        "agent-generator",
+        "orchestrator-agent",
+        "quality-controller",
+        "task-planner"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "platform",
+        "foundation",
+        "workflow",
+        "execution"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/workflow-engine.md",
+      "blueprintId": "workflow-engine",
+      "blueprintHash": "2c18c02faf295dc2",
+      "createdAt": "2026-07-01T06:26:20.251Z",
+      "updatedAt": "2026-07-01T06:26:20.251Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T06:26:20.251Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_7f6e57a4-2f2c-4813-91dd-20b952880ff0",
+      "name": "memory-manager",
+      "displayName": "Memory Manager",
+      "category": "engineering",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Curates shared memory: what is stored, indexed, retrieved and expired across all agents.",
+      "capabilities": [
+        "Manage all MemoryNamespace stores: working, project, task, agent, artifact, conversation",
+        "Enforce TTL policies and run periodic cleanup of expired entries",
+        "Index entries for keyword and semantic recall queries",
+        "Route recall() requests to the correct namespace and return ranked results",
+        "Prevent memory bloat by enforcing per-namespace size limits"
+      ],
+      "dependencies": [
+        "context-manager",
+        "knowledge-manager",
+        "orchestrator-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "platform",
+        "foundation",
+        "memory",
+        "storage"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/memory-manager.md",
+      "blueprintId": "memory-manager",
+      "blueprintHash": "17d30b29318538d6",
+      "createdAt": "2026-07-01T06:26:20.274Z",
+      "updatedAt": "2026-07-01T06:26:20.274Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T06:26:20.274Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_8622d3b7-7f6b-4ad2-8542-fd27c2c6ff75",
+      "name": "context-manager",
+      "displayName": "Context Manager",
+      "category": "engineering",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Curates and routes the right context to each agent within token budgets.",
+      "capabilities": [
+        "Load context for each task from memory, artifacts and conversation history",
+        "Compress verbose history into dense summaries using the compression policy",
+        "Trim context to fit within the agent's configured token budget",
+        "Route context inheritance so child tasks share relevant parent context",
+        "Emit context.loaded events so the execution engine can begin work immediately"
+      ],
+      "dependencies": [
+        "agent-generator",
+        "memory-manager",
+        "orchestrator-agent",
+        "workflow-engine"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "platform",
+        "foundation",
+        "context",
+        "memory"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/context-manager.md",
+      "blueprintId": "context-manager",
+      "blueprintHash": "793ace6d3e5dcad5",
+      "createdAt": "2026-07-01T06:26:20.293Z",
+      "updatedAt": "2026-07-01T06:26:20.293Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T06:26:20.293Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_b5d3353f-2902-4492-96f2-3dfdcf625953",
+      "name": "knowledge-manager",
+      "displayName": "Knowledge Manager",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Maintains the typed knowledge graph linking projects, decisions, competitors and lessons.",
+      "capabilities": [
+        "Add nodes to the 10 typed knowledge databases: projects, decisions, competitors, tasks, lessons, risks, integrations, metrics, contacts, events",
+        "Create cross-domain edges via KnowledgeGraph.addEdge()",
+        "Run full-text search across all databases for unified retrieval",
+        "Surface knowledge recommendations when agents begin new initiatives",
+        "Expire stale knowledge entries and flag outdated competitor data"
+      ],
+      "dependencies": [
+        "context-manager",
+        "decision-engine",
+        "memory-manager",
+        "orchestrator-agent",
+        "report-generator"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "platform",
+        "foundation",
+        "knowledge",
+        "graph"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/knowledge-manager.md",
+      "blueprintId": "knowledge-manager",
+      "blueprintHash": "04bf7584104173b1",
+      "createdAt": "2026-07-01T06:26:20.313Z",
+      "updatedAt": "2026-07-01T06:26:20.313Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T06:26:20.313Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_3d141b20-1cee-466e-8ff5-0eed84d2fae8",
+      "name": "requirement-analyzer",
+      "displayName": "Requirement Analyzer",
+      "category": "architecture",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Converts raw founder requests into structured AgentSpec definitions ready for the factory pipeline.",
+      "capabilities": [
+        "Parse natural-language requests into structured requirement objects",
+        "Classify each requirement by agent category, department and collaboration topology",
+        "Map identified capabilities to existing agents before requesting new ones",
+        "Generate AgentSpec definitions with role, responsibilities, objectives and I/O fields",
+        "Flag ambiguous requirements for founder clarification before proceeding"
+      ],
+      "dependencies": [
+        "agent-generator",
+        "orchestrator-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "platform",
+        "foundation",
+        "requirements",
+        "analysis"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/requirement-analyzer.md",
+      "blueprintId": "requirement-analyzer",
+      "blueprintHash": "22c11d80195f2c04",
+      "createdAt": "2026-07-01T06:26:20.331Z",
+      "updatedAt": "2026-07-01T06:26:20.331Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T06:26:20.331Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_6cce569c-9acf-4ed6-af96-b20f735c6829",
+      "name": "task-planner",
+      "displayName": "Task Planner",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Turns initiatives into concrete task graphs with dependency edges, cost estimates and parallel layers.",
+      "capabilities": [
+        "Decompose initiatives into atomic tasks with estimated cost and duration",
+        "Build dependency graphs and compute parallel execution layers",
+        "Identify the critical path and surface tasks that gate the delivery date",
+        "Assign tasks to agents based on capability matching and current load",
+        "Replan automatically when blockers or scope changes invalidate the current plan"
+      ],
+      "dependencies": [
+        "orchestrator-agent",
+        "project-manager",
+        "workflow-engine"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "platform",
+        "foundation",
+        "planning",
+        "scheduling"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/task-planner.md",
+      "blueprintId": "task-planner",
+      "blueprintHash": "895175ca253b8106",
+      "createdAt": "2026-07-01T06:26:20.367Z",
+      "updatedAt": "2026-07-01T06:26:20.367Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T06:26:20.367Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_d4765420-5ce4-4370-9b7c-a5d062eeaf1d",
+      "name": "decision-engine",
+      "displayName": "Decision Engine",
+      "category": "architecture",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Evaluates options against business criteria and records rationale for every significant decision.",
+      "capabilities": [
+        "Accept decision requests with option lists, criteria weights and constraints",
+        "Score each option against weighted criteria using a deterministic algorithm",
+        "Record the winning decision, runner-up and rationale in KnowledgeDatabases.decisions",
+        "Flag decisions that require founder approval before proceeding",
+        "Cross-link decisions to affected projects, tasks and risks in the knowledge graph"
+      ],
+      "dependencies": [
+        "knowledge-manager",
+        "orchestrator-agent",
+        "requirement-analyzer"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "platform",
+        "foundation",
+        "decision",
+        "governance"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/decision-engine.md",
+      "blueprintId": "decision-engine",
+      "blueprintHash": "e2e0a3b205a7b98d",
+      "createdAt": "2026-07-01T06:26:20.385Z",
+      "updatedAt": "2026-07-01T06:26:20.385Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T06:26:20.385Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_7abec489-31de-4335-8254-dc0aa5b7a3ef",
+      "name": "prompt-optimizer",
+      "displayName": "Prompt Optimizer",
+      "category": "engineering",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Designs, tests and versions the prompts that power agent system prompts and LLM features.",
+      "capabilities": [
+        "Audit existing agent system prompts for ambiguity, over-specification and missing constraints",
+        "Generate improved prompt variants and A/B evaluate them against quality benchmarks",
+        "Version prompts with semantic versioning and maintain a rollback trail",
+        "Propagate approved improvements to the agent blueprints and regenerate affected files",
+        "Flag prompts that produce high refusal or hallucination rates for founder review"
+      ],
+      "dependencies": [
+        "agent-generator",
+        "orchestrator-agent",
+        "quality-controller"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "platform",
+        "foundation",
+        "prompts",
+        "optimization"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/prompt-optimizer.md",
+      "blueprintId": "prompt-optimizer",
+      "blueprintHash": "ff2940100fb091f1",
+      "createdAt": "2026-07-01T06:26:20.410Z",
+      "updatedAt": "2026-07-01T06:26:20.410Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T06:26:20.410Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_be9f9465-e79c-4919-a6f0-a83d62b99b60",
+      "name": "quality-controller",
+      "displayName": "Quality Controller",
+      "category": "qa",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Owns the overall quality plan and verifies agents and features against acceptance criteria.",
+      "capabilities": [
+        "Run the full validation pipeline on generated agent files before registration",
+        "Verify that each agent's responsibilities map to measurable acceptance criteria",
+        "Block registration of agents that fail structural, semantic or duplicate checks",
+        "Track quality metrics per agent and surface regressions to the founder",
+        "Own the test suite for the Agent Factory itself and enforce coverage floors"
+      ],
+      "dependencies": [
+        "agent-generator",
+        "agent-registry",
+        "orchestrator-agent",
+        "prompt-optimizer"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "platform",
+        "foundation",
+        "quality",
+        "validation"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/quality-controller.md",
+      "blueprintId": "quality-controller",
+      "blueprintHash": "405367fd63bb5ae6",
+      "createdAt": "2026-07-01T06:26:20.429Z",
+      "updatedAt": "2026-07-01T06:26:20.429Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T06:26:20.429Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_d1841822-2cdd-41a1-b6a5-caa0863342fc",
+      "name": "logger-agent",
+      "displayName": "Logger Agent",
+      "category": "devops",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Aggregates structured logs from every agent and surfaces actionable error patterns.",
+      "capabilities": [
+        "Receive log records from every agent via the Event Bus",
+        "Classify records by level (debug/info/warn/error) and scope",
+        "Write structured logs to the ObservabilityHub with scope, level and payload",
+        "Detect anomaly patterns — repeated errors, elevated warn rates, silent agents",
+        "Alert the orchestrator when error rates exceed configured thresholds"
+      ],
+      "dependencies": [
+        "orchestrator-agent",
+        "quality-controller",
+        "report-generator",
+        "workflow-engine"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "platform",
+        "foundation",
+        "logging",
+        "observability"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/logger-agent.md",
+      "blueprintId": "logger-agent",
+      "blueprintHash": "7ee365b144de35f0",
+      "createdAt": "2026-07-01T06:26:20.448Z",
+      "updatedAt": "2026-07-01T06:26:20.448Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T06:26:20.448Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_a52c3ff4-a39a-4b0c-9c1a-be394b02cb64",
+      "name": "report-generator",
+      "displayName": "Report Generator",
+      "category": "documentation",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Turns agent outputs and observability data into founder-ready summaries and executive reports.",
+      "capabilities": [
+        "Aggregate outputs from the ObservabilityHub, dashboard backend and knowledge graph",
+        "Produce daily executive summaries: what ran, what blocked, what shipped",
+        "Generate on-demand capability reports and agent performance rankings",
+        "Format reports as Markdown for the Command Center and as structured data for dashboards",
+        "Archive reports in the Artifact Manager with semantic version tags"
+      ],
+      "dependencies": [
+        "knowledge-manager",
+        "logger-agent",
+        "orchestrator-agent",
+        "project-manager"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "platform",
+        "foundation",
+        "reporting",
+        "documentation"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/report-generator.md",
+      "blueprintId": "report-generator",
+      "blueprintHash": "60badab48e9f4bd5",
+      "createdAt": "2026-07-01T06:26:20.470Z",
+      "updatedAt": "2026-07-01T06:26:20.470Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T06:26:20.470Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_eeb595d5-77b4-40d7-86ee-f0d7cad37736",
+      "name": "configuration-manager",
+      "displayName": "Configuration Manager",
+      "category": "devops",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Manages all platform configuration, feature flags, model routing and connector credentials.",
+      "capabilities": [
+        "Maintain the SettingsManager with typed configuration, secrets and env vars",
+        "Validate connector credentials at startup and surface misconfiguration immediately",
+        "Expose model routing profiles and cost limits to the Cost Optimizer and Model Router",
+        "Gate feature flag changes through the Approval System before applying them",
+        "Notify all affected agents when configuration changes via the Event Bus"
+      ],
+      "dependencies": [
+        "logger-agent",
+        "orchestrator-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "platform",
+        "foundation",
+        "configuration",
+        "settings"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/configuration-manager.md",
+      "blueprintId": "configuration-manager",
+      "blueprintHash": "cf8b583a61d964f1",
+      "createdAt": "2026-07-01T06:26:20.488Z",
+      "updatedAt": "2026-07-01T06:26:20.488Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T06:26:20.488Z",
           "action": "created"
         }
       ]

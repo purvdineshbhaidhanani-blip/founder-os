@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Memory Manager Input",
+  "description": "Input contract for the Memory Manager agent.",
+  "type": "object",
+  "required": [
+    "taskId",
+    "goal"
+  ],
+  "properties": {
+    "taskId": {
+      "type": "string",
+      "description": "Unique identifier for this task instance."
+    },
+    "goal": {
+      "type": "string",
+      "description": "Natural-language description of what this task should achieve."
+    },
+    "context": {
+      "type": "object",
+      "description": "Structured context loaded by the Context Manager.",
+      "additionalProperties": true
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium"
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 deadline, if any."
+    }
+  }
+}

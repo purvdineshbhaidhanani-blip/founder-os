@@ -7,7 +7,8 @@ export type DepartmentName =
   | "quality"
   | "product"
   | "platform"
-  | "intelligence";
+  | "intelligence"
+  | "foundation";
 
 /**
  * Declarative description of one department agent. The factory turns each

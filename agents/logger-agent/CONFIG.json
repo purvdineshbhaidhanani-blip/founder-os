@@ -1,0 +1,38 @@
+{
+  "name": "logger-agent",
+  "displayName": "Logger Agent",
+  "category": "devops",
+  "department": "platform",
+  "status": "active",
+  "modelRouting": {
+    "preferredTier": "high",
+    "fallbackTier": "medium",
+    "maxCostCentsPerTask": 50,
+    "maxDurationMs": 120000
+  },
+  "memory": {
+    "namespace": "agent:logger-agent",
+    "ttlDefaults": {
+      "workingMemory": "1h",
+      "taskRecord": "24h",
+      "metrics": "7d"
+    }
+  },
+  "retry": {
+    "maxAttempts": 3,
+    "backoffMs": 1000,
+    "backoffMultiplier": 2
+  },
+  "approval": {
+    "requireHumanFor": [
+      "destructive-action",
+      "external-publish",
+      "config-change"
+    ]
+  },
+  "tags": [
+    "foundation",
+    "logging",
+    "observability"
+  ]
+}
