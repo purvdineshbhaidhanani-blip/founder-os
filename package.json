@@ -18,7 +18,8 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc -p tsconfig.json",
+    "build": "tsc -p tsconfig.json && vite build --config web/vite.config.ts",
+    "dev:web": "vite --config web/vite.config.ts",
     "start": "node dist/server/index.js",
     "dev": "tsx src/cli/index.ts",
     "factory": "tsx src/cli/index.ts",
@@ -40,12 +41,19 @@
   },
   "devDependencies": {
     "@types/node": "^20.14.2",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.13.1",
     "@typescript-eslint/parser": "^7.13.1",
+    "@vitejs/plugin-react": "^4.3.1",
     "eslint": "^8.57.0",
     "prettier": "^3.3.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.25.1",
     "tsx": "^4.16.0",
     "typescript": "^5.5.2",
+    "vite": "^5.3.3",
     "vitest": "^1.6.0"
   }
 }
