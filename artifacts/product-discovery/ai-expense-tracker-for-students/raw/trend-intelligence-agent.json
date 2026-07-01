@@ -1,0 +1,47 @@
+{
+  "findings": {
+    "trends": [
+      { "name": "CFPB Section 1033 open banking rule stayed and under re-write", "category": "regulatory", "stage": "plateauing", "impact": "headwind", "specificImpact": "2024 final rule guaranteeing free standardized data access was enjoined (E.D. Kentucky); CFPB opened new ANPR Aug 2025. Legal 'right to data' now uncertain and delayed — reverts to bilateral aggregator/bank commercial terms, raising integration risk/cost for aid-refund pacing feature." },
+      { "name": "Bank data-access fees monetization (JPMorgan-Plaid deal)", "category": "regulatory", "stage": "accelerating", "impact": "headwind", "specificImpact": "JPMorgan began charging aggregators for data access in 2025 (Plaid facing up to ~$300M/yr); other banks expected to follow. Continuous 'runway pacing' implies frequent polling — exactly the high-frequency access banks are now pricing, threatening unit economics for low-ARPU student users." },
+      { "name": "Post-Cleo FTC enforcement on fintech subscription/claim transparency", "category": "regulatory", "stage": "accelerating", "impact": "tailwind", "specificImpact": "March 2025 $17M Cleo settlement targeted deceptive money-availability claims and hard-to-cancel subscriptions. Competitive tailwind for honest, avoidance-reducing design: discredits predatory cash-advance incumbents, rewards clear disclosure and easy cancellation from day one." },
+      { "name": "AI financial advice governed by existing frameworks, no AI-specific rule yet", "category": "regulatory", "stage": "emerging", "impact": "headwind", "specificImpact": "SEC/FINRA apply existing fiduciary/disclosure law to AI; 2025 exam priorities include AI; FINRA 2026 report requires plain-English algorithm explanation. Design constraint: position as informational pacing tool, not investment advice." },
+      { "name": "On-device / local LLMs for private financial data", "category": "technology", "stage": "accelerating", "impact": "tailwind", "specificImpact": "Apple's ~3B on-device model and 2026 on-device AI push make local inference on financial data viable. Unlocks privacy-differentiated positioning, lowers per-user inference cost, supports emotional/avoidance-reduction design via private, judgment-free coaching." },
+      { "name": "Agentic AI banking assistants going mainstream", "category": "technology", "stage": "accelerating", "impact": "headwind", "specificImpact": "Agentic AI in finance jumped <7% (Jan 2025) to ~44% (Q1 2026); JPMorgan/BofA (3.2B Erica interactions) ship autonomous assistants suggesting savings strategies. Incumbents embedding AI advisors in bank apps where aid refunds land threatens to close the wedge before a standalone app can differentiate." },
+      { "name": "Gen Z acute financial anxiety and avoidance behavior", "category": "cultural", "stage": "accelerating", "impact": "tailwind", "specificImpact": "~70% of Gen Z report money stress disrupting sleep; insecurity rose 30%->48% (2024->2025, Deloitte); ~1 in 3 cope via avoidance instead of budgeting. Validates emotional/avoidance-reduction design thesis against high-effort incumbents like YNAB." },
+      { "name": "Gen Z distrust of social finance content and de-influencing", "category": "cultural", "stage": "accelerating", "impact": "tailwind", "specificImpact": "~53% of Gen Z name TikTok least trustworthy source for financial advice yet still use it; de-influencing/demand for transparency rising. Opens door for credible, disclosure-forward brand, but AI advice must earn trust through transparency or skepticism becomes headwind." },
+      { "name": "Student loan / aid policy upheaval (SAVE end, RAP, Pell changes, OBBBA)", "category": "macro", "stage": "accelerating", "impact": "tailwind", "specificImpact": "SAVE vacated (March 2026), interest resumed Aug 2025, 7.5M borrowers re-choosing plans July 2026; new RAP plan, Pell expansion, Parent PLUS caps, taxable IDR forgiveness from 2026. Aid rule churn strengthens aid-refund-pacing wedge as disbursement timing becomes more salient." },
+      { "name": "College affordability paradox: rising sticker price, flat net price", "category": "macro", "stage": "plateauing", "impact": "tailwind", "specificImpact": "Sticker tuition rose 2.9-4.0% for 2025-26 but inflation-adjusted net tuition fell (public four-year ~$2,300 net); >40% consider trade/community alternatives. Strong cost anxiety (marketing tailwind) but budget-constrained TAM caps WTP — pushes toward freemium/non-subscription monetization." },
+      { "name": "Gig/side-hustle income now central for Gen Z students", "category": "macro", "stage": "accelerating", "impact": "tailwind", "specificImpact": "~58% of Gen Z workers hold a side hustle; gig income can reach ~57% of total income for some; earnings fluctuate weekly/monthly. Directly validates irregular-income modeling wedge — target user has lumpy aid disbursements plus volatile gig income, a combo incumbents built on steady salary handle poorly." }
+    ]
+  },
+  "confidence": 0.78,
+  "sources": [
+    { "type": "public-data", "description": "FTC press release/settlement docs — Cleo AI $17M settlement (Mar 27, 2025)", "credibility": 0.98 },
+    { "type": "report", "description": "Legal/compliance analyses of CFPB Section 1033 stay, E.D. Kentucky injunction, Aug 2025 ANPR", "credibility": 0.9 },
+    { "type": "report", "description": "JPMorgan-Plaid data-fee coverage (Bloomberg Law, CNBC, Payments Dive) incl. ~$300M/yr estimate", "credibility": 0.85 },
+    { "type": "report", "description": "Apple ML Research 2025 foundation-models tech report and on-device AI analyses", "credibility": 0.82 },
+    { "type": "report", "description": "Agentic AI in banking adoption stats and deployments (Deloitte, Accenture, EY/MIT Tech Review Insights)", "credibility": 0.78 },
+    { "type": "survey", "description": "Gen Z financial-anxiety data (Deloitte 2025 global survey, BofA Better Money Habits, Fortune/Harvard Youth Poll)", "credibility": 0.82 },
+    { "type": "survey", "description": "Gen Z trust/de-influencing data on TikTok finance content", "credibility": 0.7 },
+    { "type": "public-data", "description": "Federal student-loan policy changes 2025-26: SAVE vacated, RAP, Pell, OBBBA, Parent PLUS caps", "credibility": 0.92 },
+    { "type": "report", "description": "College Board 2025 Trends in College Pricing — sticker vs net tuition", "credibility": 0.93 },
+    { "type": "survey", "description": "Gen Z gig/side-hustle prevalence and income volatility (PYMNTS, Intuit, Forbes)", "credibility": 0.72 },
+    { "type": "report", "description": "AI financial-advice regulatory posture — SEC exam priorities, FINRA 2026 report", "credibility": 0.85 }
+  ],
+  "gaps": [
+    "No primary quantification of aid-refund data access cost post-JPMorgan-precedent (specific per-connection, not Plaid-wide).",
+    "De-influencing/TikTok-trust stats largely from secondary/press citations of proprietary studies.",
+    "No direct evidence on whether campus-card/financial-aid-office disbursement systems (BankMobile/BMTX, Nelnet) expose usable APIs — critical integration dependency.",
+    "AI-advice regulatory risk inferred from adviser-focused frameworks; boundary for non-investment budgeting AI untested.",
+    "On-device LLM capability for reliable financial reasoning unproven at 3B-parameter scale for this use case.",
+    "Timing risk: several macro items mid-flight as of report date, could shift within a quarter."
+  ],
+  "nextSteps": [
+    "Hand to user-research-agent: validate students consciously experience 'lump-sum aid runway' as distinct pain; test WTP given flat-net-price constraint.",
+    "Commission data-access feasibility scan on campus-card/aid-disbursement providers to confirm wedge is buildable independent of 1033.",
+    "Model unit economics under 'banks charge for data' scenario; evaluate on-device inference as cost offset.",
+    "Draft compliance guardrail spec early: disclosures, click-to-cancel, advice/no-advice boundary.",
+    "Track CFPB 1033 re-write and July 1 2026 loan repayment transition quarterly — both can flip tailwind/headwind.",
+    "Escalate to competitor-intelligence: JPMorgan/BofA agentic assistants may erode the wedge — assess incumbent roadmap timelines."
+  ]
+}
