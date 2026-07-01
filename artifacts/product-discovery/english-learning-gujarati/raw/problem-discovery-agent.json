@@ -1,0 +1,53 @@
+{
+  "findings": {
+    "problemStatement": "Intermediate-level Gujarati (and broader Indian vernacular-medium) English learners can read and write grammatically correct English but cannot speak it fluently or under pressure. Root cause: exam- and grammar-focused schooling drilled rules and rote memorization while providing almost no spoken-English practice or immersion, leaving learners with 'mute English' — strong on paper, frozen in conversation. Compounded by acute speaking anxiety: in India English functions as a class/status marker, so imperfect speech risks social judgment and loss of face at work, in interviews, in social settings. No safe space to practice: not at home (family speaks Gujarati/Hindi), not at work (colleagues speak local language), not with friends. Cost of not solving is direct and quantified: fluent English raises Indian men's hourly wages ~34% and women's ~22%; communication/English weakness is a leading reason only ~42.6% of Indian graduates are employable.",
+    "problemSegments": [
+      { "segment": "Gujarati-medium graduates / job-seekers (early career)", "description": "Ages ~18-27, schooled in Gujarati medium, grammar-strong but freeze in interviews, group discussions, workplace meetings. English is #1 differentiator in Indian hiring; interviewers judge fluency/speed/confidence, not grammar.", "severity": "high", "frequency": "daily during job search and early employment; every interview/GD is high-stakes exposure" },
+      { "segment": "Working professionals needing English for workplace communication", "description": "Already employed but capped in growth because they cannot present, lead meetings, or communicate with MNC/HR/senior stakeholders in English. ~34% wage premium makes them economically motivated but time-poor and afraid of judgment in front of colleagues.", "severity": "high", "frequency": "recurring — weekly meetings, presentations, client calls" },
+      { "segment": "IELTS / immigration aspirants (strong in Gujarat)", "description": "Gujarati-medium students preparing for IELTS/study-abroad face documented speaking-band challenges; grammar/reading manageable but speaking module is failure point.", "severity": "medium", "frequency": "intensive over 3-12 month prep window" },
+      { "segment": "Socially anxious speakers avoiding English situations", "description": "Learners who actively avoid speaking opportunities due to fear of negative evaluation. ~30% of foreign-language learners experience significant anxiety; India's class-marker dynamic amplifies this.", "severity": "medium", "frequency": "chronic / ongoing avoidance behavior" }
+    ],
+    "underservedGaps": [
+      "No safe, judgment-free space to actually SPEAK. Incumbent apps (Duolingo, Hello English) drill vocabulary/grammar via tap-and-match; don't resolve core blocker of speaking under real social pressure.",
+      "Intermediate-start mismatch: most popular apps begin at basic vocabulary level, boring/insulting grammar-strong vernacular-medium learners who need to convert passive knowledge into active speech.",
+      "Pressure-based, context-specific practice (mock interviews, HR/MNC scenarios, workplace meeting simulations) largely served only by expensive live-tutor apps (EngVarta) — not scalable, affordable, self-serve products.",
+      "Gujarati-first scaffolding: incumbents teach English through English or Hindi; explaining in learner's L1 to lower cognitive load and anxiety is underserved.",
+      "Anxiety/confidence as explicit product goal: apps optimize for streaks/XP/DAU (external rewards) rather than measurable reduction in speaking fear — the actual thing keeping learners mute.",
+      "Retention mapped to real-world motivation: Duolingo's own churn shows external-reward gamification displaces intrinsic motivation; once streak breaks the habit dies."
+    ],
+    "evidenceOfExistence": [
+      "Azam, Chin & Prakash — fluent English raises Indian men's hourly wages 34%, women's 22%; 'a little' English adds 13%; return comparable to secondary schooling.",
+      "Mercer-Mettl India Graduate Skill Index 2025: only 42.6% of graduates employable, driven by communication gaps; >25% of engineering grads lack basic English comprehension; only ~57% write grammatically correct sentences.",
+      "Multiple Gujarat-specific education sources document the exact 'grammar-strong, fluency-weak' pattern for Gujarati-medium students.",
+      "IELTS-prep providers document Gujarati-medium students' specific struggle with speaking component and conversational fluency.",
+      "Language-anxiety research: ~30% of FL learners experience significant anxiety; drivers include fear of negative evaluation, low self-confidence, India framing of English as class marker, absence of safe practice spaces.",
+      "Duolingo churn analyses: users quit over streak anxiety, shallow/non-transferable learning, external-reward burnout.",
+      "Indian interview-prep market commentary: 'spoken English is #1 differentiator in job interviews'; >70% of learners have 'mute English'."
+    ]
+  },
+  "confidence": 0.78,
+  "sources": [
+    { "type": "public-data", "description": "Azam, Chin & Prakash, 'The Returns to English-Language Skills in India' (World Bank/IZA, IHDS 2005) — 34%/22% wage premium", "credibility": 0.95 },
+    { "type": "report", "description": "Mercer-Mettl India Graduate Skill Index 2025 — 42.6% employability, communication skill gaps", "credibility": 0.85 },
+    { "type": "report", "description": "Education sources documenting Gujarati-medium 'grammar-strong, fluency-weak' pattern", "credibility": 0.6 },
+    { "type": "report", "description": "Peer-reviewed language-anxiety literature (JCASC, ScienceDirect, ERIC) on ESL speaking anxiety causes, ~30% prevalence", "credibility": 0.85 },
+    { "type": "report", "description": "Duolingo churn analyses (user-venting studies) on why users quit", "credibility": 0.6 },
+    { "type": "report", "description": "Indian English-app market commentary (EngVarta, TalkDrill, SpeakingFever) — vendor-authored, corroborating but commercially motivated", "credibility": 0.5 },
+    { "type": "anecdote", "description": "Blog/Medium first-person accounts of Gujarati-medium learners and 'no safe space to practice'", "credibility": 0.4 }
+  ],
+  "gaps": [
+    "No primary interviews with actual Gujarati-medium learners yet — all evidence secondary/proxy.",
+    "Wage-premium data based on IHDS 2005 — likely directionally valid but dated.",
+    "No Gujarat-specific quantification of market size for intermediate learners seeking spoken English.",
+    "Several supporting sources are vendor/marketing content with incentive to overstate the problem.",
+    "No direct WTP data for self-serve gamified product vs free apps or higher-touch live-tutor apps.",
+    "Claim that Gujarati-FIRST scaffolding materially reduces anxiety is a hypothesis, not yet evidenced."
+  ],
+  "nextSteps": [
+    "Hand to user-research-agent to validate speaking anxiety, safe-space absence, app-abandonment reasons as lived experience.",
+    "Hand to target-audience-agent to size the two high-severity segments and estimate willingness-to-pay.",
+    "Confirm target is INTERMEDIATE speaking-anxiety learners, not beginners — reframes product away from vocabulary apps.",
+    "Validate differentiating hypotheses idea-validator flagged as unproven before build.",
+    "Source more recent English wage-premium/employability dataset."
+  ]
+}
