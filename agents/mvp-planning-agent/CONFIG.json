@@ -1,0 +1,38 @@
+{
+  "name": "mvp-planning-agent",
+  "displayName": "MVP Planning Agent",
+  "category": "planning",
+  "department": "product",
+  "status": "active",
+  "researchCapabilities": [
+    "interviews",
+    "surveys",
+    "desk-research",
+    "data-analysis",
+    "synthesis"
+  ],
+  "modelRouting": {
+    "preferredTier": "high",
+    "fallbackTier": "medium",
+    "maxCostCentsPerTask": 150,
+    "maxDurationMs": 180000
+  },
+  "memory": {
+    "namespace": "research:mvp-planning-agent",
+    "ttlDefaults": {
+      "findings": "30d",
+      "sources": "30d",
+      "gaps": "30d"
+    }
+  },
+  "validation": {
+    "minConfidenceThreshold": 0.6,
+    "requireSourceAttribution": true,
+    "requireGapDocumentation": true
+  },
+  "tags": [
+    "product",
+    "discovery",
+    "mvp"
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Pricing Strategy Agent Input",
+  "type": "object",
+  "required": [
+    "researchQuery",
+    "context"
+  ],
+  "properties": {
+    "researchQuery": {
+      "type": "string",
+      "description": "What question must be researched?"
+    },
+    "context": {
+      "type": "object",
+      "description": "Prior research context from upstream agents.",
+      "additionalProperties": true
+    },
+    "constraints": {
+      "type": "object",
+      "description": "Timeline, budget, scope constraints.",
+      "properties": {
+        "timelineWeeks": {
+          "type": "number"
+        },
+        "budget": {
+          "type": "string"
+        },
+        "scope": {
+          "type": "array"
+        }
+      }
+    }
+  }
+}

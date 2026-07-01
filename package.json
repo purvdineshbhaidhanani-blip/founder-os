@@ -24,6 +24,7 @@
     "generate:engineering": "tsx src/departments/generate.ts",
     "generate:intelligence": "tsx src/intelligence/generate.ts",
     "generate:foundation": "tsx src/departments/foundation-generate.ts",
+    "generate:product-discovery": "tsx src/departments/product-discovery-generate.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc -p tsconfig.json --noEmit",

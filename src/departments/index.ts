@@ -4,3 +4,5 @@ export * from "./engineering.js";
 export * from "./integration.js";
 export * from "./foundation.js";
 export * from "./foundation-integration.js";
+export * from "./product-discovery.js";
+export * from "./product-discovery-integration.js";

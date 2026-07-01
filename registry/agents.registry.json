@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "updatedAt": "2026-07-01T06:26:20.488Z",
+  "updatedAt": "2026-07-01T07:06:06.709Z",
   "agents": [
     {
       "id": "agent_f448d3a8-b4eb-4ee9-985d-e1b5fc75dad2",
@@ -2951,6 +2951,635 @@
         {
           "version": "1.0.0",
           "timestamp": "2026-07-01T06:26:20.488Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_5b0609a2-0c15-4a63-8eb0-21176026e343",
+      "name": "idea-validator",
+      "displayName": "Idea Validator",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Validates founder ideas against market feasibility, solveability, and founder fit criteria.",
+      "capabilities": [
+        "Assess technical feasibility — can this be built with current technology stacks?",
+        "Evaluate market viability — is there demonstrated demand?",
+        "Check founder fit — does the founder have relevant domain expertise or passion?",
+        "Flag missing information and request clarification",
+        "Produce a validation report with confidence score and recommendation (proceed/pivot/reject)"
+      ],
+      "dependencies": [
+        "problem-discovery-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "product",
+        "discovery",
+        "validation"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/idea-validator.md",
+      "blueprintId": "idea-validator",
+      "blueprintHash": "f41d9c96c9dc80b9",
+      "createdAt": "2026-07-01T07:06:06.248Z",
+      "updatedAt": "2026-07-01T07:06:06.248Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T07:06:06.248Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_99c03bd2-a68e-4bf5-8e5f-52a49c15b221",
+      "name": "problem-discovery-agent",
+      "displayName": "Problem Discovery Agent",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Unearths the core problem the idea solves through research and founder interviews.",
+      "capabilities": [
+        "Extract core problem from founder's idea description",
+        "Research related problems in similar markets",
+        "Identify underserved problem segments",
+        "Define problem scope, severity, and frequency",
+        "Validate problem exists through proxy evidence"
+      ],
+      "dependencies": [
+        "idea-validator",
+        "target-audience-agent",
+        "user-research-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "product",
+        "discovery",
+        "research"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/problem-discovery-agent.md",
+      "blueprintId": "problem-discovery-agent",
+      "blueprintHash": "2881a5a43152c254",
+      "createdAt": "2026-07-01T07:06:06.284Z",
+      "updatedAt": "2026-07-01T07:06:06.284Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T07:06:06.284Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_0e45091c-28d3-402d-8faa-b2f40ba21a97",
+      "name": "target-audience-agent",
+      "displayName": "Target Audience Agent",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Identifies and profiles the people most likely to buy the product.",
+      "capabilities": [
+        "Identify primary and secondary target audiences",
+        "Build demographic, psychographic and behavioral profiles",
+        "Estimate audience size and growth trajectory",
+        "Define audience pain points and willingness-to-pay",
+        "Score audiences by purchase likelihood and market size"
+      ],
+      "dependencies": [
+        "market-research-agent",
+        "problem-discovery-agent",
+        "user-research-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "product",
+        "discovery",
+        "audience"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/target-audience-agent.md",
+      "blueprintId": "target-audience-agent",
+      "blueprintHash": "f792f5266fc1a480",
+      "createdAt": "2026-07-01T07:06:06.318Z",
+      "updatedAt": "2026-07-01T07:06:06.318Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T07:06:06.318Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_744bbb97-a569-445f-b89b-927ec761664e",
+      "name": "market-research-agent",
+      "displayName": "Market Research Agent",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Measures total addressable market size and market growth trends.",
+      "capabilities": [
+        "Calculate TAM from primary research, analyst reports and comparable markets",
+        "Derive SAM from target audience size and willingness-to-pay",
+        "Estimate SOM based on realistic first-year market capture",
+        "Trend market growth — is it expanding, contracting or stagnant?",
+        "Flag outdated data and source reliability concerns"
+      ],
+      "dependencies": [
+        "competitor-intelligence-agent",
+        "target-audience-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "product",
+        "discovery",
+        "market"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/market-research-agent.md",
+      "blueprintId": "market-research-agent",
+      "blueprintHash": "32f32e0d46e8f686",
+      "createdAt": "2026-07-01T07:06:06.350Z",
+      "updatedAt": "2026-07-01T07:06:06.350Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T07:06:06.350Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_ff6c77fe-1a09-4862-89bc-2a658bf0075e",
+      "name": "competitor-intelligence-agent",
+      "displayName": "Competitor Intelligence Agent",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Maps competitors, analyzes their strengths and identifies market gaps.",
+      "capabilities": [
+        "Identify direct competitors (same problem, same audience)",
+        "Identify indirect competitors (same audience, related problems)",
+        "Profile each competitor: pricing, features, positioning, user reviews",
+        "Score competitor strength: market share, funding, momentum",
+        "Identify gaps competitors leave unserved"
+      ],
+      "dependencies": [
+        "market-research-agent",
+        "trend-intelligence-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "product",
+        "discovery",
+        "competitors"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/competitor-intelligence-agent.md",
+      "blueprintId": "competitor-intelligence-agent",
+      "blueprintHash": "f22ea4e907a689e2",
+      "createdAt": "2026-07-01T07:06:06.381Z",
+      "updatedAt": "2026-07-01T07:06:06.381Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T07:06:06.381Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_04064781-3015-400b-bf0e-e3aed449db4c",
+      "name": "trend-intelligence-agent",
+      "displayName": "Trend Intelligence Agent",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Detects emerging trends that amplify or threaten the product opportunity.",
+      "capabilities": [
+        "Scan for regulatory changes affecting the market",
+        "Detect emerging technologies that unlock new use cases",
+        "Track cultural shifts in user behavior and preferences",
+        "Assess macro trends: AI adoption, remote work, mobile-first, etc.",
+        "Flag trends that create tail winds or head winds"
+      ],
+      "dependencies": [
+        "competitor-intelligence-agent",
+        "user-research-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "product",
+        "discovery",
+        "trends"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/trend-intelligence-agent.md",
+      "blueprintId": "trend-intelligence-agent",
+      "blueprintHash": "5a29cc201f4372d6",
+      "createdAt": "2026-07-01T07:06:06.411Z",
+      "updatedAt": "2026-07-01T07:06:06.411Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T07:06:06.411Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_f64b9861-fe68-46c0-b352-410b9846e0b0",
+      "name": "user-research-agent",
+      "displayName": "User Research Agent",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Conducts interviews and observational research to validate user pain and product fit.",
+      "capabilities": [
+        "Design interview guide to validate key assumptions",
+        "Recruit and interview target audience members",
+        "Conduct observational studies of user workflows",
+        "Synthesize research into validated jobs-to-be-done",
+        "Identify mismatches between founder assumptions and user reality"
+      ],
+      "dependencies": [
+        "opportunity-discovery-agent",
+        "problem-discovery-agent",
+        "trend-intelligence-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "product",
+        "discovery",
+        "user-research"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/user-research-agent.md",
+      "blueprintId": "user-research-agent",
+      "blueprintHash": "b36d221ca3a4c2f1",
+      "createdAt": "2026-07-01T07:06:06.440Z",
+      "updatedAt": "2026-07-01T07:06:06.440Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T07:06:06.440Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_3548b54d-0406-4747-8c8b-e0fd8d61c807",
+      "name": "opportunity-discovery-agent",
+      "displayName": "Opportunity Discovery Agent",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Synthesizes research into a clear market opportunity statement and positioning.",
+      "capabilities": [
+        "Integrate findings from all research streams (market, users, competitors, trends)",
+        "Identify the most compelling, defensible opportunity",
+        "Articulate unique value proposition vs competitors",
+        "Define initial product positioning and messaging",
+        "Flag research gaps and assumptions needing validation"
+      ],
+      "dependencies": [
+        "business-model-agent",
+        "competitor-intelligence-agent",
+        "market-research-agent",
+        "pricing-strategy-agent",
+        "user-research-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "product",
+        "discovery",
+        "opportunity"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/opportunity-discovery-agent.md",
+      "blueprintId": "opportunity-discovery-agent",
+      "blueprintHash": "fd753fa2dd79f16c",
+      "createdAt": "2026-07-01T07:06:06.468Z",
+      "updatedAt": "2026-07-01T07:06:06.468Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T07:06:06.468Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_0e7d29ee-276f-4251-affd-a779b716de67",
+      "name": "pricing-strategy-agent",
+      "displayName": "Pricing Strategy Agent",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Recommends pricing models and initial pricing tiers based on research.",
+      "capabilities": [
+        "Research competitor pricing models and customer willingness-to-pay",
+        "Recommend pricing model: subscription, one-time, freemium, etc.",
+        "Design initial tier structure (Free/Pro/Enterprise or equivalent)",
+        "Calculate unit economics and break-even scenarios",
+        "Identify pricing levers for future optimization"
+      ],
+      "dependencies": [
+        "business-model-agent",
+        "opportunity-discovery-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "product",
+        "discovery",
+        "pricing"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/pricing-strategy-agent.md",
+      "blueprintId": "pricing-strategy-agent",
+      "blueprintHash": "2e7d7ff8de4658b1",
+      "createdAt": "2026-07-01T07:06:06.498Z",
+      "updatedAt": "2026-07-01T07:06:06.498Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T07:06:06.498Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_2ce6e8fd-8fa3-4837-906f-02257ee14a2a",
+      "name": "business-model-agent",
+      "displayName": "Business Model Agent",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Designs the revenue model, acquisition strategy and cost structure.",
+      "capabilities": [
+        "Design revenue streams and business model canvas",
+        "Model acquisition channels and customer acquisition cost",
+        "Estimate operating costs and path to profitability",
+        "Identify key partnerships and distribution channels",
+        "Calculate financial milestones: breakeven, cash-flow positive"
+      ],
+      "dependencies": [
+        "opportunity-discovery-agent",
+        "pricing-strategy-agent",
+        "product-strategy-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "product",
+        "discovery",
+        "business-model"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/business-model-agent.md",
+      "blueprintId": "business-model-agent",
+      "blueprintHash": "895ff6f0edb52295",
+      "createdAt": "2026-07-01T07:06:06.534Z",
+      "updatedAt": "2026-07-01T07:06:06.534Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T07:06:06.534Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_c3593e62-b9a1-4790-9313-4fbdd6fdbbf7",
+      "name": "product-strategy-agent",
+      "displayName": "Product Strategy Agent",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Converts market research into product vision, positioning and strategy.",
+      "capabilities": [
+        "Define product vision aligned with market opportunity",
+        "Articulate product positioning and key messages",
+        "Identify core product competencies needed",
+        "Design feature priority framework (RICE or similar)",
+        "Plan product evolution beyond MVP"
+      ],
+      "dependencies": [
+        "business-model-agent",
+        "feature-planning-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "product",
+        "discovery",
+        "strategy"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/product-strategy-agent.md",
+      "blueprintId": "product-strategy-agent",
+      "blueprintHash": "746e34ddd93780d7",
+      "createdAt": "2026-07-01T07:06:06.565Z",
+      "updatedAt": "2026-07-01T07:06:06.565Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T07:06:06.565Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_779a7477-10a7-4c98-b703-9aaf67163824",
+      "name": "feature-planning-agent",
+      "displayName": "Feature Planning Agent",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Generates and prioritizes product features based on strategy and research.",
+      "capabilities": [
+        "Generate feature set that solves core problem",
+        "Score features by impact on core use case",
+        "Identify mandatory vs differentiator vs nice-to-have",
+        "Map features to user personas and jobs-to-be-done",
+        "Create prioritized feature roadmap"
+      ],
+      "dependencies": [
+        "mvp-planning-agent",
+        "product-strategy-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "product",
+        "discovery",
+        "features"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/feature-planning-agent.md",
+      "blueprintId": "feature-planning-agent",
+      "blueprintHash": "7da18acebef0a8fd",
+      "createdAt": "2026-07-01T07:06:06.596Z",
+      "updatedAt": "2026-07-01T07:06:06.596Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T07:06:06.596Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_900fd8ca-74a5-49f0-b75c-b889db328694",
+      "name": "mvp-planning-agent",
+      "displayName": "MVP Planning Agent",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Defines the minimal viable product scope and launch criteria.",
+      "capabilities": [
+        "Define MVP scope: what's in, what's out",
+        "Identify critical learning experiments for MVP",
+        "Estimate MVP timeline and resource needs",
+        "Define MVP launch criteria and success metrics",
+        "Plan for graceful degradation of features"
+      ],
+      "dependencies": [
+        "feature-planning-agent",
+        "user-story-generator"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "product",
+        "discovery",
+        "mvp"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/mvp-planning-agent.md",
+      "blueprintId": "mvp-planning-agent",
+      "blueprintHash": "a29dad6086d31145",
+      "createdAt": "2026-07-01T07:06:06.623Z",
+      "updatedAt": "2026-07-01T07:06:06.623Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T07:06:06.623Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_bbdc4695-53b6-4e98-996e-febc74b9c18b",
+      "name": "user-story-generator",
+      "displayName": "User Story Generator",
+      "category": "engineering",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Converts features into structured user stories for development teams.",
+      "capabilities": [
+        "Write user stories in standard format (As a..., I want..., So that...)",
+        "Define acceptance criteria for each story",
+        "Estimate story complexity",
+        "Map stories to user personas and workflows",
+        "Sequence stories for MVP release planning"
+      ],
+      "dependencies": [
+        "mvp-planning-agent",
+        "success-metrics-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "product",
+        "discovery",
+        "stories"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/user-story-generator.md",
+      "blueprintId": "user-story-generator",
+      "blueprintHash": "83c4c6bc647cdabf",
+      "createdAt": "2026-07-01T07:06:06.653Z",
+      "updatedAt": "2026-07-01T07:06:06.653Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T07:06:06.653Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_07d40e2a-efba-45e3-b19c-396d86db3fb9",
+      "name": "success-metrics-agent",
+      "displayName": "Success Metrics Agent",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Defines measurable success criteria for product validation and growth.",
+      "capabilities": [
+        "Define key user metrics: activation, retention, engagement",
+        "Set target benchmarks based on comparable products",
+        "Design experiment plan to validate core hypotheses",
+        "Identify leading indicators (predict future success)",
+        "Plan instrumentation for day-1 measurement"
+      ],
+      "dependencies": [
+        "product-discovery-report-generator",
+        "user-story-generator"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "product",
+        "discovery",
+        "metrics"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/success-metrics-agent.md",
+      "blueprintId": "success-metrics-agent",
+      "blueprintHash": "6887070f9d914fdd",
+      "createdAt": "2026-07-01T07:06:06.681Z",
+      "updatedAt": "2026-07-01T07:06:06.681Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T07:06:06.681Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_0edf6fed-5d1b-4136-998f-11d13841f96f",
+      "name": "product-discovery-report-generator",
+      "displayName": "Product Discovery Report Generator",
+      "category": "documentation",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Synthesizes all research into a complete, machine-readable Product Discovery Package.",
+      "capabilities": [
+        "Compile all discovery outputs into a coherent package",
+        "Generate executive summary and key findings",
+        "Create structured JSON/YAML versions for downstream systems",
+        "Include all research artifacts and source data",
+        "Flag any missing validation or open questions"
+      ],
+      "dependencies": [
+        "success-metrics-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "product",
+        "discovery",
+        "reporting"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/product-discovery-report-generator.md",
+      "blueprintId": "product-discovery-report-generator",
+      "blueprintHash": "796319277a3a8143",
+      "createdAt": "2026-07-01T07:06:06.709Z",
+      "updatedAt": "2026-07-01T07:06:06.709Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T07:06:06.709Z",
           "action": "created"
         }
       ]

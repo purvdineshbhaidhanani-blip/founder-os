@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Feature Planning Agent Output",
+  "type": "object",
+  "required": [
+    "findings",
+    "confidence",
+    "sources"
+  ],
+  "properties": {
+    "findings": {
+      "type": "object",
+      "description": "Research findings (structured per agent type).",
+      "additionalProperties": true
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Confidence in findings (0-1)."
+    },
+    "sources": {
+      "type": "array",
+      "description": "Evidence sources backing each finding.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "interview",
+              "survey",
+              "report",
+              "public-data",
+              "benchmark"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "credibility": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      }
+    },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Research gaps identified."
+    },
+    "nextSteps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

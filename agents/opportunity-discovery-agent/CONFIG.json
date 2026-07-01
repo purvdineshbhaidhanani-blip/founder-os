@@ -1,0 +1,38 @@
+{
+  "name": "opportunity-discovery-agent",
+  "displayName": "Opportunity Discovery Agent",
+  "category": "research",
+  "department": "product",
+  "status": "active",
+  "researchCapabilities": [
+    "interviews",
+    "surveys",
+    "desk-research",
+    "data-analysis",
+    "synthesis"
+  ],
+  "modelRouting": {
+    "preferredTier": "high",
+    "fallbackTier": "medium",
+    "maxCostCentsPerTask": 150,
+    "maxDurationMs": 180000
+  },
+  "memory": {
+    "namespace": "research:opportunity-discovery-agent",
+    "ttlDefaults": {
+      "findings": "30d",
+      "sources": "30d",
+      "gaps": "30d"
+    }
+  },
+  "validation": {
+    "minConfidenceThreshold": 0.6,
+    "requireSourceAttribution": true,
+    "requireGapDocumentation": true
+  },
+  "tags": [
+    "product",
+    "discovery",
+    "opportunity"
+  ]
+}
