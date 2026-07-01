@@ -1,0 +1,63 @@
+{
+  "findings": {
+    "activationMetrics": [
+      { "metric": "Guided-setup completion rate (install -> term dates + refund amount -> first runway number viewed, same session)", "target": ">=80% of users who start setup complete it and see their number in-session", "rationale": "Directly encodes upstream launch criterion and input-friction hypothesis: if manual/guided term modeling clears 80%, it validates bank-linked ingestion is not a hard v1 requirement." },
+      { "metric": "Time-to-first-number (median seconds from install to first safe-to-spend value rendered)", "target": "Median <=2 minutes; first number reachable in <=2 taps from app open", "rationale": "Low friction to core value is critical for anxiety-avoidant users who abandon under cognitive load. Fast time-to-value is earliest signal ambient promise lands." },
+      { "metric": "Setup abandonment rate by step (term dates, disbursement dates, refund amount)", "target": "No single step accounts for >10% absolute drop-off; overall abandonment <=20%", "rationale": "Localizes friction so engineering knows which onboarding field to fix." },
+      { "metric": "Zero-unhandled-error activation quality (share of completed setups producing valid runway number with no error/null state)", "target": "100% of completed setups yield a valid number; 0 unhandled-error states", "rationale": "For anxious users, an error at moment of first trust is disproportionately damaging; broken first number likely means permanent churn." }
+    ],
+    "retentionMetrics": [
+      { "metric": "Decision-moment return rate: share who open/glance at number near a purchase decision or disbursement events, NOT daily opens", "target": ">=50% check the number at least once in the week following disbursement or a spending decision", "rationale": "MUST NOT be pure DAU. Anxiety drives avoidance; rewarding daily opens would optimize for wrong behavior. Contextual, intentional return is the success signal for an ambient tool." },
+      { "metric": "Per-term / cross-disbursement retention (does user still have active, self-correcting runway at next disbursement cycle)", "target": ">=40% of setup-completers remain active through at least one full disbursement-to-disbursement cycle", "rationale": "Product's natural rhythm is the academic term, not the calendar day. Avoids the DAU trap entirely." },
+      { "metric": "Ambient-surface reliance ratio (share of number-views from widget/lock-screen glance vs full app open)", "target": ">=30% of number-views via widget/glance, rising over the term", "rationale": "Glancing without opening app IS intended healthy behavior for anxiety-aware, low-touch design." },
+      { "metric": "Passive-active health (share of active users keeping runway data fresh with minimal-effort logging/import)", "target": ">=45% of retained users have >=1 spend input/import per active week", "rationale": "Self-correction engine only works with data, but measures sustained low-effort input, not high engagement volume." }
+    ],
+    "outcomeMetrics": [
+      { "metric": "Runway-lasting rate: share whose spend stays within pace so funds last to next disbursement", "target": ">=60% of active users reach next disbursement without depleting runway early (vs ~64-68% baseline of students who run out of money)", "rationale": "The actual job-to-be-done. Beating the baseline is product-market fit." },
+      { "metric": "Behavior-change / on-pace adherence: reduction in early-term overspend among users who recall their number", "target": "Users trend toward on-pace spending; measurable drop in overspend-driven downward recalculations after week 2", "rationale": "Directly tests value hypothesis that a single number changes spending behavior." },
+      { "metric": "Perceived accuracy / trust score (in-app prompt: does number match lived reality)", "target": ">=70% rate number 'about right' or better; correction rate trending down over time", "rationale": "Tests accuracy-trust hypothesis. Anxious user only acts on a number they trust." },
+      { "metric": "Self-reported financial-confidence / anxiety-reduction lift (pre/post-term short survey)", "target": "Net positive shift in 'I feel in control of my money this term' among retained users", "rationale": "Ultimate outcome is reduced financial stress, not more app usage." }
+    ],
+    "businessMetrics": [
+      { "metric": "Institutional pilot / design-partner logos signed", "target": "1-3 design-partner campuses provisioned during MVP; pathway to 15-40 signed logos for operating break-even" },
+      { "metric": "Per-campus organic student activation (free-tier sign-ups + setup completion per pilot institution)", "target": "Sufficient per-campus penetration to serve as aid-office sales evidence" },
+      { "metric": "Institutional ARR proxy (activated students x $2-8/student/yr)", "target": "Model ARR per pilot logo (e.g., 10k-student school @ $3 = ~$30k ARR) toward $1.5-5M SOM Y2" },
+      { "metric": "Deferred-bundle demand signal (in-app requests for bank-sync, subscription detection, splitting)", "target": "Quantified latent-demand rate per excluded feature to gate v1.1 build decisions; capture volume only" },
+      { "metric": "Aggregation/COGS efficiency once bank-linking piloted (cost per active user vs Plaid $0.40-0.90 band)", "target": "Track only if/when bank ingestion enters scope" }
+    ],
+    "leadingIndicators": [
+      "Time-to-first-number and same-session first-number-view rate — predict activation and retention before D7/D30 data exists.",
+      "Step-level setup drop-off shape — predicts whether manual/guided input hypothesis holds and whether bank-linking becomes forced v1.1 dependency.",
+      "Early perceived-accuracy prompt responses (first-week trust score) — predict trust-driven retention long before term-end outcome data arrives.",
+      "Glance-via-widget adoption in week 1 — predicts healthy low-touch reliance, distinguishing intended ambient use from disengagement.",
+      "First self-correction event acknowledged without abandonment — predicts whether tool reduces rather than triggers anxiety.",
+      "Deferred-feature request rate in first 2 weeks — leading demand signal for v1.1 roadmap and unconfirmed bundle hypothesis.",
+      "Per-campus organic sign-up velocity in a pilot — leading indicator of institutional deal viability ahead of any signed logo."
+    ]
+  },
+  "confidence": 0.68,
+  "sources": [
+    { "type": "report", "description": "mvp-planning-agent.json — launch criteria, five learning experiments, instrumentation plan aligned to disbursement cycles", "credibility": 0.7 },
+    { "type": "report", "description": "user-research-agent.json — anxiety drives avoidance contradiction; JTBD of making refund last the term; ~64-68% run out of money baseline", "credibility": 0.6 },
+    { "type": "report", "description": "user-story-generator.json — 10 sequenced stories defining activation surface, self-correction behavior, ambient/widget glance surface", "credibility": 0.6 },
+    { "type": "report", "description": "business-model-agent.json — institutional B2B2C revenue $2-8/student/yr, 15-40 logos to break-even, $30k ARR per 10k-student school, Plaid COGS, SOM Y2 $1.5-5M", "credibility": 0.7 },
+    { "type": "public-data", "description": "Edvisors/Money.com + NASFAA survey baselines (~64-68% run out of money) used to set runway-lasting outcome target", "credibility": 0.7 },
+    { "type": "benchmark", "description": "iGrad/Enrich institutional comparable ($2-10/student/yr, 600+ institutions) validating price band and logo-driven break-even model", "credibility": 0.7 }
+  ],
+  "gaps": [
+    "No pilot-cohort size or target institution set defined upstream; per-campus penetration targets and statistical power cannot be finalized.",
+    "Runway-lasting outcome baseline is population-level secondary data, not measured for this product's cohort; target is directional until a control/baseline is instrumented.",
+    "No confirmed method to observe actual end-of-term spending vs disbursement — outcome metric fidelity depends on unresolved input-completeness question.",
+    "Anxiety/confidence-lift measurement requires a validated pre/post instrument not yet specified; risk of survey non-response bias among avoidant users.",
+    "No fully-loaded burn model; 15-40 break-even logo count remains an estimate.",
+    "Contextual 'decision-moment' return-rate metric requires instrumenting intent/decision events, no defined capture mechanism yet."
+  ],
+  "nextSteps": [
+    "Confirm pilot-cohort size and target institutions with mvp-planning-agent to set statistical thresholds.",
+    "Define runway-lasting control/baseline (pre-app spending self-report) so target is measured against this cohort, not only secondary data.",
+    "Co-design instrumentation event schema with engineering for anxiety-safe metric set.",
+    "Specify and validate short pre/post financial-confidence instrument with low burden.",
+    "Escalate: none of these targets imply a committed launch date; route any date to founder/human approval.",
+    "Flag to product-discovery-report-generator: outcome-metric fidelity depends on resolving manual-vs-bank-linked input-completeness question."
+  ]
+}
