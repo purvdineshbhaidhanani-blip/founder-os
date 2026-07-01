@@ -1,0 +1,58 @@
+{
+  "findings": {
+    "directCompetitors": [
+      { "name": "YNAB (You Need A Budget)", "pricing": "$14.99/mo or $109/yr (34-day trial). FREE 1-year student plan (proof of enrollment); up to 6-person shared budget.", "keyFeatures": ["Zero-based/'give every dollar a job'", "Bank sync (Plaid)", "Goal tracking, reports, rollover", "Family/roommate sharing up to 6", "Educational workshops"], "aiCapabilities": "No meaningful AI; rules-based categorization, manual philosophy-driven workflow.", "positioning": "Premium behavior-change system for committed budgeters; free student year as acquisition funnel.", "userSentiment": "Polarizing: transformative for right user but criticized as complicated, steep learning curve (2-4mo), expensive for sub-$50K earners. Beginners rage-quit within weeks.", "threatLevel": "high" },
+      { "name": "Cleo AI", "pricing": "Free tier; Cleo Plus ~$5.99/mo; Pro/Builder up to ~$14.99/mo (cash advance, credit builder, credit score).", "keyFeatures": ["AI chatbot as primary UI", "Auto-categorization w/ per-category limits", "Savings goals, cashback, Cleo Wallet", "Cash advance (Cleo Cover)", "Gamified Gen-Z persona"], "aiCapabilities": "Strongest conversational AI: plain-English Q&A over bank-linked data, spending comparisons, savings nudges. Persona-driven engagement is core hook.", "positioning": "Gen-Z-native 'money bestie' — entertainment-first budgeting plus fintech monetization.", "userSentiment": "Young users love humor/engagement; others find tone too casual, advance-monetization-heavy. FTC $17M settlement (March 2025) over deceptive cash-advance/cancellation practices.", "threatLevel": "high" },
+      { "name": "Finny (AI Money Tracker)", "pricing": "Free tier (unlimited manual tracking, 150+ currencies, charts); Finny Pro $1.99/mo or $17.99/yr.", "keyFeatures": ["AI input via text/voice/receipt scan", "'Tap to Track' NFC/Apple Pay instant capture", "No bank linking; local storage + offline; privacy-first", "150+ currency Unified Currency View", "Category limits with rollover for irregular income"], "aiCapabilities": "AI parsing of natural-language/voice/receipt input, not a bank feed. AI as frictionless capture rather than analysis.", "positioning": "Privacy-first, low-cost, student/traveler-oriented; explicitly markets to college students and irregular income. Closest philosophical competitor.", "userSentiment": "Positive for AI-assisted no-bank-link input, offline support, multi-currency; small/newer player, limited public review volume.", "threatLevel": "high" },
+      { "name": "PocketGuard", "pricing": "Free tier; Plus $12.99/mo, $74.99/yr, or $149.99 lifetime.", "keyFeatures": ["'In My Pocket' single safe-to-spend number", "Auto bank/credit/loan sync + categorization", "Bill tracking, debt payoff plan, subscription cancel", "Basic financial-literacy course"], "aiCapabilities": "Minimal; algorithmic calculation, not conversational/predictive AI.", "positioning": "Simplicity-first 'one number' app for overwhelmed beginners — adjacent to first-time-manager ICP.", "userSentiment": "Praised as beginner-friendly; criticized for free-tier caps, weaker depth vs YNAB/Monarch.", "threatLevel": "medium" },
+      { "name": "Goodbudget", "pricing": "Free forever (20 envelopes, 1 account, 2 devices, 1yr history); Premium $10/mo or $80/yr.", "keyFeatures": ["Digital envelope budgeting", "Manual entry (free) or Plaid sync (Premium)", "Multi-device household sharing", "Personalized reports"], "aiCapabilities": "None.", "positioning": "Manual, intentional envelope system for hands-on budgeters/couples.", "userSentiment": "Liked for teaching discipline and free tier; free 1-account limit frustrates users; feels dated vs AI-first apps.", "threatLevel": "low" }
+    ],
+    "indirectCompetitors": [
+      { "name": "Rocket Money", "pricing": "Free tier; Premium 'pay-what's-fair' ~$7-$14/mo.", "relevance": "Huge brand absorbing ex-Mint users; students use mainly for subscription cancellation, not core budgeting. No irregular-income/aid features.", "threatLevel": "medium" },
+      { "name": "Monarch Money", "pricing": "No free tier; Core $99.99/yr (incl. AI Assistant + Household sharing); Plus $199/yr.", "relevance": "Leading post-Mint premium destination. Priced/positioned for affluent adults/couples — mismatched to Pell-eligible students on price and complexity.", "threatLevel": "medium" },
+      { "name": "Copilot Money", "pricing": "$13/mo or $95/yr.", "relevance": "Best-in-class AI categorization (private per-user ML model) and design, but Apple-only until Dec 2025, premium-priced. No student or aid-refund features.", "threatLevel": "low" },
+      { "name": "Splitwise", "pricing": "Free tier (daily add-expense limits + ads); Pro ~$4.99/mo or ~$50/yr.", "relevance": "35M+ users, dominant in shared/roommate bill-splitting — exact 'split expenses' job students need. Siloed from personal budgeting — partner-shaped gap, high threat if it adds budgeting.", "threatLevel": "high" }
+    ],
+    "gapAnalysis": [
+      "Term-runway pacing of lump-sum aid refunds: NO incumbent converts a one-time $3-8K disbursement into a per-week/per-month runway. Best practice today is a manual 'divide by months' hack. Concrete, defensible core feature no competitor ships.",
+      "Unified personal-budget + split-expenses in one ledger: Splitwise owns splitting but is siloed from budgeting; a student's shared groceries/rent and personal budget live in two apps that never reconcile.",
+      "Native irregular/lumpy income modeling: every app assumes steady monthly income. Part-time wages + episodic aid refunds break the monthly mental model; no app forecasts 'will this deposit last to finals?'",
+      "Emotional/avoidance job: Cleo uses humor to drive engagement but monetizes via advances (FTC-sanctioned). No app reduces money anxiety/avoidance without upselling debt-like products.",
+      "International multi-currency for domestic students: only Finny/Splitwise Pro handle multi-currency well; mainstream apps ignore international students paying/receiving aid across currencies.",
+      "Price-and-privacy fit for Pell-eligible users: strongest tools (YNAB $109, Monarch $100-200, Copilot $95, PocketGuard $75) too expensive; cheap/free tools (Goodbudget, Finny) lack aid-runway and split integration. White space at 'free-or-near-free + AI + student-native'."
+    ],
+    "swot": {
+      "strengths": ["Defensible wedge feature (aid-refund runway pacing) no incumbent offers", "AI-native input/coaching combined with budgeting engine (Cleo lacks it, Finny only partly has it)", "Can unify budgeting + splitting, currently split across two apps", "ICP-native design vs incumbents built for salaried adults"],
+      "weaknesses": ["No brand, funding, or distribution vs YNAB, Rocket Money, Splitwise (35M), Monarch", "Bank-link trust/Plaid coverage costly; privacy-first no-link sacrifices auto-tracking", "Low WTP and high churn (graduation) pressuring monetization", "AI coaching invites same regulatory scrutiny that hit Cleo (FTC)"],
+      "opportunities": ["Mint's shutdown (3.6M+ displaced) left unowned free/beginner tier", "YNAB's free student year is acquisition not retention — students churn at graduation, dislike learning curve", "Campus/financial-aid-office and .edu distribution tied to disbursement calendars", "Partner-or-absorb Splitwise's siloed job; multi-currency underserved for intl students"],
+      "threats": ["Splitwise adding budgeting, or Cleo/Monarch deepening AI + student SKU, erases wedge", "YNAB's free student year undercuts price-based entry", "Incumbents already ship real AI; AI-native angle not durably unique", "Regulatory risk on AI financial advice/cash-advance monetization aimed at young adults"]
+    }
+  },
+  "confidence": 0.78,
+  "sources": [
+    { "type": "public-data", "description": "YNAB official pricing/student program pages + 2025-26 reviews (ynab.com, PennyHoarder)", "credibility": 0.85 },
+    { "type": "public-data", "description": "Cleo pricing/features + FTC March 2025 $17M settlement reporting", "credibility": 0.85 },
+    { "type": "public-data", "description": "Finny official site/blog + App Store listing", "credibility": 0.7 },
+    { "type": "public-data", "description": "PocketGuard pricing page + Forbes/PennyHoarder/SmartAsset reviews", "credibility": 0.85 },
+    { "type": "public-data", "description": "Goodbudget pricing/features (NerdWallet, Experian)", "credibility": 0.85 },
+    { "type": "public-data", "description": "Rocket Money pricing/features (Motley Fool, CNBC)", "credibility": 0.85 },
+    { "type": "public-data", "description": "Monarch pricing/features (PennyHoarder)", "credibility": 0.85 },
+    { "type": "public-data", "description": "Copilot Money pricing/features (Forbes, PennyHoarder)", "credibility": 0.85 },
+    { "type": "public-data", "description": "Splitwise pricing/user base — 35M+ users, ~31% of bill-split transactions", "credibility": 0.8 },
+    { "type": "report", "description": "Student lump-sum/aid-refund budgeting guidance (studentaid.gov, BestMoney, Finny) documenting manual 'divide-by-months' workaround", "credibility": 0.75 }
+  ],
+  "gaps": [
+    "No verified funding/market-share figures for most competitors except Splitwise.",
+    "Finny user-sentiment base thin — relies on vendor/self-published sources.",
+    "Cleo's exact tier structure varies by market/A-B tests.",
+    "No first-party primary research confirming demand for aid-runway feature.",
+    "Regional/international pricing verified only at high level."
+  ],
+  "nextSteps": [
+    "Commission primary research validating aid-refund-runway pain and WTP.",
+    "Pull audited download/DAU/funding data for YNAB, Cleo, Rocket Money, Splitwise.",
+    "Prototype-test runway pacing and unified budget+split vs YNAB/Cleo.",
+    "Assess Splitwise partnership vs build; evaluate regulatory guardrails post-Cleo FTC.",
+    "Hand to trend-intelligence-agent to layer market-timing signals onto competitive map."
+  ]
+}
