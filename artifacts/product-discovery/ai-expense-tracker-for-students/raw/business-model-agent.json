@@ -1,0 +1,63 @@
+{
+  "findings": {
+    "revenueStreams": [
+      "Institutional/Campus License (PRIMARY, recurring ARR): $2-8/student/yr sold to financial-aid offices; comparable iGrad/Enrich $2-10/student/yr across 600+ institutions. 10k-student school @ $3 = $30k ARR. Load-bearing revenue line — break-even driven by logo count, not consumer conversion.",
+      "Student Plus consumer subscription (SECONDARY): $1.99/mo or $17.99/yr targeting Gen Z direct segment; low single-digit % conversion typical of freemium consumer fintech — treat as upside/validation signal, not core Y1-Y2 ARR.",
+      "Free-forever student tier (NON-revenue, distribution asset): runway/safe-to-spend tracker. Role is top-of-funnel and land-and-expand proof for institutional deals (usage data becomes sales case), not direct revenue.",
+      "Potential later streams (UNVALIDATED): anonymized/aggregate financial-wellness reporting dashboards for institutions as paid add-on; referral/affiliate revenue from student financial products (high compliance/brand risk given trust-first positioning — recommend deferring)."
+    ],
+    "costStructure": {
+      "majorCostCategories": [
+        "People/payroll — 60-70% of total operating cost (SaaS benchmark). Engineering dominates absolute burn at pre-revenue/MVP stage.",
+        "Sales & Marketing — 30-50%+ of revenue early-stage while building pipeline. Institutional CAC $8k-20k per closed school with multi-month cycle sits here — field/relationship sales, not cheap self-serve.",
+        "G&A — ~14-20% of revenue (legal, institutional contracting, procurement/RFP response overhead).",
+        "COGS / hosting + data infrastructure — Plaid/aggregation is a material variable cost: ~$0.60-0.90/active user/mo early-stage, dropping toward $0.40 at scale. Real gross-margin drag against mostly-free user base.",
+        "Compliance & security — front-loaded: SOC 2 Type II ~$25k-60k all-in year one (audit $12k-30k + readiness $5k-25k + automation $8k-30k/yr + 100-300 staff hours); recurring annually.",
+        "Support/success — grows with institutional accounts; aid offices expect onboarding, training, account management."
+      ],
+      "complianceConsiderations": "Handling student financial data via bank-linked aggregation makes SOC 2 non-optional and a gating factor for institutional deals — aid offices/CIOs/compliance officers require it in procurement. Budget $25k-60k year one, recurring annually, plus ~$5k-15k/yr infrastructure hardening. Additional obligations: FERPA (student education records via institutional contracts), GLBA/Safeguards Rule (financial data), state privacy laws. Data-processing agreements per institution add legal/G&A cost. Recommend SOC 2 as Y1 fixed cost, sequenced before institutional sales outreach — it's a deal prerequisite."
+    },
+    "keyPartnerships": [
+      "Plaid (or Yodlee/MX alternative) — bank/transaction data aggregation, core to runway tracker. Per-active-user cost model; negotiate volume/commit discounts (30-50% reduction achievable at 10k+ MAU).",
+      "Financial-aid offices — buyer AND distribution channel (push app to enrolled students). Land-and-expand anchor for institutional ARR.",
+      "Campus channel partners — student financial-wellness programs, bursar/student-success offices, orientation programs; internal champions routing free tier to students.",
+      "Higher-ed ecosystem/SIS integrators (Ellucian partner network, 150+ member orgs) — potential co-sell path to institutions running campus ERP/SIS.",
+      "Incumbent-adjacent references (iGrad/Enrich's 600+ institution footprint) — validates price band and buyer, but also primary competitive incumbent to displace.",
+      "Compliance/security tooling partner (Vanta/Drata/Thoropass-class) — compress SOC 2 cost/timeline (30-50% reduction via automation)."
+    ],
+    "financialMilestones": {
+      "breakeven": "Logo-driven, not consumer-conversion-driven. With institutional CAC $8k-20k/school and ~$30k ARR per 10k-student school @ $3, payback within year one per closed logo. Operating break-even (covering $25k-60k SOC 2 + baseline eng/hosting + S&M burn) plausibly requires ~15-40 signed institutional logos depending on average school size/price point — landing in SOM Y2 range ($1.5-5M ARR). MODERATE confidence: precise logo count depends on fully-loaded burn not yet specified upstream.",
+      "cashFlowPositive": "Realistically Y2-Y3, gated by (a) multi-month institutional sales cycles (higher-ed procurement commonly 6-12 months, 60-120 days minimum at department level, longer with CFO/procurement authority) creating lag between S&M spend and ARR recognition, and (b) front-loaded fixed compliance cost in Y1. Cash flow will be lumpy/seasonal (aligned to fiscal-year budgeting windows). Sustainable positivity most credible in upper half of SOM Y2 range ($3-5M ARR) once repeatable institutional pipeline exists and Plaid unit costs renegotiated down."
+    },
+    "acquisitionChannels": [
+      "Direct institutional outreach to financial-aid/student-success offices — core testable channel; map fiscal-year/budget windows, land outreach before budget committed. Testable via 3-5 design-partner schools.",
+      "Design-partner/pilot program — 1-2 free/discounted campus pilots to generate usage data and reference logo; most testable MVP motion for multi-month B2B cycle.",
+      "Product-led/free-tier virality among students — free runway tracker as bottom-up land signal; measurable via organic student sign-ups per campus, becomes aid-office sales evidence.",
+      "Higher-ed conferences & associations (NASFAA, EDUCAUSE) — relationship-building channel for long, diffuse higher-ed buying; testable via lead volume from one event.",
+      "Ecosystem/integration co-sell (Ellucian-type networks) — later-stage channel, test only after repeatable direct motion exists.",
+      "Low-cost consumer digital (campus micro-influencers, student subreddits, TikTok) — cheap testable channel for Student Plus segment and free-tier top-of-funnel; keep spend small until conversion proven."
+    ]
+  },
+  "confidence": 0.7,
+  "sources": [
+    { "type": "benchmark", "description": "SaaS opex benchmarks: 30/50/20 rule, S&M 30-50%+ revenue early-stage, R&D 20-30%, G&A 14-20%, payroll 60-70% opex", "credibility": 0.8 },
+    { "type": "public-data", "description": "SOC 2 Type II cost data: $25k-60k all-in first year; audit $12k-30k, readiness $5k-25k, automation $8k-30k/yr, 100-300+ staff hours; 30-50% reduction via automation", "credibility": 0.8 },
+    { "type": "public-data", "description": "Plaid pricing: Transactions per-connected-account subscription product; ~$0.90/active user/mo early-stage dropping to $0.40-0.60 at scale; 30-50% reductions at 10k+ MAU", "credibility": 0.8 },
+    { "type": "report", "description": "Higher-ed procurement/sales-cycle evidence: long diffuse cycles aligned to academic/budget calendars, 60-120 days at department level and longer with CFO/procurement authority", "credibility": 0.75 },
+    { "type": "benchmark", "description": "Upstream pricing-strategy inputs: iGrad/Enrich comparable ($2-10/student/yr, 600+ institutions), institutional CAC $8k-20k, SAM $150-300M, SOM Y1 $0.3-1.2M / Y2 $1.5-5M ARR", "credibility": 0.7 }
+  ],
+  "gaps": [
+    "No upstream headcount/burn plan; break-even logo count (15-40 range) and cash-flow-positive threshold estimated, not modeled bottom-up.",
+    "Free-tier active-user projection unknown, so Plaid/aggregation COGS cannot be sized precisely — biggest gross-margin risk.",
+    "Institutional sales-cycle length for THIS buyer inferred from general higher-ed benchmarks; not validated with direct discovery interviews.",
+    "FERPA/GLBA applicability and per-institution DPA legal cost flagged qualitatively but not quantified.",
+    "Student Plus free-to-paid conversion assumed low but has no dedicated benchmark cited."
+  ],
+  "nextSteps": [
+    "Request engineering/headcount burn plan from product-strategy-agent to convert break-even logo estimate into modeled figure.",
+    "Build unit-economics model with two COGS scenarios (Plaid $0.90 vs $0.40/active user) against free-tier user forecast.",
+    "Validate institutional sales-cycle length and price sensitivity via 3-5 financial-aid-office discovery interviews.",
+    "Get legal/compliance input on FERPA + GLBA/Safeguards Rule scope and per-institution DPA cost.",
+    "Escalate to pricing-strategy-agent to confirm whether Student Plus is core ARR or upside — changes cash-flow-positive timeline."
+  ]
+}
