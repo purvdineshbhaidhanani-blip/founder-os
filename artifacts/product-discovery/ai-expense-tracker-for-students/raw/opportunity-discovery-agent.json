@@ -1,0 +1,35 @@
+{
+  "findings": {
+    "opportunityStatement": "For U.S. college students who receive lump-sum financial-aid or loan refunds at the start of each term, the core problem is not generic budgeting but runway pacing: a one-time disbursement must last 4-5 months, and no existing tool models this 'front-loaded income, zero income thereafter' pattern — leaving students to overspend early and run dry before term-end, compounded by low financial literacy and aid-policy churn (SAVE vacated) that makes disbursement timing unpredictable. The solution is a privacy-first, low-effort 'term runway' tracker that automatically paces a lump-sum refund across the academic term, surfaces a single 'safe-to-spend-per-week' number, and requires near-zero ongoing engagement. Why now: on-device LLMs make privacy-first, passive AI feasible; the Cleo FTC $17M settlement (Mar 2025) has made honest, non-manipulative design a differentiator; gig/irregular-income volatility validates the non-salaried income model; student-loan policy churn is raising salience of aid-timing pain — but the window is finite because JPMorgan/BofA agentic banking assistants and rising bank data-access fees threaten to close this wedge within 18-24 months.",
+    "uniqueValueProposition": "Against YNAB (rigid zero-based budgeting built for salaried adults; high-effort methodology anxious students abandon), Cleo (engagement-maximizing, gamified chat under FTC scrutiny for dark patterns), and Finny (financial literacy education, not operational cash-flow tooling): the defensible edge is being the only tool that natively models a lump-sum aid refund as a depleting term runway and delivers the answer passively — one 'safe-to-spend' number, no daily categorization required. YNAB assumes recurring income; Cleo optimizes for engagement (the exact behavior anxious students flee); Finny teaches rather than paces cash. None of the three solves aid-refund runway.",
+    "positioning": "For financially anxious college students living off lump-sum aid refunds, [Product] is the runway tracker that tells you exactly how much you can safely spend this week so your refund lasts the whole term — without the daily budgeting homework other apps demand. Unlike engagement-driven finance apps, it works quietly in the background and respects your privacy, because we make money when your refund lasts, not when you open the app.",
+    "riskAddressed": {
+      "anxietyAvoidanceRisk": "Same anxiety that motivates purchase drives avoidance of engagement-heavy tools, so the product must NOT be engagement-dependent. Core value is ambient and low-touch: a single passively-computed 'safe-to-spend-this-week' number delivered via glanceable notification/widget, no logging/categorization/chat required. Deliberately inverts the Cleo/gamification model (also penalized by FTC), turning the anxiety-avoidance liability into a positioning advantage ('the finance app you don't have to open'). Success metric shifts from DAU/engagement to 'runway accuracy' and 'terms survived without overdraft'.",
+      "bundleUncertaintyRisk": "Budget+split bundle is unconfirmed and Splitwise (35M users) already owns splitting — do NOT lead with or build split feature at launch. Sequencing: (1) ship runway wedge standalone, validate retention alone; (2) treat roommate cost-sharing (73% conflict rate confirmed) as validated adjacent problem, test demand via lightweight Splitwise import before native splitting; (3) run fake-door/concierge test on 'bundled split' to measure pull before committing engineering."
+    }
+  },
+  "confidence": 0.55,
+  "sources": [
+    { "type": "report", "description": "Market research stream: TAM $1.5-1.85B / SAM $150-300M / SOM $0.3-1.2M Y1 ARR, ~12.7% CAGR, low direct-student WTP favoring B2B2C institutional channel", "credibility": 0.6 },
+    { "type": "report", "description": "Competitor intelligence stream: direct/indirect competitor mapping; identified gap — no incumbent paces lump-sum aid refunds into a term runway", "credibility": 0.7 },
+    { "type": "public-data", "description": "Cleo FTC $17M settlement (Mar 2025) establishing regulatory penalty for dark-pattern/engagement-maximizing finance UX", "credibility": 0.85 },
+    { "type": "report", "description": "Trends stream: on-device LLM privacy tailwind, SAVE-plan vacatur raising aid-timing salience, gig-income volatility; headwinds — data-access fees, agentic banking assistants, AI-advice regulatory scrutiny", "credibility": 0.55 },
+    { "type": "report", "description": "User research stream (secondary/desk research, self-rated confidence 0.48, NOT primary interviews): CONFIRMED refund-runway problem, low literacy, 73% roommate cost-sharing conflict; CONTRADICTED anxiety->avoidance; UNCONFIRMED budget+split bundle demand", "credibility": 0.48 }
+  ],
+  "gaps": [
+    "No primary user interviews exist — entire user-side evidence base is desk research at 0.48 confidence.",
+    "Direct-student WTP is LOW; monetization path (direct subscription vs B2B2C institutional) unresolved and materially changes the model.",
+    "Anxiety->avoidance contradiction addressed by design hypothesis (ambient/low-touch), but no behavioral evidence a passive tool actually retains avoidant students rather than being ignored.",
+    "Budget+split bundle demand unconfirmed; Splitwise's ownership of splitting is a real competitive moat.",
+    "Timing risk (18-24 month window) asserted but not quantified with evidence on incumbent roadmaps.",
+    "No evidence on whether financial-aid disbursement data is accessible via Plaid/bank feeds or requires manual entry — determines feasibility of 'passive' computation."
+  ],
+  "nextSteps": [
+    "Commission 8-12 primary interviews with aid-refund-dependent students to validate runway problem intensity and whether passive/low-touch tool overcomes anxiety->avoidance barrier.",
+    "Run fake-door/concierge test on standalone runway feature and 'bundled split' feature to measure comparative pull before roadmap commitment.",
+    "Hand to pricing-strategy-agent and business-model-agent: given LOW direct-student WTP, evaluate B2B2C institutional channel vs direct subscription.",
+    "Technical/roadmap scan of JPMorgan/BofA agentic assistants to quantify wedge-closure timeline.",
+    "Validate technical feasibility of passive runway computation given rising Plaid/data-access fees; cost the on-device LLM privacy claim.",
+    "Frame split feature as optional Splitwise-integration experiment, not native build, until bundle demand is proven."
+  ]
+}
