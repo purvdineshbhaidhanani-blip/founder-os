@@ -1,0 +1,85 @@
+{
+  "findings": {
+    "personas": [
+      {
+        "name": "Refund-Runway Rae (Aid-Dependent, Lump-Sum Disbursement)",
+        "demographic": "18-24, US undergraduate at a public 4-year or community college, Pell-eligible (household income typically <$60K), often first-generation. Part-time wage income plus 1-2 lump-sum aid refunds per term.",
+        "psychographic": "Anxiety-driven relationship with money; feast-or-famine mindset. Money is a top stressor tied to persistence. Wants control but lacks a mental model for pacing a big deposit over ~4 months.",
+        "behavioral": "Receives one large refund at term start, spends fastest weeks 1-4, runs short by mid-term. Uses free tools (bank app, spreadsheet). MDRC 'Aid Like a Paycheck' RCT (~9,000 students) confirms the lump-sum-to-shortfall pattern.",
+        "painPoints": ["No tool converts lump-sum refund into per-week/per-month term runway", "Runs out of money before next disbursement", "Irregular income breaks fixed-budget apps built for salaried adults", "Financial stress threatens enrollment/persistence"],
+        "willingnessToPay": "LOW absolute WTP but real: most budget-constrained persona (Pell = need-based). YNAB gives students a FREE year, signaling category treats students as free/low-margin. Monetization more likely via B2B2C (colleges, MDRC-style programs) than direct consumer subscriptions."
+      },
+      {
+        "name": "First-Budget Finn (First-Time Money Manager)",
+        "demographic": "18-20, traditional-age undergraduate, broad income range, first time managing own money away from parents.",
+        "psychographic": "No budgeting habit yet; learns via app/social (TikTok finance), values simplicity and automation over spreadsheets. Open to 'AI does it for me' framing.",
+        "behavioral": "Adopts free apps readily; churns quickly with friction. Overlaps with subscription-heavy behavior.",
+        "painPoints": ["Doesn't know how to start a budget or what 'normal' spending is", "Existing apps assume prior financial literacy", "Habit doesn't stick without nudges"],
+        "willingnessToPay": "LOW-to-MODERATE. High free-app adoption, low paid conversion; but pays for OTHER app categories (~$97/mo media/subscriptions per Talker Research). WTP exists but is spent on entertainment, not finance."
+      },
+      {
+        "name": "Splitwise Sam (Cost-Sharing Roommate/Friend Group)",
+        "demographic": "19-23, lives off-campus or shared housing, splits rent/utilities/groceries/subscriptions with 2-5 people.",
+        "psychographic": "Socially motivated; wants to avoid awkward money conversations. Trusts a bill-splitting app but sees it as siloed from personal budgeting.",
+        "behavioral": "Active Splitwise/Venmo user. Splitwise reports 35M+ global users; ~38% of Gen Z regularly use digital expense-sharing tools. Bill-splitting apps market ~$612M in 2025, ~7-8% CAGR.",
+        "painPoints": ["Shared costs live in Splitwise; personal budget lives elsewhere — no unified view", "Group subscriptions and rent create recurring reconciliation overhead"],
+        "willingnessToPay": "MODERATE — strongest paid signal of the five. A paid bill-splitting market already exists (Splitwise Pro monetizes), proving this cohort will pay for shared-cost tooling."
+      },
+      {
+        "name": "Subscription-Stack Sky (Subscription-Heavy Gen Z Spender)",
+        "demographic": "18-24 undergraduate, discretionary-income-positive, heavy digital consumer.",
+        "psychographic": "Convenience-first, prone to subscription creep and set-and-forget billing; motivated by 'save money / cancel waste' hooks.",
+        "behavioral": "Holds ~8+ subscriptions; 35% pay for unwanted ones. Subscribes to ~26% more services than average American (Bango); spends ~$97/mo on media (Talker Research).",
+        "painPoints": ["Loses money to forgotten/unwanted subscriptions", "No single place tracks recurring drains against income"],
+        "willingnessToPay": "MODERATE-to-HIGH relative to peers. Clearest 'save-me-money' ROI story and proven discretionary spend."
+      },
+      {
+        "name": "Currency-Crossing Camila (International Student)",
+        "demographic": "18-24, F-1 undergraduate; 357,231 international undergrads in US 2024/25 (IIE Open Doors). Top origins India, China.",
+        "psychographic": "Managing money across two currencies and cultures; risk-averse about fees; no US credit history yet.",
+        "behavioral": "Tracks forex, remittances, multi-currency balances; underserved by US-centric budgeting apps.",
+        "painPoints": ["Multi-currency budgeting and forex fee tracking", "No US credit history — excluded from credit-linked features", "US apps assume single-currency, domestic-banking user"],
+        "willingnessToPay": "MODERATE. Smaller segment but higher relative spend capacity (often self-funded) and acute unmet need."
+      }
+    ],
+    "primaryAudience": {
+      "segment": "Aid-dependent US undergraduates receiving lump-sum financial-aid refunds, overlapping with first-time money managers",
+      "estimatedSize": "~5.8M-6.0M core (Pell recipients as proxy): 6,032,974 in AY2022-23, 6.3-6.5M AY2023-24 (Federal Student Aid / educationdata.org). Broader ceiling: ~19.28M undergrads (Fall 2024, NCES) x 72% receiving some aid ≈ 13.9M, or x 55% federal aid ≈ 10.6M.",
+      "rationale": "Highest severity in upstream problem discovery, largest well-bounded population, institutionally validated pain (MDRC RCT). Only segment where pacing a lump sum into a term runway has no incumbent. Trade-off: lowest-WTP segment (need-based by definition) — monetization likely requires B2B2C/institutional or freemium rather than direct consumer subscriptions."
+    },
+    "secondaryAudiences": [
+      { "segment": "Subscription-heavy Gen Z spenders (best consumer-WTP)", "estimatedSize": "Overlaps most of ~19.28M undergrads; ~8+ subs each, 35% carry unwanted subs" },
+      { "segment": "Cost-sharing roommates/friend groups (strongest existing paid-market proof)", "estimatedSize": "~38% of Gen Z regularly use expense-sharing apps; bill-splitting market ~$612M in 2025" },
+      { "segment": "International undergraduates (high per-user need, smaller base)", "estimatedSize": "357,231 intl undergrads, 2024/25 (IIE Open Doors), +4% YoY" }
+    ],
+    "icp": {
+      "description": "A US undergraduate (18-22) who receives a lump-sum financial-aid refund each term AND earns irregular part-time wages, is a first-time money manager, and already pays for consumer subscriptions (proving WTP exists) — giving both acute lump-sum-runway pain and a 'save-me-money-on-subscriptions' monetization hook. Reachable via campus financial-aid offices and first-year onboarding.",
+      "criteria": ["Enrolled undergraduate, age 18-22, in the US", "Pell-eligible / receives lump-sum aid refund at least once per term", "Has part-time wage income (irregular cash flow)", "No established budgeting habit (first-time manager)", "Holds multiple paid subscriptions (WTP proxy)", "Smartphone-first, comfortable with AI-driven automation", "Reachable via financial-aid office, first-year seminars, or campus partnerships"]
+    }
+  },
+  "confidence": 0.72,
+  "sources": [
+    { "type": "public-data", "description": "NCES / educationdata.org — 19.28M US undergraduate enrollment, Fall 2024", "credibility": 0.9 },
+    { "type": "public-data", "description": "NCES NPSAS 2019-20 — 72% of undergrads received some financial aid; 55% received federal aid; avg federal aid $8,700", "credibility": 0.95 },
+    { "type": "public-data", "description": "Federal Student Aid / educationdata.org / Statista — ~6.03M Pell recipients AY2022-23; 6.3-6.5M AY2023-24", "credibility": 0.9 },
+    { "type": "public-data", "description": "IIE Open Doors 2024/25 — 357,231 international undergraduates (+4% YoY); 1.18M total international students", "credibility": 0.95 },
+    { "type": "report", "description": "MDRC 'Aid Like a Paycheck' RCT (~9,000 students, TX & CA community colleges)", "credibility": 0.9 },
+    { "type": "report", "description": "Talker Research / Bango — Gen Z ~$97.70/mo media spend, subscribes to ~26% more services than avg American", "credibility": 0.7 },
+    { "type": "report", "description": "Bill-splitting apps market (market.us) — ~$612M in 2025, ~7-8% CAGR; Splitwise 35M+ users", "credibility": 0.65 },
+    { "type": "benchmark", "description": "YNAB — free year for college students; $14.99/mo regular price", "credibility": 0.75 }
+  ],
+  "gaps": [
+    "No direct, sourced conversion rate of students to PAID budgeting apps — WTP inferred from adjacent spend.",
+    "Segment sizes overlap heavily; no de-duplicated sizing exists.",
+    "Pell is a proxy for 'lump-sum-refund-dependent'; exact refund population unmeasured.",
+    "Upstream '68%/59%' stats passed in without traced primary survey.",
+    "No willingness-to-pay figure specific to AI/automation feature set."
+  ],
+  "nextSteps": [
+    "user-research-agent: run WTP interviews on ICP; validate 'save-me-money-on-subscriptions' as monetization wedge.",
+    "market-research-agent: size de-duplicated SAM/SOM; evaluate B2B2C institutional channel given primary segment's low direct WTP.",
+    "Trace upstream '68%/59%' statistics to citable primary survey.",
+    "Validate lump-sum-refund population precisely via NPSAS microdata.",
+    "Resolve size-vs-monetization tension: highest-severity segment (aid-dependent) has lowest WTP; best WTP is subscription-heavy/cost-sharing segments."
+  ]
+}
