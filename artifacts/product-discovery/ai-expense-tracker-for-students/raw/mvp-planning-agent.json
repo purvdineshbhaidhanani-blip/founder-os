@@ -1,0 +1,61 @@
+{
+  "findings": {
+    "mvpScope": {
+      "included": [
+        "Academic-calendar / aid-disbursement term modeling (manual/guided setup) — RICE 130.7; highest-value P0, structural anchor that makes runway math meaningful; manual/guided entry avoids risk-heavy SIS/bank dependency for v1",
+        "Refund-pacing runway engine — RICE 113.4; core problem-solving compute layer ('how long does my aid last') that depends on the term model above",
+        "Ambient one-number surface (low-touch) — RICE 108.0; primary UI surface and persona's core interaction, low-touch keeps build cost down while validating the 'one number' value hypothesis"
+      ],
+      "excluded": [
+        "Passive bank-transaction ingestion + auto-classification (P0, RICE 72.0) — EXCLUDED v1: highest technical/compliance risk (Plaid-style aggregation), not required to validate core runway value prop which can run on manual/guided input first; sequence into v1.1 once demand proven",
+        "Institutional SSO onboarding (P1, RICE 54.0) — EXCLUDED: institutional sales motion, not needed for direct-to-student learning launch",
+        "SOC2 compliance (P1, RICE 42.0) — EXCLUDED from MVP build, flagged as gating prerequisite the moment bank ingestion or institutional distribution is pursued",
+        "Predictive shortfall alerts (P1, RICE 76.8) — EXCLUDED: depends on trustworthy runway signal being validated first; premature alerts erode trust",
+        "Subscription detection (P1, RICE 61.3) — EXCLUDED: depends on transaction ingestion which is out of v1",
+        "All P2 items (literacy scaffolding, institutional analytics dashboard, multi-refund modeling, SIS integration, Student Plus tier depth) — EXCLUDED: post-MVP by definition",
+        "Expense splitting — EXCLUDED (explicitly deferred upstream): Splitwise owns the category and bundle demand is unconfirmed"
+      ]
+    },
+    "estimatedTimeline": "ESTIMATE ONLY — PENDING FOUNDER/HUMAN APPROVAL, NOT A COMMITMENT: a rough order-of-magnitude of ~8-12 weeks appears feasible for the three included features (term model + runway engine + ambient one-number surface) given manual/guided input avoids bank/compliance work. Requires explicit human approval before treated as a delivery date; per upstream constraint no hard deadline is being attached.",
+    "launchCriteria": [
+      "Primary persona (student on financial aid) can complete guided term/aid-disbursement setup in one session without support intervention (target: >=80% setup-completion rate in usability testing)",
+      "Runway engine produces a runway/one-number output for every completed setup with zero unhandled-error states across tested aid-disbursement patterns",
+      "The ambient one-number surface renders the runway figure as primary view, reachable in <=2 taps from app open",
+      "Every included feature emits instrumentation events before launch (no dark features shipping without telemetry)",
+      "Manual/guided term model correctly handles disbursement schedules of the target institution set used for pilot cohort (validated against real academic calendars)",
+      "A defined pilot cohort (target: N students recruited) is provisioned and consented for data collection"
+    ],
+    "learningExperiments": [
+      "Value hypothesis: does a single 'runway' number change how students perceive/manage aid — measure whether users return to check the number and whether self-reported confidence improves",
+      "Input-friction hypothesis: will students tolerate manual/guided term + aid setup, or is passive bank ingestion actually a hard requirement — measure setup completion and drop-off; de-risks decision to build excluded bank-ingestion feature",
+      "Accuracy-trust hypothesis: does runway figure match students' lived reality closely enough to be trusted — collect perceived-accuracy feedback vs actual spend",
+      "Persona-fit hypothesis: is aid-disbursement/refund-pacing framing the right core problem for the primary student persona vs general expense tracking",
+      "Demand signal for deferred bundle: passively observe whether users request expense-splitting or subscription features, to test upstream 'unconfirmed bundle demand' assumption without building it"
+    ],
+    "instrumentationPlan": [
+      "Activation funnel from day 1: install -> setup started -> term model completed -> first runway number viewed (measures onboarding friction and manual-input hypothesis)",
+      "Engagement: runway-surface open events, frequency/recency of return visits, time-to-first-open after disbursement events (measures ambient one-number value hypothesis)",
+      "Accuracy/trust telemetry: in-app perceived-accuracy prompt and any user corrections to runway inputs",
+      "Feature-request/intent capture: lightweight in-app signal for requested-but-excluded capabilities (bank sync, subscription detection, splitting) to quantify latent demand",
+      "Error/degradation logging: unhandled states, setup abandonment points, graceful-degradation fallbacks triggered (feeds launch-criteria and reliability)",
+      "Cohort-level retention: D1/D7/D30 retention and per-term retention aligned to disbursement cycles"
+    ]
+  },
+  "confidence": 0.62,
+  "sources": [
+    { "type": "report", "description": "Upstream feature-planning backlog with RICE scores (P0/P1/P2 tiers plus explicit deferral of expense splitting). Sole authoritative input.", "credibility": 0.7 },
+    { "type": "report", "description": "MVP Planning Agent objective 'launchable within 8-12 weeks' from SYSTEM_PROMPT.md, used as timeline estimate frame (flagged as approval-pending)", "credibility": 0.8 }
+  ],
+  "gaps": [
+    "No underlying discovery evidence (interviews/surveys) directly consulted by this agent — RICE scores accepted as given but value hypotheses remain unvalidated.",
+    "Primary persona described only as 'students'; no explicit target institution set or pilot-cohort size provided.",
+    "No resource/team-capacity data supplied, so timeline estimate is order-of-magnitude only.",
+    "Success-metric thresholds proposed by this agent, not sourced from upstream targets."
+  ],
+  "nextSteps": [
+    "Route ~8-12 week estimate to founder/human approver before any date is communicated as committed.",
+    "Hand three-feature MVP scope to user-story-generator for story decomposition.",
+    "Request explicit primary-persona definition, target institution list, desired pilot-cohort size to finalize launch criteria.",
+    "Confirm sequencing decision (defer bank ingestion to v1.1, SOC2 gating dependency) before build starts."
+  ]
+}
