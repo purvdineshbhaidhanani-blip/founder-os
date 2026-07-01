@@ -190,3 +190,40 @@ flagged as **compromised**.
 A repository secret scan (`AIzaSy`, `ghp_`, `rl_c88`) was run across `src/`, `web/`,
 and `tests/` and returned **zero matches** — no secret is hardcoded in the codebase.
 Keep it that way.
+
+## 7. Railway deployment
+
+This app is a **single self-contained Node process holding in-memory state**
+(sessions, SSE progress subscriptions, the runtime object graph) — exactly the
+model Railway's persistent-container runtime supports natively, unlike a
+stateless serverless platform. No code changes were required to run here.
+
+**Confirmed compatible, unmodified:**
+- `src/server/index.ts` reads `PORT` from the environment (`Number(process.env.PORT) || 4173`)
+  and binds via `server.listen(port)` with no explicit host, which defaults to
+  all interfaces — required for a containerized platform to route traffic in.
+  Verified locally with `PORT=5555` injected exactly as Railway would.
+- Sessions and SSE re-verified against the existing Playwright E2E suite after
+  the above check — 6/6 specs still pass, no regression from confirming
+  Railway compatibility.
+
+**Deployment config:** `railway.json` at the repo root pins the Nixpacks
+builder and `npm start` as the start command, with an on-failure restart
+policy. Railway's Nixpacks builder auto-detects the `build`/`start` scripts
+in `package.json` even without this file; it is included for explicitness
+and reproducibility.
+
+**Steps to deploy (requires a human with Railway account access):**
+1. `npm install -g @railway/cli` (or use `npx @railway/cli`), then `railway login`
+   — this opens a browser OAuth flow and cannot be done headlessly by an agent.
+2. From the repo root: `railway init` (or `railway link` if a project already
+   exists), then `railway up`.
+3. In the Railway project dashboard (or via `railway variables set KEY=value`),
+   set at minimum: `FOUNDER_EMAIL`, `FOUNDER_PASSWORD`, `SESSION_SECRET`. Set
+   `NODE_ENV=production` to enable the `Secure` cookie attribute. Add
+   `GITHUB_TOKEN` / `YOUTUBE_API_KEY` / `STACK_EXCHANGE_KEY` if those research
+   sources should be active. Railway injects `PORT` automatically — do not set
+   it manually.
+4. Railway assigns a public `*.up.railway.app` HTTPS domain automatically on
+   first deploy (or a custom domain if configured) — that URL only exists
+   after step 2 actually runs against an authenticated Railway account.
