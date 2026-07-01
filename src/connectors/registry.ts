@@ -22,6 +22,8 @@ export const BUILTIN_CONNECTORS: ConnectorDefinition[] = [
   { id: "calendar", name: "Calendar", vendor: "Google", category: "comms", requiredEnv: ["GOOGLE_CALENDAR_CREDENTIALS"], optionalEnv: [], description: "Calendar reads and event creation." },
   { id: "browser", name: "Browser", vendor: "Playwright", category: "browser", requiredEnv: [], optionalEnv: ["PLAYWRIGHT_BROWSERS_PATH"], description: "Headless browser automation." },
   { id: "mcp", name: "MCP", vendor: "Model Context Protocol", category: "mcp", requiredEnv: [], optionalEnv: ["MCP_REGISTRY_URL"], description: "Connects MCP tool servers." },
+  { id: "youtube", name: "YouTube Data API", vendor: "Google", category: "data", requiredEnv: ["YOUTUBE_API_KEY"], optionalEnv: [], description: "YouTube video/channel search for research." },
+  { id: "stackexchange", name: "Stack Exchange API", vendor: "Stack Exchange", category: "data", requiredEnv: [], optionalEnv: ["STACK_EXCHANGE_KEY"], description: "Stack Exchange Q&A search for research (key optional, raises quota)." },
 ];
 
 export class ConnectorRegistry {
