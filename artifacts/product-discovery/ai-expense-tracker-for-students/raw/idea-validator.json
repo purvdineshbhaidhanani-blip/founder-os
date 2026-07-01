@@ -1,0 +1,54 @@
+{
+  "findings": {
+    "technicalFeasibility": {
+      "verdict": "high",
+      "rationale": "The core stack is mature and off-the-shelf. Bank transaction data is accessible via aggregation APIs (Plaid Transactions product), and transaction categorization is a solved problem where hybrid ML+LLM pipelines reach 85-95% accuracy on known merchants. An LLM adds a natural-language advice/insight layer on top of this proven pipeline. The main non-trivial challenges are cost control (pure-LLM categorization is expensive and slow, so a hybrid rules+ML+LLM design is required), data privacy/compliance handling of financial data, and the well-documented reliability caveat that AI financial advice can produce poor recommendations — not any fundamental technical blocker.",
+      "evidence": [
+        "Plaid offers a Transactions product with per-successful-link pricing ~$0.50-$2.00 and a free tier of ~200 API calls, making bank data access viable for early-stage startups (est. $30K-$65K/yr at ~5K users).",
+        "ML-based transaction categorization typically achieves 85-95% accuracy on known merchant categories; a hybrid approach reached 94% accuracy at ~0.2s per transaction.",
+        "Industry practice (e.g. ANNA) combines LLMs with traditional ML to cut LLM costs ~75% while keeping accuracy — confirming a cost-effective architecture exists for LLM-in-the-loop finance apps.",
+        "Reported risk: over half of Gen Z/millennials who used AI for financial advice said they made a poor decision as a result — a product/safety design constraint, not a feasibility blocker."
+      ]
+    },
+    "marketViability": {
+      "verdict": "medium",
+      "rationale": "Demand signal is strong but the space is crowded and hard to monetize. Students clearly experience financial anxiety and there is measurable appetite for AI-assisted finance (67-77% of Gen Z report using AI for personal finance; budgeting is the top use case at ~60%). However, the student budgeting market is saturated with entrenched incumbents (YNAB with a free student year, PocketGuard, Goodbudget, Rocket Money, Monarch, Copilot, Finny), and Mint's 2024 shutdown showed the 'free-and-everything' model is not sustainable. Students are low-willingness-to-pay, so an 'AI expense tracker for students' risks being a thin feature on top of commodity aggregation unless it has a sharp differentiator. Verdict is medium: real demand exists, but the wedge and monetization path are unproven.",
+      "evidence": [
+        "67% of Gen Z (up to 77% in one survey) report using AI to help manage personal finances; saving/budgeting is the top AI use case at ~60%.",
+        "~73% of Gen Z report feeling anxious about money at least weekly, with students juggling tuition, rent, food, and subscriptions — a clear pain point.",
+        "The market is crowded with student-targeted incumbents (YNAB free first year for students, PocketGuard, Goodbudget, Finny free tier, plus general leaders Rocket Money and Monarch).",
+        "Mint's March 2024 shutdown left ~3.6M users to migrate and, per market coverage, 'the free-and-everything model died with Mint' — signaling monetization difficulty for a low-willingness-to-pay student segment."
+      ]
+    },
+    "founderFit": {
+      "verdict": "unknown",
+      "rationale": "no founder profile provided — flag as open question"
+    },
+    "recommendation": "proceed"
+  },
+  "confidence": 0.62,
+  "sources": [
+    { "type": "report", "description": "CNBC/Fortune/Yahoo coverage of surveys on Gen Z and millennial AI use for personal finance (67-77% adoption; ~60% for budgeting; >50% report a resulting poor decision).", "credibility": 0.8 },
+    { "type": "report", "description": "Bankrate 2025 survey via news coverage: ~73% of Gen Z feel financial anxiety at least weekly.", "credibility": 0.75 },
+    { "type": "public-data", "description": "Student budgeting app landscape from Shorelight, CNBC Select, WalletHub, Purdue Global, MTSU (YNAB, PocketGuard, Goodbudget, Finny, Mint successors).", "credibility": 0.7 },
+    { "type": "public-data", "description": "Plaid Transactions API pricing and startup cost estimates (Monetizely, Plaid docs/pricing, ProtonBits).", "credibility": 0.65 },
+    { "type": "benchmark", "description": "Transaction categorization accuracy benchmarks (85-95% ML; 94% hybrid; arXiv 2508.05425 synthetic-data fine-tuned LM; ANNA LLM+ML cost reduction case).", "credibility": 0.7 },
+    { "type": "report", "description": "Mint March 2024 shutdown (~3.6M users) and market consolidation around Rocket Money, Monarch, Copilot (Rocket Money, CNBC Select, Engadget, Finny).", "credibility": 0.75 }
+  ],
+  "gaps": [
+    "No founder profile provided — cannot assess founder-market fit.",
+    "No defined differentiator vs incumbents — unclear what the 'AI' does that YNAB/PocketGuard/Rocket Money don't already offer.",
+    "No target-student segmentation (US vs international, undergrad vs grad, banked vs cash-heavy, region).",
+    "No monetization hypothesis for a low-willingness-to-pay segment; unit economics untested.",
+    "No primary demand evidence specific to STUDENTS wanting an AI expense tracker (cited surveys are Gen Z/millennial-wide).",
+    "Regulatory/compliance scope not assessed."
+  ],
+  "nextSteps": [
+    "Collect founder profile to resolve founder-market fit before deep research.",
+    "Define concrete differentiator: identify one JTBD incumbents underserve for students (shared/split expenses, international-student multi-currency, financial-aid/refund tracking, subscription cleanup).",
+    "Run 8-12 primary interviews with target students to validate willingness to link a bank account and pay.",
+    "Model unit economics: Plaid cost per active student + hybrid categorization/LLM inference cost vs realistic student price point.",
+    "Prototype hybrid categorization pipeline (rules + ML + selective LLM) to confirm accuracy and cost.",
+    "Add explicit AI-advice safety/guardrail plan given documented risk of poor financial decisions from AI advice."
+  ]
+}
