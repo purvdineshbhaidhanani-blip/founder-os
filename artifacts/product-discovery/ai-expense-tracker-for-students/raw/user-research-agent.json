@@ -1,0 +1,55 @@
+{
+  "findings": {
+    "researchMethod": "SECONDARY / DESK RESEARCH SYNTHESIS OF PUBLIC DISCUSSION AND PUBLISHED SURVEYS — NOT PRIMARY INTERVIEWS. This validation-demo run had no access to real student interview subjects. No live interviews conducted, no quotes attributed to named individuals, no n=X interview count claimed. Evidence drawn from published survey data (NASFAA, Trellis, Edvisors/Money, Intuit Credit Karma, C+R Research, EY, Bread Financial) and aggregated forum/how-to sources. Confidence deliberately set low (0.48). Findings are directional hypotheses to be re-validated with real interviews (n>=5 per persona) before driving product decisions.",
+    "jobsToBeDone": [
+      { "job": "When I receive a lump-sum aid/loan refund at the start of the term, I want to know how much I can safely spend per week, so I can make the money last until the next disbursement instead of running out mid-semester.", "evidence": "~64-68% run out of money at least once; refunds 'supposed to last the semester or academic year' but tempting to spend on non-essentials. Sources: Edvisors/Money survey; Penny Hoarder/College Raptor on refund pacing. Strongest-evidenced JTBD, maps directly to candidate wedge." },
+      { "job": "When I'm managing my own money for the first time, I want simple guidance on where my money is going, so I can build a budgeting habit without feeling overwhelmed.", "evidence": "Only 53% feel prepared to manage money; incoming students averaged 2/6 basic financial-literacy questions correct (NASFAA; Forbes/Constable 2024; Inside Higher Ed 2022)." },
+      { "job": "When I share rent, utilities and groceries with roommates, I want a fair, transparent record of who owes what, so I can settle up without awkward money conversations or arguments.", "evidence": "2025 survey: money disagreements are #1 cause of roommate conflict, 73% argued about shared expenses; current behavior is spreadsheets/group chats/Splitwise (junehomes.com, SoFi). Splitwise already named as incumbent for this half of the wedge." },
+      { "job": "When I sign up for streaming/app subscriptions, I want to be reminded of what I'm still paying for, so I can cancel the ones I forgot and stop wasting money.", "evidence": "Gen Z most likely to forget subscriptions (55% vs 48% millennials), wastes ~$276/yr; 37% canceled a streaming service recently over 'subscription fatigue'. Consumers underestimate subscription spend (~$86 est vs ~$219 actual, C+R Research 2024)." },
+      { "job": "When I look for money advice, I want a source I can actually trust, so I don't get burned by acting on low-quality financial content.", "evidence": "53% of Gen Z call TikTok least trustworthy for finance yet ~49% still favor it; 37% got 'in trouble' after acting on social-media financial advice (Intuit Credit Karma Fall 2024)." }
+    ],
+    "painPoints": [
+      { "pain": "Lump-sum refunds are not paced to term length; students spend early and run short before next disbursement.", "evidence": "money.com/Edvisors: two-thirds run out of money; ~68% ran out at least once since start of calendar year; more recent data cites 77% in past 12 months, 34% running out 5+ times. Class-year gradient (52% freshmen -> 77% seniors)." },
+      { "pain": "Financial anxiety triggers avoidance rather than action — students don't open budgeting tools when stressed.", "evidence": "~70% of Gen Z lose sleep over money; over half scroll social media, 47% binge TV, a third 'bed rot' instead of budgeting (Fortune 2025; Bread Financial: 48% had a finance panic/anxiety attack). Direct risk to any tool requiring proactive engagement." },
+      { "pain": "Low baseline financial literacy — students don't know how to budget or interpret aid vs loan money.", "evidence": "NASFAA/Forbes: fewer than 14.5% answered all 6 basic questions correctly; only 53% feel prepared; only 23% could explain what they owe and why." },
+      { "pain": "Splitting shared costs with roommates causes conflict and awkwardness.", "evidence": "73% of roommates argued about shared expenses; money is #1 roommate conflict driver. Current workarounds (Splitwise, spreadsheets) leave a gap around groceries/communal staples." },
+      { "pain": "Forgotten/unused subscriptions silently drain limited student budgets.", "evidence": "Gen Z forgets subscriptions most (55%), wastes ~$276/yr; large gap between perceived and actual subscription spend." },
+      { "pain": "Distrust of AI/finance-influencer content could suppress adoption of an AI expense tracker unless trust is explicitly earned.", "evidence": "53% rate TikTok least trustworthy for finance; 37% got burned acting on social financial advice; only ~20% of finfluencer content carries disclosures. Inferred link to AI-tool distrust: plausible but 'inferred, not directly evidenced'." }
+    ],
+    "assumptionChecks": [
+      { "assumption": "68% of students run out of money per year.", "status": "confirmed", "rationale": "Multiple independent surveys land in this range: ~64% mid-semester (Edvisors/Money), ~68% since start of calendar year, and a more recent 77%/12-month figure. Specific 68% well within corroborated band." },
+      { "assumption": "Lump-sum aid refunds don't pace to term-end (runway problem is the core wedge).", "status": "confirmed", "rationale": "Refund-guidance sources explicitly frame refund as money that must last the semester/year but is commonly overspent early; running-out surveys corroborate the outcome. Strongest-supported assumption." },
+      { "assumption": "Target users are first-time budgeters with low financial literacy.", "status": "confirmed", "rationale": "Literacy surveys (NASFAA, Forbes, Inside Higher Ed) consistently show low preparedness among incoming/current students." },
+      { "assumption": "Gen Z financial anxiety is accelerating and disrupts sleep (~70%).", "status": "confirmed", "rationale": "Fortune 2025 and multiple outlets report ~70% of Gen Z losing sleep over money; Bread Financial and EY corroborate. Note this cuts both ways for the product." },
+      { "assumption": "Distrust of AI/finance content is a headwind, but Gen Z still uses TikTok for finance info.", "status": "confirmed", "rationale": "Intuit Credit Karma / Newsweek confirm the paradox: least-trusted yet heavily used. Direct distrust of an AI budgeting tool specifically is unconfirmed — extrapolated from finfluencer/social distrust." },
+      { "assumption": "Unified budget + split-expenses is a compelling combined wedge.", "status": "unconfirmed", "rationale": "Each half validated as real pain, but NO secondary evidence students want them bundled vs using a dedicated splitter (Splitwise) plus a budget view. Founder-composition assumption only primary interviews can test — flagged as key mismatch to probe." },
+      { "assumption": "An AI expense tracker will be adopted by anxious students to help them budget.", "status": "contradicted", "rationale": "POTENTIAL MISMATCH: same anxiety that motivates the product also drives avoidance — >50% of Gen Z scroll/binge/'bed rot' rather than confront finances. A tool requiring proactive engagement risks non-use precisely when needed most. Load-bearing contradiction the founder should address (e.g., passive/ambient nudges, automation over dashboards) — must be tested with real users, not assumed." }
+    ]
+  },
+  "confidence": 0.48,
+  "sources": [
+    { "type": "public-data", "description": "Edvisors / Money.com survey — ~64-68% run out of money mid-semester; class-year gradient 52%->77%; 63% couldn't get $500 in emergency.", "credibility": 0.75 },
+    { "type": "public-data", "description": "NASFAA + Forbes (Constable 2024) + Inside Higher Ed 2022 — incoming students averaged 2/6 literacy questions correct.", "credibility": 0.8 },
+    { "type": "public-data", "description": "Fortune (Sept 2025) + Bread Financial + EY — ~70% of Gen Z lose sleep over money; avoidance behaviors instead of budgeting.", "credibility": 0.7 },
+    { "type": "public-data", "description": "Intuit Credit Karma (Fall 2024) + Newsweek — 53% call TikTok least trustworthy yet ~49% favor it; 37% got 'in trouble' from social financial advice.", "credibility": 0.7 },
+    { "type": "public-data", "description": "Roommate expense surveys (junehomes.com 2025, SoFi, Discover) — 73% argued about shared expenses.", "credibility": 0.55 },
+    { "type": "public-data", "description": "Subscription studies (joinchargeback, Recurly, C+R Research 2024) — Gen Z forgets subscriptions most (55%), wastes ~$276/yr.", "credibility": 0.6 },
+    { "type": "anecdote", "description": "Aggregated refund-behavior how-to/forum sources describing common student spending of refunds on non-essentials.", "credibility": 0.45 }
+  ],
+  "gaps": [
+    "No primary interviews conducted — all evidence is secondary/desk research; no direct quotes, no observed workflows, no n>=5-per-persona validation. Primary gap and reason confidence capped near 0.48.",
+    "No source directly tests Gen Z trust of an AI budgeting/expense app specifically — extrapolated from finfluencer/social-media distrust.",
+    "No evidence on whether students want budget + expense-splitting bundled vs separate tools — core wedge composition untested.",
+    "Reddit/forum threads did not surface as retrievable links; paraphrased survey findings stand in for quotes.",
+    "Several statistics originate from vendor/marketing-adjacent sources (roommate and subscription apps) with mild incentive bias.",
+    "The 'anxiety drives avoidance -> non-adoption' contradiction evidenced at population level but not tested against this specific product concept."
+  ],
+  "nextSteps": [
+    "Run real primary interviews: minimum 5 per persona. Required to lift confidence above ~0.6.",
+    "Explicitly test load-bearing contradiction: will anxious/avoidant students engage with an AI expense tracker, or does automation/passive nudging outperform an active dashboard?",
+    "Validate the bundle: interview whether students conceptualize 'budget pacing' and 'split with roommates' as one job or two.",
+    "Probe AI-specific trust: A/B message-test framing (AI-assisted vs rule-based) with target students.",
+    "Capture verbatim voice-of-customer from live Reddit/TikTok threads to complement survey data.",
+    "Escalate flagged issues (unconfirmed bundle; contradicted anxiety->adoption assumption) before opportunity sizing."
+  ]
+}
