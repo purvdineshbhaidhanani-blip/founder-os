@@ -1,0 +1,52 @@
+{
+  "findings": {
+    "recommendedModel": "B2B2C-primary hybrid with a permanently-free direct student tier. Do NOT copy Copilot/Monarch ($95-199/yr paid subscription) — LOW WTP among ~6.0-6.5M Pell recipients (core need-based audience) makes a paid consumer subscription structurally mismatched. Rationale: (1) Freemium-to-paid conversion on mobile finance-adjacent apps sits at ~2-3%, so a paid tier for budget-constrained students converts far below even that; (2) the incumbent playbook for this population (campus financial wellness) is institutional licensing at $2-10/student/year across 600+ colleges via iGrad/Enrich — proven WTP that sits with the institution, not the student. Recommended: free forever for students (removes WTP barrier, matches low-touch/ambient design), monetized via (a) institutional per-student licenses to financial-aid offices and (b) optional low-price consumer 'Plus' tier for secondary higher-WTP subscription-heavy Gen Z segment.",
+    "tiers": [
+      { "name": "Student Free (forever)", "price": "$0", "includes": ["Term runway tracker (lump-sum aid paced into per-week safe-to-spend)", "One aid/bank account link", "Ambient weekly safe-to-spend number + low-frequency notifications", "Refund-runway 'you have X weeks left' projection"] },
+      { "name": "Student Plus (secondary segment only)", "price": "$1.99/mo or $17.99/yr (anchored to Finny, closest true student-priced comp; far below Copilot $95/Monarch $99-199)", "includes": ["Multiple account/aid-source linking", "Custom spend categories & goals", "Term-over-term trend history", "Optional overdraft/low-balance early warnings"] },
+      { "name": "Institutional / Campus License (primary revenue)", "price": "$2-$8 per enrolled student/year, tiered down by enrollment; floor + volume discount, sold as annual contract to financial-aid office", "includes": ["White-label/co-branded campus deployment", "Aid-refund disbursement integration hook", "Aggregate anonymized cohort dashboards (retention signals, not individual data)", "First-gen/Pell cohort targeting", "SSO/student-portal integration", "Free Plus features unlocked for covered students"] }
+    ],
+    "institutionalChannel": {
+      "viable": true,
+      "pricingApproach": "Per-enrolled-student annual license, $2-8/student/yr, tiered down as enrollment rises. Sold to financial-aid/student-success offices, not students. Position on outcome metrics (persistence, dropout reduction, disbursement stewardship) rather than app features.",
+      "evidence": "iGrad/Enrich runs this exact model for the same student population — campus financial wellness quoted at $2-$10/student/yr based on enrollment, deployed at 600+ institutions, per-student price falling as enrollment grows. Establishes proven institutional WTP band for Pell/first-gen use cases. Our narrower single-purpose 'runway' tool should price at lower-to-mid end ($2-8) since it's a focused feature, not full curriculum."
+    },
+    "unitEconomics": {
+      "estimatedCAC": "Direct-consumer CAC intentionally near-$0 (free tier, organic/campus-referral, ambient design). Institutional CAC is sales-led: multi-month sales cycles; ~$8k-$20k fully-loaded cost per closed institution, recovered across covered student base.",
+      "estimatedARPPU": "Direct 'Plus' ARPPU ~$18-24/yr, but applied to only low-single-digit % of free users (~2-3% freemium conversion, likely lower for primary audience), so blended direct ARPU well under $1/user/yr. Institutional 'ARPPU' is really ARPA: 10,000-student school at $3/student = ~$30k ARR; per-student economics ($2-8) dwarf realistic direct-consumer monetization.",
+      "breakEvenLogic": "A single mid-size campus contract (~10k students @ ~$3 = ~$30k ARR) covers more revenue than ~15,000+ free students would yield at ~2-3% conversion to ~$18/yr Plus (~$8k-9k). Break-even driven by institutional logos, not consumer conversion: at ~$8k-20k CAC per school and ~$30k ARR, payback inside year one, compounding via multi-year renewals. Consumer Plus is a margin add-on, not the break-even engine."
+    },
+    "pricingLevers": [
+      "Per-student enrollment tiering (steepen volume discounts for large/system-wide deals)",
+      "Multi-year/system (state university system) contracts for ACV expansion and lower churn",
+      "Outcome-based or at-risk pricing tied to persistence/retention lift",
+      "Bundling: unlock consumer Plus features free for institutionally-covered students",
+      "Sponsor/underwriter model (credit unions, banks, foundations subsidize per-student cost)",
+      "Data/reporting upsell: premium aggregate cohort analytics tier for institutional buyers",
+      "Consumer Plus price/packaging tests aimed only at higher-WTP Gen Z secondary segment",
+      "Free-year student promo (mirror YNAB) as conversion funnel into paid Plus post-graduation"
+    ]
+  },
+  "confidence": 0.68,
+  "sources": [
+    { "type": "benchmark", "description": "iGrad/Enrich campus financial wellness programs priced $2-$10/student/yr, enrollment-tiered; 600+ institutions", "credibility": 0.7 },
+    { "type": "benchmark", "description": "Freemium mobile app conversion benchmarks ~2-3% (median ~2.18% freemium vs ~12% hard paywall); RevenueCat State of Subscription Apps", "credibility": 0.75 },
+    { "type": "public-data", "description": "Competitor consumer pricing anchors (YNAB $109/yr, Finny $1.99/mo, Copilot $95/yr, Monarch $99.99-199/yr, Cleo $5.99-14.99/mo)", "credibility": 0.6 },
+    { "type": "report", "description": "RevenueCat subscription-app benchmarks: higher-priced apps show better Day-35 conversion; trial-to-paid exceeds freemium", "credibility": 0.65 }
+  ],
+  "gaps": [
+    "No published direct WTP figure specific to Pell recipients for a budgeting app; LOW-WTP claim inherited from upstream, indirectly corroborated only.",
+    "iGrad/Enrich exact quote sheet not public (403 on pricing page); $2-10 band from aggregated search summaries, not verified rate card.",
+    "No finance-category-specific ARPU/conversion breakout retrievable; direct-tier estimates extrapolated from cross-category benchmarks.",
+    "Institutional CAC/sales-cycle estimate ($8k-20k) is industry-pattern assumption, not sourced data for this niche.",
+    "Unknown whether financial-aid offices pay for single-purpose tool vs only bundled full-curriculum suites — substitution risk with iGrad/Enrich."
+  ],
+  "nextSteps": [
+    "Run direct WTP survey/Van Westendorp on both segments to replace inherited LOW-WTP assumption with measured price-sensitivity curve.",
+    "Mystery-shop or interview 3-5 financial-aid offices/channel partners for real per-student quote sheets from iGrad/Enrich/Sqwire/CashCourse.",
+    "Validate willingness of aid offices to buy single-feature tool vs full suite via 3-5 discovery calls.",
+    "Model institutional funnel economics (logos for break-even, sales-cycle length, renewal rate); pressure-test CAC assumption.",
+    "Hand to business-model-agent to reconcile B2B2C-primary model with GTM/channel strategy.",
+    "Pilot pricing test: 1-2 campus pilots at introductory rate before broad rollout."
+  ]
+}
