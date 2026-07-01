@@ -1,0 +1,47 @@
+{
+  "findings": {
+    "tam": {
+      "value": "~$1.5B-$1.85B (narrow: US-addressable share of the global budgeting-app segment; global budgeting-app segment $1.5B-$1.85B in 2024, North America ~35% share ≈ $525M-$650M US). Broader ceiling: global personal-finance-apps market ~$31.7B (2025), too broad to be load-bearing.",
+      "source": "DataIntelo ($1.85B budgeting-app market 2024, 12.7% CAGR) and Verified Market Reports ($1.5B, 2024) for narrow segment; Research Nester ($31.7B personal-finance-apps, 2025, 20.8% CAGR) for broad ceiling; North America 35.3% regional share.",
+      "methodology": "Two-tier TAM. Narrow/defensible tier = dedicated budgeting-app market ($1.5-1.85B global, 2024), most closely matches product category, US ≈ 35% ($525-650M). Broad tier = full personal-finance-apps market ($31.7B, 2025) reported as upper bound only (includes neobanking, investing, lending unrelated to student budgeting). Estimates vary 5-10x across firms ($421M to $1.85B) due to inconsistent market definitions — flagged as reliability concern; $1.5-1.85B is median of credible budgeting-specific reports."
+    },
+    "sam": {
+      "value": "~$150M-$300M/yr revenue-serviceable (US student-focused budgeting), built bottom-up, NOT as % of TAM.",
+      "methodology": "Bottom-up from ICP population. Reachable population: ~6.0-6.5M Pell primary + subset of broader 10.6-13.9M aid-dependent undergrads → serviceable base ~8-10M students. Two revenue streams reflecting LOW direct student WTP: (1) D2C freemium — 3-5% conversion (industry norm), student-discounted ARPPU ~$40-70/yr (vs Cleo $5.99-14.99/mo, YNAB $99-109/yr, Copilot $95/yr), 10M x 4% x ~$55 ≈ $22M scaled to full reachable base ~$100-200M. (2) B2B2C institutional — financial-aid offices/financial-wellness programs (comparables: Enrich/iGrad serves 600+ institutions, Sqwire) at ~$1-3/covered student/yr across ~5-8M covered students ≈ $7.5-24M, headroom to $50-100M at scale. Combined ceiling ≈ $150-300M/yr."
+    },
+    "som": {
+      "value": "~$0.3M-$1.2M ARR by end of Year 1; ~$1.5M-$5M ARR by end of Year 2 (conservative).",
+      "methodology": "Conservative capture against entrenched competitors (Cleo, Rocket Money, YNAB, Copilot, Monarch). Year 1: 1-3 institutional pilots covering ~20k-60k students at ~$1.50/student ≈ $30k-90k B2B2C, plus D2C 50k-150k installs via TikTok/campus channels x ~3% paid x ~$50 ≈ $75k-225k → ~$0.3-1.2M ARR. Year 2: 8-15 institutions + D2C growth to ~300k-600k users, ~3-4% paid → ~$1.5-5M ARR. Intentionally low: student direct WTP is weak, churn high for seasonal users, CAC pressure limits year-1 paid acquisition scale."
+    },
+    "marketTrend": "expanding — dedicated budgeting-app segment growing ~12.7% CAGR (DataIntelo); broader personal-finance-apps market ~20-25% CAGR (Research Nester 20.8%, Business Research Company ~25%). Growth driven by AI-native budgeting tools, open-banking integration, subscription model expansion — directly relevant. Caveat: narrow niche grows slower (~5-13%) than headline figure; rising CAC compressing unit economics even in expanding market.",
+    "acquisitionEconomics": "Fintech consumer CPI ~$2.50-$6.00, but fully-loaded consumer-fintech CAC commonly $50-$105/paying user with KYC/onboarding drop-off included (Business of Apps; First Page Sage SMB-fintech CAC ~$1,450 for higher-value verticals). CAC rose 40-60% across financial services 2023-2025 — paid-social acquisition deteriorating. Viable path: low-cost channels — TikTok app-install $0.50-$1.80/install, influencer/creator partnerships ~$3.50 CPI with up to 73% CAC reduction, campus/financial-aid-office partnerships (near-zero marginal CAC, bundled into B2B2C contracts). Realistic effective CAC target: ~$3-15 blended via organic/TikTok/campus vs $50-100+ via paid Meta/Google — reinforces institutional B2B2C wedge for capital efficiency."
+  },
+  "confidence": 0.6,
+  "sources": [
+    { "type": "report", "description": "DataIntelo — Budgeting App Market $1.85B (2024), 12.7% CAGR to $5.44B by 2033", "credibility": 0.55 },
+    { "type": "report", "description": "Verified Market Reports — budgeting apps market ~$1.5B (2024)", "credibility": 0.5 },
+    { "type": "report", "description": "Research Nester — Personal Finance Apps Market $31.7B (2025), 20.8% CAGR, North America 35.3% share", "credibility": 0.6 },
+    { "type": "report", "description": "Business Research Company / Fortune Business Insights / Precedence — corroborating double-digit growth of personal-finance apps", "credibility": 0.55 },
+    { "type": "benchmark", "description": "Business of Apps (2025) & youyaa — fintech CPI $2.50-$6.00; fully-loaded neobank CAC $85-$105", "credibility": 0.65 },
+    { "type": "benchmark", "description": "First Page Sage / Visora — fintech CAC benchmarks; CAC up 40-60% 2023-2025", "credibility": 0.6 },
+    { "type": "benchmark", "description": "RevenueCat State of Subscription Apps 2025 & adapty — freemium conversion 2-5%, ARPPU ranges", "credibility": 0.7 },
+    { "type": "benchmark", "description": "TikTok install-cost & fintech influencer case data ($0.50-$1.80/install, $3.50 CPI via creators, 73% CAC reduction)", "credibility": 0.5 },
+    { "type": "public-data", "description": "Competitor pricing — Cleo $5.99-14.99/mo, YNAB $99-109/yr, Copilot $95/yr", "credibility": 0.75 },
+    { "type": "public-data", "description": "Enrich/iGrad (600+ institutions) & Sqwire — institutional student financial-wellness B2B2C channel exists", "credibility": 0.55 },
+    { "type": "public-data", "description": "Upstream target-audience input — Pell (6.0-6.5M), aid-dependent (10.6-13.9M), 19.28M undergrads, 357,231 intl students", "credibility": 0.8 }
+  ],
+  "gaps": [
+    "No published per-student pricing for institutional financial-wellness contracts (Enrich, Sqwire, iGrad) — B2B2C assumption needs vendor/RFP validation.",
+    "Budgeting-app market-size estimates vary 5-10x across analyst firms ($421M to $1.85B for 2024).",
+    "No student-specific ARPPU or freemium-conversion data; 3-5% and $40-70/yr extrapolated from general subscription-app benchmarks.",
+    "CAC figures are for general consumer fintech; no clean benchmark for student-only budgeting apps.",
+    "Competitor active-user counts not obtainable, limiting precision on realistic SOM market-share capture."
+  ],
+  "nextSteps": [
+    "Request institutional pricing via mystery-shopping or RFP to Enrich, Sqwire, iGrad.",
+    "Commission or run small student WTP survey (n=100-300 Pell-eligible undergrads).",
+    "Hand to competitor-intelligence-agent to size Cleo/Rocket Money/YNAB/Monarch active users and student penetration.",
+    "Validate campus/financial-aid-office acquisition CAC by piloting 1-2 partnerships.",
+    "Reconcile 5-10x TAM variance by purchasing one primary analyst report with US segmentation."
+  ]
+}
