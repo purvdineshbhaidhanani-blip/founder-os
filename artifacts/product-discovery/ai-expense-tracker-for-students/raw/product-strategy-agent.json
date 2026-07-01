@@ -1,0 +1,53 @@
+{
+  "findings": {
+    "productVision": "Every student who receives a lump-sum aid refund should feel calm confidence about money lasting the whole term — not a spreadsheet, but a quiet number they can trust. We are building the ambient 'term runway' layer for student finances: a passive tracker that paces a big refund into a per-week safe-to-spend figure, so students avoid the mid-term cash cliff without ever having to categorize a transaction. Grounded in user research showing anxiety drives avoidance of engagement-heavy budgeting tools, we win by being the lowest-touch, highest-trust way to make aid money last.",
+    "positioningStatement": "For financial-aid offices and the students they fund — who worry that lump-sum refunds run out before the term ends — the AI Expense Tracker is a passive term-runway tool that paces a refund into a weekly safe-to-spend number. Unlike YNAB (active envelope budgeting), Cleo (engagement-heavy chatbot), and Finny (education-first, not refund-paced), we are the only tool that natively treats a lump-sum aid refund as a depleting runway, delivered ambiently with zero daily categorization.",
+    "coreCompetencies": [
+      "Refund-pacing engine: modeling a lump-sum aid disbursement across a known academic term into a rolling per-week safe-to-spend number that self-corrects with actual spend",
+      "Ambient/low-touch UX: surfacing one trustworthy number with near-zero required interaction, tuned against anxiety-avoidance behavior rather than for daily engagement",
+      "Passive bank-transaction ingestion and auto-classification good enough to require no manual categorization from the student",
+      "Institutional distribution and integration: onboarding via financial-aid offices, SSO/roster-aware deployment, admin-facing outcome reporting",
+      "Trust and security posture: SOC2 Type II compliance and student-data privacy as both deal prerequisite and brand pillar",
+      "Academic-calendar and aid-disbursement domain modeling (term boundaries, refund timing, mid-term gaps)"
+    ],
+    "featurePriorityFramework": {
+      "methodology": "RICE, weighted toward impact on core anxiety/runway problem and institutional-deal readiness",
+      "criteria": [
+        "Reach: students affected per term, weighted by institutional-channel leverage (features unlocking aid-office deals count higher than consumer-only reach)",
+        "Impact: direct effect on core problem — improves pacing accuracy, reduces mid-term cash-cliff risk, lowers engagement burden (scored 0.25/0.5/1/2/3)",
+        "Confidence: validation strength from upstream streams; unvalidated bundles (split, full budgeting) capped at low confidence",
+        "Effort: person-months, with explicit multiplier for anything touching SOC2 scope or institutional integration",
+        "Strategic gate (modifier): protects 18-24mo competitive window before agentic bank AI closes gap; avoids building commoditized capability others own (splitting owned by Splitwise)"
+      ]
+    },
+    "evolutionBeyondMVP": [
+      "Predictive shortfall alerts: warn ambiently when projected spend will exhaust runway before term end, with suggested weekly adjustment",
+      "Multi-refund / multi-term modeling: handle staggered disbursements, work-study income, multi-semester runway",
+      "Institutional analytics dashboard: aggregate (anonymized) outcome reporting for financial-aid offices to justify renewal/expansion",
+      "Student Plus tier depth: richer personalization, goal 'safety cushions', export — monetizing secondary Gen Z segment without compromising free-forever distribution asset",
+      "Aid-disbursement and SIS integrations (direct refund-schedule sync) to make pacing zero-setup at institutional scale",
+      "DEFERRED — expense splitting: explicitly NOT on the roadmap at launch or v2; Splitwise owns splitting and upstream flagged budget+split bundle as unconfirmed. Only revisit if a dedicated validation experiment proves it lifts core-runway retention."
+    ]
+  },
+  "confidence": 0.78,
+  "sources": [
+    { "type": "report", "description": "Upstream opportunity stream: passive 'term runway' pacing, anxiety-driven avoidance of engagement-heavy tools", "credibility": 0.8 },
+    { "type": "report", "description": "Upstream UVP/competitive positioning vs YNAB, Cleo, Finny", "credibility": 0.8 },
+    { "type": "report", "description": "Upstream business-model stream: B2B2C-primary, free student tier, Student Plus $1.99/mo, institutional license $2-8/student/yr", "credibility": 0.8 },
+    { "type": "benchmark", "description": "Competitive/pricing comparables (iGrad, Enrich, Splitwise, YNAB, Cleo, Finny) bounding positioning and roadmap decisions", "credibility": 0.65 }
+  ],
+  "gaps": [
+    "Quantified reach inputs for RICE scoring absent — need addressable students-per-institution and expected institutional adoption rate.",
+    "Effort estimates require engineering input, especially SOC2 scope multipliers and bank-integration complexity.",
+    "Budget+split bundle remains unvalidated; no experiment design yet exists.",
+    "Pacing-accuracy target (weekly variance students tolerate before losing trust) undefined, central to Impact score.",
+    "No validated data on minimum ambient-UX interaction threshold that avoids anxiety-driven churn."
+  ],
+  "nextSteps": [
+    "Hand vision/positioning/RICE framework to feature-planning-agent to populate scored MVP backlog.",
+    "Request quantified reach and effort inputs to make RICE scores actionable.",
+    "Confirm with business-model-agent that institutional-channel weighting in RICE Reach matches B2B2C-primary revenue model.",
+    "Flag to orchestrator: any GTM timeline tied to 18-24mo window requires explicit human approval before committing to a deadline.",
+    "Recommend dedicated validation experiment before split/budget bundle enters any roadmap; keep deferred by default."
+  ]
+}
