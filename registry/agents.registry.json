@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "updatedAt": "2026-07-01T07:06:06.709Z",
+  "updatedAt": "2026-07-01T09:36:05.391Z",
   "agents": [
     {
       "id": "agent_f448d3a8-b4eb-4ee9-985d-e1b5fc75dad2",
@@ -3580,6 +3580,330 @@
         {
           "version": "1.0.0",
           "timestamp": "2026-07-01T07:06:06.709Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_3f3caa1c-dffb-4e34-9122-c37d8a3ed4e8",
+      "name": "solution-architect-app",
+      "displayName": "Solution Architect (App Generation)",
+      "category": "architecture",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Converts a validated Product Discovery Package into a complete system architecture and technology stack.",
+      "capabilities": [
+        "Read the Product Discovery Package and extract MVP scope, constraints, and non-functional requirements (compliance, cost, scale)",
+        "Design the overall system architecture: client/server topology, service boundaries, data flow, integration points",
+        "Select a technology stack appropriate to the MVP scope, budget, and timeline constraints carried in the package",
+        "Decide build-vs-buy for cross-cutting concerns (auth, payments, notifications, AI) and hand each decision to the owning specialist architect",
+        "Produce a single System Architecture Document other agents treat as the source of truth"
+      ],
+      "dependencies": [
+        "ai-architect",
+        "application-architect",
+        "backend-architect",
+        "database-architect",
+        "product-discovery-report-generator"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "app-generation",
+        "architecture",
+        "system-design"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/solution-architect-app.md",
+      "blueprintId": "solution-architect-app",
+      "blueprintHash": "19d6674d081bfd10",
+      "createdAt": "2026-07-01T09:36:05.020Z",
+      "updatedAt": "2026-07-01T09:36:05.020Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T09:36:05.020Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_880ca5e1-a5b0-4b12-9084-1a11b69bc60b",
+      "name": "application-architect",
+      "displayName": "Application Architect",
+      "category": "architecture",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Designs the frontend/application layer: screens, navigation, state, and platform targets.",
+      "capabilities": [
+        "Translate MVP user stories and personas into a screen map and navigation graph",
+        "Choose frontend framework/platform approach consistent with the System Architecture Document and declared platform targets",
+        "Define state-management and data-fetching patterns that match the backend API contract",
+        "Specify authentication, notification, and payment UI touchpoints without owning their backend implementation",
+        "Produce a Frontend Architecture Spec consumed by the developer agent"
+      ],
+      "dependencies": [
+        "developer-agent",
+        "solution-architect-app"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "app-generation",
+        "architecture",
+        "frontend"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/application-architect.md",
+      "blueprintId": "application-architect",
+      "blueprintHash": "b2dc772c3c94851d",
+      "createdAt": "2026-07-01T09:36:05.097Z",
+      "updatedAt": "2026-07-01T09:36:05.097Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T09:36:05.097Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_3dd02e9c-5713-4be5-80fa-99b64abca430",
+      "name": "backend-architect",
+      "displayName": "Backend Architect",
+      "category": "architecture",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Designs the backend services, API contracts, auth, and payments integration.",
+      "capabilities": [
+        "Design service boundaries and API contracts (REST/GraphQL) that satisfy the frontend architecture spec",
+        "Specify the authentication/authorization model (session, OAuth, roles) appropriate to the MVP scope",
+        "Specify payments integration architecture only if the Product Discovery Package's business model requires it at MVP",
+        "Define error handling, rate limiting, and versioning conventions for every API surface",
+        "Produce a Backend Architecture Spec (API contracts + auth model + payments model) consumed by the developer agent"
+      ],
+      "dependencies": [
+        "application-architect",
+        "database-architect",
+        "developer-agent",
+        "solution-architect-app"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "app-generation",
+        "architecture",
+        "backend"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/backend-architect.md",
+      "blueprintId": "backend-architect",
+      "blueprintHash": "59e2492900c0bddf",
+      "createdAt": "2026-07-01T09:36:05.176Z",
+      "updatedAt": "2026-07-01T09:36:05.176Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T09:36:05.176Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_074598d7-39ee-4309-9717-175fad4f3b5a",
+      "name": "database-architect",
+      "displayName": "Database Architect",
+      "category": "architecture",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Designs the data model, schema, and storage strategy for the application.",
+      "capabilities": [
+        "Design an entity-relationship model covering every domain object the backend API contracts reference",
+        "Choose storage engine(s) (relational/document/cache) appropriate to the MVP's data-access patterns",
+        "Specify indexing, migration strategy, and data-retention/compliance requirements (e.g. FERPA/GLBA if flagged in the discovery package)",
+        "Define seed/fixture data needed for the developer agent's test environment",
+        "Produce a Database Architecture Spec (schema + migrations plan) consumed by the developer agent"
+      ],
+      "dependencies": [
+        "backend-architect",
+        "developer-agent",
+        "solution-architect-app"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "app-generation",
+        "architecture",
+        "database"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/database-architect.md",
+      "blueprintId": "database-architect",
+      "blueprintHash": "760f1b8beace139f",
+      "createdAt": "2026-07-01T09:36:05.209Z",
+      "updatedAt": "2026-07-01T09:36:05.209Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T09:36:05.209Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_09f04e3c-42c5-4295-b186-93b3eb46819c",
+      "name": "ai-architect",
+      "displayName": "AI Architect",
+      "category": "architecture",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Designs the AI/ML integration layer: model selection, prompts, guardrails, and cost controls.",
+      "capabilities": [
+        "Identify every AI-touchpoint implied by the Product Discovery Package and system architecture (e.g. classification, generation, recommendation)",
+        "Select model/provider tier appropriate to the accuracy, latency, and cost constraints in the discovery package",
+        "Design prompts/agent behavior with explicit guardrails against the risks flagged in the discovery package's risk report (e.g. no investment advice, disclosure requirements)",
+        "Specify cost-control mechanisms (caching, model tiering, rate limiting) proportional to the MVP's monetization model",
+        "Produce an AI Integration Spec consumed by the developer agent"
+      ],
+      "dependencies": [
+        "backend-architect",
+        "developer-agent",
+        "solution-architect-app"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "app-generation",
+        "architecture",
+        "ai"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/ai-architect.md",
+      "blueprintId": "ai-architect",
+      "blueprintHash": "ada94871986f7375",
+      "createdAt": "2026-07-01T09:36:05.252Z",
+      "updatedAt": "2026-07-01T09:36:05.252Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T09:36:05.252Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_97dc5791-0478-4b4d-a208-1dc629f0914e",
+      "name": "developer-agent",
+      "displayName": "Developer Agent",
+      "category": "engineering",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Implements the application code from the architecture specs: frontend, backend, database, and AI integration.",
+      "capabilities": [
+        "Implement frontend screens and navigation per the Frontend Architecture Spec and MVP user stories",
+        "Implement backend services and API endpoints per the Backend Architecture Spec",
+        "Implement database schema and migrations per the Database Architecture Spec",
+        "Implement AI integration touchpoints per the AI Integration Spec, including guardrails",
+        "Write unit and integration tests covering every MVP acceptance criterion before handing off to QA"
+      ],
+      "dependencies": [
+        "ai-architect",
+        "application-architect",
+        "backend-architect",
+        "database-architect",
+        "qa-engineer-app",
+        "solution-architect-app"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "app-generation",
+        "engineering",
+        "implementation"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/developer-agent.md",
+      "blueprintId": "developer-agent",
+      "blueprintHash": "7ae5e18ee04670bb",
+      "createdAt": "2026-07-01T09:36:05.285Z",
+      "updatedAt": "2026-07-01T09:36:05.285Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T09:36:05.285Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_d67fee8b-ed10-496f-844f-dfa59e798ade",
+      "name": "qa-engineer-app",
+      "displayName": "QA Engineer (App Generation)",
+      "category": "qa",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Validates the implemented application against MVP acceptance criteria and launch criteria before deployment.",
+      "capabilities": [
+        "Run and verify the developer agent's test suite passes with no regressions",
+        "Verify every MVP user story's acceptance criteria is demonstrably met",
+        "Verify the Product Discovery Package's launch criteria (e.g. setup-completion rate targets, zero-unhandled-error requirement) are testable and met",
+        "Run a security/compliance pass against any requirement flagged in the discovery package's risk report",
+        "Block deployment and return findings to developer-agent on any failure; only pass clean builds to deployment-agent"
+      ],
+      "dependencies": [
+        "deployment-agent",
+        "developer-agent",
+        "solution-architect-app"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "app-generation",
+        "qa",
+        "validation"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/qa-engineer-app.md",
+      "blueprintId": "qa-engineer-app",
+      "blueprintHash": "8d4f2e7d19abbeab",
+      "createdAt": "2026-07-01T09:36:05.330Z",
+      "updatedAt": "2026-07-01T09:36:05.330Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T09:36:05.330Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_db175e92-70d7-4308-b3a9-657ea6245a17",
+      "name": "deployment-agent",
+      "displayName": "Deployment Agent",
+      "category": "devops",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Packages the validated application into a deployable, production-ready build.",
+      "capabilities": [
+        "Assemble the deployment package: build artifacts, environment configuration templates, infrastructure-as-code where applicable",
+        "Configure CI/CD pipeline stages matching the declared deployment targets",
+        "Verify the production build boots cleanly against a smoke-test environment before marking release-ready",
+        "Document rollback procedure and environment variable/secrets requirements (never embedding real secrets)",
+        "Produce a Deployment Package artifact and a Production Build artifact as the department's final output"
+      ],
+      "dependencies": [
+        "qa-engineer-app",
+        "solution-architect-app"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "app-generation",
+        "devops",
+        "deployment"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/deployment-agent.md",
+      "blueprintId": "deployment-agent",
+      "blueprintHash": "0f2b177620f7ae2f",
+      "createdAt": "2026-07-01T09:36:05.391Z",
+      "updatedAt": "2026-07-01T09:36:05.391Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-01T09:36:05.391Z",
           "action": "created"
         }
       ]

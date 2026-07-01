@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Application Architect Output",
+  "type": "object",
+  "required": [
+    "deliverable",
+    "confidence",
+    "qualityScore",
+    "traceability"
+  ],
+  "properties": {
+    "deliverable": {
+      "type": "object",
+      "description": "The structured artifact this agent produces (spec, code manifest, test report, etc.).",
+      "additionalProperties": true
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Confidence the deliverable correctly satisfies upstream requirements."
+    },
+    "qualityScore": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Self-assessed quality against this agent's VALIDATION.md criteria."
+    },
+    "traceability": {
+      "type": "array",
+      "description": "Explicit links from each decision to the upstream artifact/finding that justified it.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "decision": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "nextSteps": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "name": "qa-engineer-app",
+  "displayName": "QA Engineer (App Generation)",
+  "category": "qa",
+  "department": "app-generation",
+  "status": "active",
+  "modelRouting": {
+    "preferredTier": "high",
+    "fallbackTier": "medium",
+    "maxCostCentsPerTask": 200,
+    "maxDurationMs": 240000
+  },
+  "memory": {
+    "namespace": "app-generation:qa-engineer-app",
+    "ttlDefaults": {
+      "deliverable": "90d",
+      "traceabilityLog": "90d",
+      "confidenceLog": "90d"
+    }
+  },
+  "retry": {
+    "maxAttempts": 3,
+    "backoffMs": 1000,
+    "backoffMultiplier": 2
+  },
+  "validation": {
+    "minConfidenceThreshold": 0.6,
+    "requireTraceability": true
+  },
+  "approval": {
+    "requireHumanFor": [
+      "deployment-to-production",
+      "secrets-provisioning",
+      "payments-go-live"
+    ]
+  },
+  "tags": [
+    "app-generation",
+    "qa",
+    "validation"
+  ]
+}

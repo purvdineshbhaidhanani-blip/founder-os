@@ -9,7 +9,8 @@ export type DepartmentName =
   | "platform"
   | "intelligence"
   | "foundation"
-  | "product-discovery";
+  | "product-discovery"
+  | "app-generation";
 
 /**
  * Declarative description of one department agent. The factory turns each
