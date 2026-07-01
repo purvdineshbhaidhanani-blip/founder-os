@@ -9,3 +9,7 @@ coverage/
 .env.*
 !.env.example
 .runtime/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/

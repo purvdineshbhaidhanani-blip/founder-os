@@ -58,9 +58,15 @@ export function registerAuthRoutes(router: Router): void {
   });
 
   router.get("/api/auth/me", (ctx) => {
+    // Session-check endpoint, not a protected resource: "no session yet" is
+    // an expected, routine state (every fresh/unauthenticated page load hits
+    // this once), so it always responds 200 with `user: null` rather than a
+    // 401. A real 401 here would make the browser log a network error on
+    // every single first paint of the app, which is indistinguishable from
+    // an actual failure in devtools/console-based monitoring.
     const session = readSession(ctx.req);
     if (!session) {
-      sendJson(ctx.res, 401, { error: "Not authenticated." });
+      sendJson(ctx.res, 200, { user: null });
       return;
     }
     sendJson(ctx.res, 200, { user: { email: session.email } });

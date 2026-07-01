@@ -77,19 +77,23 @@ describe("auth routes", () => {
     expect(meBody.user.email).toBe(TEST_EMAIL);
   });
 
-  it("/me returns 401 without a session cookie", async () => {
+  it("/me returns 200 with a null user without a session cookie (session-check, not a protected resource)", async () => {
     const res = await fetch(`${baseUrl}/api/auth/me`);
-    expect(res.status).toBe(401);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.user).toBeNull();
   });
 
-  it("/me returns 401 with a tampered cookie", async () => {
+  it("/me returns 200 with a null user for a tampered cookie", async () => {
     const res = await fetch(`${baseUrl}/api/auth/me`, {
       headers: { Cookie: "founder_session=tampered.value" },
     });
-    expect(res.status).toBe(401);
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.user).toBeNull();
   });
 
-  it("logout clears the cookie and subsequent /me is 401", async () => {
+  it("logout clears the cookie and subsequent /me reports a null user", async () => {
     const loginRes = await fetch(`${baseUrl}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -105,5 +109,17 @@ describe("auth routes", () => {
 
     const clearedCookieHeader = logoutRes.headers.get("set-cookie");
     expect(clearedCookieHeader).toContain("Max-Age=0");
+
+    // Sessions are stateless HMAC-signed cookies with no server-side
+    // revocation list: logout only clears the cookie client-side (Max-Age=0
+    // above), it does not invalidate the signed value itself. A client that
+    // discards the cookie (as every real browser does on Max-Age=0, and as
+    // the E2E settings.spec.ts verifies end-to-end) is logged out; a client
+    // that deliberately replays the old cookie value is not blocked by this
+    // design. Documented here rather than silently assumed.
+    const meRes = await fetch(`${baseUrl}/api/auth/me`, { headers: { Cookie: cookie } });
+    expect(meRes.status).toBe(200);
+    const meBody = await meRes.json();
+    expect(meBody.user.email).toBe(TEST_EMAIL);
   });
 });

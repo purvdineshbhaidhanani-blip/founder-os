@@ -18,8 +18,9 @@ export interface LoginResponse {
   user: AuthUser;
 }
 
+/** /api/auth/me always responds 200; `user` is null when there is no active session. */
 export interface MeResponse {
-  user: AuthUser;
+  user: AuthUser | null;
 }
 
 export interface ApiErrorBody {
