@@ -1,0 +1,55 @@
+{
+  "findings": {
+    "problemStatement": "Undergraduate and graduate students (roughly ages 18-24, plus international students) must self-manage money for the first time on IRREGULAR income (part-time wages + lump-sum financial-aid refunds disbursed once or twice a semester) while lacking budgeting skills — and the result is measurable harm. Roughly 68% of students run out of money at least once a year (1 in 5 do so 8+ times), 59% have considered dropping out over money, and ~80% say financial stress hurts their mental health, with ~16% saying it directly harmed academic performance (Hope Center / Ellucian 2024). The cost of NOT solving is concrete and severe: dropout risk, degraded grades, chronic anxiety, and avoidance behavior (43-49% of Gen Z avoid even checking their balance, which compounds the problem). The core unmet need is not 'a tracker' but help converting a large, front-loaded, lumpy inflow into a steady spendable amount, staying aware of small recurring drains (subscriptions, shared costs), and reducing money anxiety — the emotional job, not just the arithmetic job.",
+    "problemSegments": [
+      { "segment": "Aid-dependent students living on lump-sum disbursements", "description": "Students whose main cash source is a financial-aid refund paid as one/two lump sums per term. MDRC 'Aid Like A Paycheck' shows lump sums don't last the semester; biweekly-style pacing measurably helped students budget and cut work hours. Most distinctly student-specific pain — no incumbent budgets around aid-disbursement cadence.", "severity": "high", "frequency": "acute 1-2x per term at disbursement, chronic budgeting pressure daily" },
+      { "segment": "First-time money managers with no budgeting habit", "description": "Students managing their own finances for the first time. Incoming students average only ~2 of 6 basic financial-literacy questions correct; >40% lack adequate financial literacy; only ~23% can explain what they owe and why.", "severity": "high", "frequency": "daily/continuous throughout enrollment" },
+      { "segment": "Students sharing costs with roommates and friend groups", "description": "Rent, utilities, groceries, group trips split across people, plus social awkwardness chasing repayment. Splitwise (100M+ downloads) proves demand, but shared balances live siloed from personal budget.", "severity": "medium", "frequency": "weekly to monthly" },
+      { "segment": "Subscription-heavy Gen Z spenders", "description": "Gen Z averages ~8+ subscriptions; 35% paid for unwanted subscription, 25% missed cancellation window, 22% incurred missed-payment/late fee.", "severity": "medium", "frequency": "monthly recurring, often unnoticed" },
+      { "segment": "International students", "description": "Multi-currency budgeting, forex losses on remittances, expensive money transfers, no US credit history, hidden cultural/social spend. Distinct sub-segment mainstream US budget apps do not address.", "severity": "medium", "frequency": "continuous, with periodic remittance spikes" }
+    ],
+    "underservedGaps": [
+      "No mainstream budgeting app models financial-aid disbursement cadence — turning a lump-sum refund into a paced 'runway to end of term' allowance is student-native and unaddressed by YNAB, Rocket Money, Monarch, Copilot.",
+      "Personal budgeting and shared/split expenses live in separate apps (budget app + Splitwise); roommate/group balances invisible inside a student's own budget, so true spendable cash is never accurate.",
+      "Irregular, mixed income (variable part-time shifts + episodic aid) poorly handled by tools built around a steady monthly paycheck assumption.",
+      "Emotional/anxiety job unaddressed: 43-49% of Gen Z avoid checking balances, yet incumbents assume an engaged user who logs in.",
+      "International-student needs (multi-currency view, remittance/forex awareness, no-credit-history context) ignored by US-centric incumbents.",
+      "Habit formation / literacy scaffolding for genuine first-timers is thin — incumbents optimize for people who already know how to budget."
+    ],
+    "evidenceOfExistence": [
+      "Hope Center national survey (Ellucian/PRNewswire 2024): 59% considered dropping out over finances; ~80% negative mental-health impact; ~16% academic harm.",
+      "Danahy 2024 (Journal of Consumer Affairs) + Inside Higher Ed: ~71% experienced financial trouble while enrolled; ~68% ran out of money at least once/year; 1 in 5 ran out 8+ times.",
+      "MDRC 'Aid Like A Paycheck': lump-sum aid doesn't last the semester; biweekly pacing measurably improved budgeting and reduced work hours.",
+      "NASFAA / Inside Higher Ed literacy surveys (100k+ incoming students): avg ~2/6 correct, >40% inadequate literacy, only ~23% can explain what they owe.",
+      "Splitwise 100M+ downloads, explicit mission to reduce stress/awkwardness money places on relationships — proven demand for shared-expense tracking.",
+      "Recurly / Savanta / UNiDAYS subscription surveys: Gen Z ~8+ subs, 35% unwanted, 25% missed cancellation, 22% late fees.",
+      "Discover / US Bank / Bank of America Better Money Habits 2024-2025: 43-49% of Gen Z avoid checking balances due to anxiety; ~65% negative emotions about finances.",
+      "MPOWER / VisaVerge / iefa: international students lose money to forex gaps, lack US credit history, face multi-currency budgeting."
+    ]
+  },
+  "confidence": 0.74,
+  "sources": [
+    { "type": "report", "description": "Hope Center national survey via Ellucian/PRNewswire 2024 — 59% considered dropping out over finances, ~80% mental-health impact, ~16% academic harm", "credibility": 0.8 },
+    { "type": "report", "description": "Danahy 2024, Journal of Consumer Affairs (Wiley); corroborated by Inside Higher Ed (68% ran out of money, 1 in 5 did 8+ times)", "credibility": 0.85 },
+    { "type": "report", "description": "MDRC 'Aid Like A Paycheck' — lump-sum aid doesn't last a semester; biweekly disbursement improves budgeting and cuts work hours", "credibility": 0.85 },
+    { "type": "survey", "description": "NASFAA / Inside Higher Ed financial-literacy surveys (100k+ incoming students)", "credibility": 0.8 },
+    { "type": "public-data", "description": "Splitwise (100M+ downloads) — proxy demand for shared/split-expense tracking among roommates and friend groups", "credibility": 0.6 },
+    { "type": "survey", "description": "Recurly / Savanta / UNiDAYS Gen Z subscription surveys", "credibility": 0.65 },
+    { "type": "survey", "description": "Discover / US Bank / Bank of America Better Money Habits 2024-2025", "credibility": 0.75 },
+    { "type": "report", "description": "MPOWER Financing / VisaVerge / iefa — international-student forex losses, no US credit history, multi-currency budgeting", "credibility": 0.6 }
+  ],
+  "gaps": [
+    "Most cited stats are Gen-Z-wide or all-student, not narrowly scoped to a single differentiator segment.",
+    "Direct qualitative voice-of-student (r/college, r/personalfinance) not pulled verbatim this pass — recommend user-research-agent capture primary quotes.",
+    "One primary source (PRNewswire Hope Center release) returned HTTP 403; corroborated via Ellucian newsroom mirror.",
+    "No willingness-to-pay evidence for students specifically — severity established, payment intent not yet shown.",
+    "Splitwise download count is market-existence proxy, not evidence of student-specific dissatisfaction with existing split tools."
+  ],
+  "nextSteps": [
+    "Hand to user-research-agent to gather primary qualitative evidence and confirm which segment's pain is felt most acutely.",
+    "Hand to target-audience-agent to segment and size top-severity candidates and pick a wedge.",
+    "Prioritize two most defensible wedges: (1) aid-disbursement-paced budgeting, (2) unified personal-budget + shared-expense view.",
+    "Validate willingness-to-pay for students specifically before committing.",
+    "Confirm refined, student-scoped problem before advancing."
+  ]
+}
