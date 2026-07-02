@@ -1,7 +1,9 @@
 import type { RawResearchItem, SourceAdapter, SourceAdapterResult } from "../types.js";
+import { classifyException, classifyHttpStatus } from "./classify.js";
 
 const TIMEOUT_MS = 8000;
 const SOURCE_ID = "youtube";
+const DEFAULT_QUERY = "startup product launch";
 
 interface YouTubeSearchItem {
   id?: { videoId?: string };
@@ -16,19 +18,20 @@ interface YouTubeSearchResponse {
   items?: YouTubeSearchItem[];
 }
 
-async function fetchYoutube(windowDays: number): Promise<SourceAdapterResult> {
+async function fetchYoutube(windowDays: number, topic?: string): Promise<SourceAdapterResult> {
   const apiKey = process.env.YOUTUBE_API_KEY;
   if (!apiKey) {
-    return { ok: false, error: "Missing YOUTUBE_API_KEY" };
+    return { ok: false, error: "Missing YOUTUBE_API_KEY", reason: "authentication-failure" };
   }
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
     const publishedAfter = new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000).toISOString();
+    const query = topic && topic.trim().length > 0 ? topic.trim() : DEFAULT_QUERY;
     const params = new URLSearchParams({
       part: "snippet",
-      q: "startup product launch",
+      q: query,
       type: "video",
       order: "date",
       maxResults: "25",
@@ -39,7 +42,11 @@ async function fetchYoutube(windowDays: number): Promise<SourceAdapterResult> {
 
     const response = await fetch(url, { signal: controller.signal });
     if (!response.ok) {
-      return { ok: false, error: `YouTube search failed with status ${response.status}` };
+      return {
+        ok: false,
+        reason: classifyHttpStatus(response.status),
+        error: `YouTube search failed with status ${response.status}`,
+      };
     }
 
     const body = (await response.json()) as YouTubeSearchResponse;
@@ -55,7 +62,11 @@ async function fetchYoutube(windowDays: number): Promise<SourceAdapterResult> {
 
     return { ok: true, items };
   } catch (error) {
-    return { ok: false, error: error instanceof Error ? error.message : "unknown YouTube fetch error" };
+    return {
+      ok: false,
+      reason: classifyException(error),
+      error: error instanceof Error ? error.message : "unknown YouTube fetch error",
+    };
   } finally {
     clearTimeout(timer);
   }

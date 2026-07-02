@@ -82,11 +82,14 @@ export function getConnectorStatus(): Promise<ConnectorStatusView[]> {
  * (202). On a 422 (MissingKeysError) the promise rejects with an ApiError
  * whose `.body` carries `{ error, missing }` — callers should catch ApiError
  * and render `error.body.missing` to the user rather than a generic message.
+ *
+ * `topic`, when provided, narrows research to that topic instead of general
+ * discovery — see src/research/types.ts's `SourceAdapter.fetch` `topic` param.
  */
-export function runResearch(windowDays: number): Promise<RunResearchAccepted> {
+export function runResearch(windowDays: number, topic?: string): Promise<RunResearchAccepted> {
   return request<RunResearchAccepted>("/research/run", {
     method: "POST",
-    body: JSON.stringify({ windowDays }),
+    body: JSON.stringify({ windowDays, ...(topic ? { topic } : {}) }),
   });
 }
 
@@ -146,11 +149,14 @@ export function subscribeProgress(
  * promise rejects with an ApiError whose `.body` carries
  * `{ error, missing }` — same shape as `runResearch`'s 422, so
  * `isMissingKeysError` works for either.
+ *
+ * `topic`, when provided, narrows research to that topic instead of general
+ * discovery — see `runResearch`'s doc comment.
  */
-export function runPipeline(windowDays: number): Promise<RunPipelineAccepted> {
+export function runPipeline(windowDays: number, topic?: string): Promise<RunPipelineAccepted> {
   return request<RunPipelineAccepted>("/pipeline/run", {
     method: "POST",
-    body: JSON.stringify({ windowDays }),
+    body: JSON.stringify({ windowDays, ...(topic ? { topic } : {}) }),
   });
 }
 

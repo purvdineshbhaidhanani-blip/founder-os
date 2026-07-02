@@ -70,10 +70,42 @@ describe("source adapters", () => {
     vi.useRealTimers();
   });
 
-  it("github adapter returns ok:false on non-2xx status", async () => {
+  it("github adapter returns ok:false with reason 'authentication-failure' on a 403 status", async () => {
     global.fetch = vi.fn().mockResolvedValue(jsonResponse({}, false, 403)) as unknown as typeof fetch;
     const result = await githubSource.fetch(30);
     expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.reason).toBe("authentication-failure");
+  });
+
+  it("github adapter returns ok:false with reason 'api-limit' on a 429 status", async () => {
+    global.fetch = vi.fn().mockResolvedValue(jsonResponse({}, false, 429)) as unknown as typeof fetch;
+    const result = await githubSource.fetch(30);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.reason).toBe("api-limit");
+  });
+
+  it("github adapter classifies a network exception as reason 'network-failure'", async () => {
+    global.fetch = vi.fn().mockRejectedValue(new TypeError("fetch failed")) as unknown as typeof fetch;
+    const result = await githubSource.fetch(30);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.reason).toBe("network-failure");
+  });
+
+  it("github adapter queries the Issues search endpoint (not repositories), scoped with is:issue", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ items: [] }));
+    global.fetch = fetchMock as unknown as typeof fetch;
+    await githubSource.fetch(30);
+    const calledUrl = fetchMock.mock.calls[0]?.[0] as string;
+    expect(calledUrl).toContain("api.github.com/search/issues");
+    expect(decodeURIComponent(calledUrl)).toContain("is:issue");
+  });
+
+  it("github adapter includes the topic in the search query when provided", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ items: [] }));
+    global.fetch = fetchMock as unknown as typeof fetch;
+    await githubSource.fetch(30, "invoicing software");
+    const calledUrl = fetchMock.mock.calls[0]?.[0] as string;
+    expect(decodeURIComponent(calledUrl)).toContain("invoicing software");
   });
 
   it("youtube adapter returns ok:true on 200", async () => {
@@ -100,6 +132,19 @@ describe("source adapters", () => {
     expect(result.ok).toBe(false);
   });
 
+  it("youtube adapter uses the topic as the search query when provided, and the default query otherwise", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ items: [] }));
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    await youtubeSource.fetch(30, "expense tracking app");
+    const withTopicUrl = fetchMock.mock.calls[0]?.[0] as string;
+    expect(withTopicUrl).toContain("q=expense+tracking+app");
+
+    await youtubeSource.fetch(30);
+    const defaultUrl = fetchMock.mock.calls[1]?.[0] as string;
+    expect(defaultUrl).toContain("q=startup+product+launch");
+  });
+
   it("stackexchange adapter returns ok:true on 200 without a key", async () => {
     delete process.env.STACK_EXCHANGE_KEY;
     global.fetch = vi.fn().mockResolvedValue(
@@ -115,6 +160,19 @@ describe("source adapters", () => {
     global.fetch = vi.fn().mockRejectedValue(new Error("dns failure")) as unknown as typeof fetch;
     const result = await stackExchangeSource.fetch(30);
     expect(result.ok).toBe(false);
+  });
+
+  it("stackexchange adapter uses the topic as the search query when provided, and the default query otherwise", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ items: [] }));
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    await stackExchangeSource.fetch(30, "real estate CRM");
+    const withTopicUrl = fetchMock.mock.calls[0]?.[0] as string;
+    expect(withTopicUrl).toContain("q=real+estate+CRM");
+
+    await stackExchangeSource.fetch(30);
+    const defaultUrl = fetchMock.mock.calls[1]?.[0] as string;
+    expect(defaultUrl).toContain("q=startup+product");
   });
 
   it("hackernews adapter returns ok:true on 200", async () => {
@@ -133,6 +191,19 @@ describe("source adapters", () => {
     expect(result.ok).toBe(false);
   });
 
+  it("hackernews adapter adds a topic as an Algolia `query` param instead of running a bare firehose", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ hits: [] }));
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    await hackerNewsSource.fetch(30, "dev tools");
+    const withTopicUrl = fetchMock.mock.calls[0]?.[0] as string;
+    expect(withTopicUrl).toContain("query=dev+tools");
+
+    await hackerNewsSource.fetch(30);
+    const defaultUrl = fetchMock.mock.calls[1]?.[0] as string;
+    expect(defaultUrl).not.toContain("query=");
+  });
+
   it("rss adapter parses standard RSS 2.0 items", () => {
     const xml = `<?xml version="1.0"?><rss><channel>
       <item><title>Big Launch</title><link>https://example.com/a</link><pubDate>Wed, 01 Jan 2026 00:00:00 GMT</pubDate><description>desc</description></item>
@@ -144,18 +215,56 @@ describe("source adapters", () => {
     expect(items[1]?.title).toBe("CDATA Title");
   });
 
-  it("rss adapter returns ok:true (empty items) when feeds fail", async () => {
-    global.fetch = vi.fn().mockRejectedValue(new Error("unreachable")) as unknown as typeof fetch;
+  it("rss adapter returns ok:false with a classified reason when every feed fails, instead of silently reporting success", async () => {
+    global.fetch = vi.fn().mockRejectedValue(new TypeError("fetch failed")) as unknown as typeof fetch;
     const result = await rssSource.fetch(30);
-    expect(result.ok).toBe(true);
-    if (result.ok) expect(result.items).toEqual([]);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.reason).toBe("network-failure");
+      expect(result.error).toBeTruthy();
+    }
   });
 
   it("rss adapter never throws even if fetch throws synchronously", async () => {
     global.fetch = vi.fn().mockImplementation(() => {
       throw new Error("sync throw");
     }) as unknown as typeof fetch;
-    await expect(rssSource.fetch(30)).resolves.toMatchObject({ ok: true });
+    await expect(rssSource.fetch(30)).resolves.toMatchObject({ ok: false });
+  });
+
+  it("rss adapter returns ok:true with partialFailure set when some (but not all) feeds fail", async () => {
+    const goodXml = `<rss><channel><item><title>Big Launch</title><link>https://example.com/a</link></item></channel></rss>`;
+    let call = 0;
+    global.fetch = vi.fn().mockImplementation(() => {
+      call += 1;
+      if (call === 1) {
+        return Promise.resolve({ ok: true, status: 200, text: async () => goodXml } as unknown as Response);
+      }
+      return Promise.reject(new Error("feed unreachable"));
+    }) as unknown as typeof fetch;
+
+    const result = await rssSource.fetch(30);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.items.length).toBeGreaterThan(0);
+      expect(result.partialFailure).toBeDefined();
+      expect(result.partialFailure?.detail).toContain("feed unreachable");
+    }
+  });
+
+  it("rss adapter filters items by topic (case-insensitive, title or snippet) when a topic is provided", async () => {
+    const xml = `<rss><channel>
+      <item><title>Accounting Automation Launch</title><link>https://example.com/a</link><description>for bookkeepers</description></item>
+      <item><title>Unrelated Gaming News</title><link>https://example.com/b</link><description>nothing relevant</description></item>
+    </channel></rss>`;
+    global.fetch = vi.fn().mockResolvedValue({ ok: true, status: 200, text: async () => xml } as unknown as Response) as unknown as typeof fetch;
+
+    const result = await rssSource.fetch(30, "accounting");
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.items.length).toBeGreaterThan(0);
+      expect(result.items.every((item) => item.title.toLowerCase().includes("accounting"))).toBe(true);
+    }
   });
 
   it("reddit adapter returns ok:true and maps posts on 200", async () => {
@@ -203,21 +312,59 @@ describe("source adapters", () => {
     }
   });
 
-  it("reddit adapter returns ok:true with empty items when a subreddit request fails, and never throws", async () => {
-    global.fetch = vi.fn().mockRejectedValue(new Error("network down")) as unknown as typeof fetch;
+  it("reddit adapter returns ok:false with a classified reason when every subreddit request fails, instead of silently reporting success", async () => {
+    global.fetch = vi.fn().mockRejectedValue(new TypeError("fetch failed")) as unknown as typeof fetch;
     const result = await redditSource.fetch(30);
-    expect(result.ok).toBe(true);
-    if (result.ok) expect(result.items).toEqual([]);
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.reason).toBe("network-failure");
+      expect(result.error).toBeTruthy();
+    }
   });
 
-  it("reddit adapter returns ok:false status per-subreddit but overall ok:true, never throws on non-2xx", async () => {
+  it("reddit adapter returns ok:false with reason 'authentication-failure' when every subreddit responds 403 (blocked/rate-limited)", async () => {
+    global.fetch = vi.fn().mockResolvedValue(jsonResponse({}, false, 403)) as unknown as typeof fetch;
+    const result = await redditSource.fetch(30);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.reason).toBe("authentication-failure");
+  });
+
+  it("reddit adapter returns ok:false with reason 'api-limit' when every subreddit responds 429", async () => {
     global.fetch = vi.fn().mockResolvedValue(jsonResponse({}, false, 429)) as unknown as typeof fetch;
     const result = await redditSource.fetch(30);
-    expect(result.ok).toBe(true);
-    if (result.ok) expect(result.items).toEqual([]);
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.reason).toBe("api-limit");
   });
 
-  it("reddit adapter returns ok:true (empty items) on timeout without throwing", async () => {
+  it("reddit adapter returns ok:true with partialFailure set when one subreddit succeeds and the other fails", async () => {
+    const nowSeconds = Math.floor(Date.now() / 1000);
+    let call = 0;
+    global.fetch = vi.fn().mockImplementation(() => {
+      call += 1;
+      if (call === 1) {
+        return Promise.resolve(
+          jsonResponse({
+            data: {
+              children: [
+                { data: { title: "Post one", permalink: "/r/startups/comments/1/x/", created_utc: nowSeconds, score: 5 } },
+              ],
+            },
+          }),
+        );
+      }
+      return Promise.resolve(jsonResponse({}, false, 429));
+    }) as unknown as typeof fetch;
+
+    const result = await redditSource.fetch(30);
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      expect(result.items).toHaveLength(1);
+      expect(result.partialFailure).toBeDefined();
+      expect(result.partialFailure?.reason).toBe("api-limit");
+    }
+  });
+
+  it("reddit adapter returns ok:false on timeout without throwing", async () => {
     vi.useFakeTimers();
     global.fetch = vi.fn().mockImplementation(
       (_url: string, init?: { signal?: AbortSignal }) =>
@@ -228,7 +375,7 @@ describe("source adapters", () => {
 
     const promise = redditSource.fetch(30);
     await vi.advanceTimersByTimeAsync(8000);
-    await expect(promise).resolves.toMatchObject({ ok: true, items: [] });
+    await expect(promise).resolves.toMatchObject({ ok: false, reason: "network-failure" });
     vi.useRealTimers();
   });
 
@@ -236,7 +383,29 @@ describe("source adapters", () => {
     global.fetch = vi.fn().mockImplementation(() => {
       throw new Error("sync throw");
     }) as unknown as typeof fetch;
-    await expect(redditSource.fetch(30)).resolves.toMatchObject({ ok: true });
+    await expect(redditSource.fetch(30)).resolves.toMatchObject({ ok: false });
+  });
+
+  it("reddit adapter uses the site-wide search endpoint (not the fixed subreddit listings) when a topic is provided", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ data: { children: [] } }));
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    await redditSource.fetch(30, "invoicing software");
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    const calledUrl = fetchMock.mock.calls[0]?.[0] as string;
+    expect(calledUrl).toContain("reddit.com/search.json");
+    expect(calledUrl).toContain("q=invoicing+software");
+  });
+
+  it("reddit adapter keeps the fixed subreddit listings when no topic is provided", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(jsonResponse({ data: { children: [] } }));
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    await redditSource.fetch(30);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    const urls = fetchMock.mock.calls.map((call) => call[0] as string);
+    expect(urls.some((url) => url.includes("r/startups"))).toBe(true);
+    expect(urls.some((url) => url.includes("r/SaaS"))).toBe(true);
   });
 
   it("reddit adapter filters posts outside the requested windowDays", async () => {

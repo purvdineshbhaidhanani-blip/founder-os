@@ -7,6 +7,7 @@ import type { ArtifactManager } from "../runtime/artifacts/manager.js";
 import type { MemoryEngine } from "../runtime/memory/engine.js";
 import type { EventBus } from "../runtime/events/bus.js";
 import { ALL_SOURCE_ADAPTERS } from "./sources/index.js";
+import { classifyException } from "./sources/classify.js";
 import { buildFounderReport } from "./report.js";
 import { dedupeItems } from "./dedup.js";
 import type {
@@ -15,6 +16,7 @@ import type {
   ResearchProgressEvent,
   ResearchSession,
   SourceAdapter,
+  SourceFailureReason,
 } from "./types.js";
 
 const logger = createLogger("research.engine");
@@ -146,6 +148,7 @@ export class ResearchEngine {
   async run(
     windowDays: number,
     onProgress: (event: ResearchProgressEvent) => void = () => undefined,
+    topic?: string,
   ): Promise<ResearchSession> {
     const sessionId = generateId("research");
     const startedAt = nowIso();
@@ -174,7 +177,8 @@ export class ResearchEngine {
     }
 
     const sourcesUsed: string[] = [];
-    const sourcesFailed: Array<{ id: string; error: string }> = [];
+    const sourcesFailed: Array<{ id: string; error: string; reason: SourceFailureReason }> = [];
+    const sourcesPartial: Array<{ id: string; reason: SourceFailureReason; detail: string }> = [];
     const allItems: RawResearchItem[] = [];
 
     let completedCount = 0;
@@ -183,17 +187,29 @@ export class ResearchEngine {
     const settlements = await Promise.allSettled(
       eligible.map(async (adapter) => {
         onProgress({ type: "source.start", sourceId: adapter.id });
-        const result = await adapter.fetch(windowDays);
+        const result = await adapter.fetch(windowDays, topic);
         completedCount += 1;
         const percent = Math.round((completedCount / total) * 100);
 
         if (result.ok) {
           sourcesUsed.push(adapter.id);
           allItems.push(...result.items);
-          onProgress({ type: "source.done", sourceId: adapter.id, itemCount: result.items.length });
+          if (result.partialFailure) {
+            sourcesPartial.push({
+              id: adapter.id,
+              reason: result.partialFailure.reason,
+              detail: result.partialFailure.detail,
+            });
+          }
+          onProgress({
+            type: "source.done",
+            sourceId: adapter.id,
+            itemCount: result.items.length,
+            ...(result.partialFailure ? { partialFailure: result.partialFailure } : {}),
+          });
         } else {
-          sourcesFailed.push({ id: adapter.id, error: result.error });
-          onProgress({ type: "source.failed", sourceId: adapter.id, error: result.error });
+          sourcesFailed.push({ id: adapter.id, error: result.error, reason: result.reason });
+          onProgress({ type: "source.failed", sourceId: adapter.id, error: result.error, reason: result.reason });
         }
 
         onProgress({ type: "progress", percent, message: `${completedCount}/${total} sources complete` });
@@ -207,8 +223,9 @@ export class ResearchEngine {
       const adapter = eligible[i];
       if (settlement && settlement.status === "rejected" && adapter) {
         const message = settlement.reason instanceof Error ? settlement.reason.message : String(settlement.reason);
-        sourcesFailed.push({ id: adapter.id, error: message });
-        onProgress({ type: "source.failed", sourceId: adapter.id, error: message });
+        const reason = classifyException(settlement.reason);
+        sourcesFailed.push({ id: adapter.id, error: message, reason });
+        onProgress({ type: "source.failed", sourceId: adapter.id, error: message, reason });
       }
     }
 
@@ -238,6 +255,8 @@ export class ResearchEngine {
       sourcesFailed: sourcesFailed.map((f) => f.id),
       sourcesSkipped: skipped.map((s) => s.id),
       sourcesEligibleCount: eligible.length,
+      failedReasons: sourcesFailed.map((f) => ({ id: f.id, reason: f.reason })),
+      sourcesPartial,
     });
 
     const completedAt = nowIso();
@@ -245,11 +264,13 @@ export class ResearchEngine {
     const session: ResearchSession = {
       id: sessionId,
       windowDays,
+      ...(topic ? { topic } : {}),
       startedAt,
       completedAt,
       sourcesUsed,
       sourcesFailed,
       sourcesSkipped: skipped,
+      sourcesPartial,
       opportunities,
       report,
       totalItemsCollected: dedupedItems.length,
@@ -261,7 +282,7 @@ export class ResearchEngine {
       kind: "report",
       owner: "research-engine",
       content: JSON.stringify(session, null, 2),
-      metadata: { sessionId, windowDays, tags: ["research"] },
+      metadata: { sessionId, windowDays, ...(topic ? { topic } : {}), tags: ["research"] },
     });
     session.artifactId = artifact.id;
 

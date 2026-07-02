@@ -10,6 +10,7 @@ import type { ResearchProgressEvent, ResearchSession } from "../../research/type
 
 const RunBody = z.object({
   windowDays: z.number().int().positive().max(365).optional(),
+  topic: z.string().trim().min(1).max(200).optional(),
 });
 
 /**
@@ -82,10 +83,11 @@ export function registerResearchRoutes(router: Router, ctx: AppContext): void {
       if (!requireSession(reqCtx)) return;
 
       const windowDays = reqCtx.body.windowDays ?? 30;
+      const topic = reqCtx.body.topic;
       const streamId = generateId("stream");
       const sub = getOrCreateSubscription(streamId);
 
-      const runPromise = ctx.research.run(windowDays, (event) => broadcast(streamId, event));
+      const runPromise = ctx.research.run(windowDays, (event) => broadcast(streamId, event), topic);
       const settledPromise = runPromise.then(
         (session) => ({ status: "resolved" as const, session }),
         (error) => ({ status: "rejected" as const, error }),

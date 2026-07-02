@@ -1,7 +1,9 @@
 import type { RawResearchItem, SourceAdapter, SourceAdapterResult } from "../types.js";
+import { classifyException, classifyHttpStatus } from "./classify.js";
 
 const TIMEOUT_MS = 8000;
 const SOURCE_ID = "stackexchange";
+const DEFAULT_QUERY = "startup product";
 
 interface StackExchangeQuestion {
   title?: string;
@@ -14,15 +16,16 @@ interface StackExchangeResponse {
   items?: StackExchangeQuestion[];
 }
 
-async function fetchStackExchange(windowDays: number): Promise<SourceAdapterResult> {
+async function fetchStackExchange(windowDays: number, topic?: string): Promise<SourceAdapterResult> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
     const fromDate = Math.floor((Date.now() - windowDays * 24 * 60 * 60 * 1000) / 1000);
+    const query = topic && topic.trim().length > 0 ? topic.trim() : DEFAULT_QUERY;
     const params = new URLSearchParams({
       order: "desc",
       sort: "creation",
-      q: "startup product",
+      q: query,
       site: "stackoverflow",
       fromdate: String(fromDate),
       pagesize: "25",
@@ -34,7 +37,11 @@ async function fetchStackExchange(windowDays: number): Promise<SourceAdapterResu
 
     const response = await fetch(url, { signal: controller.signal });
     if (!response.ok) {
-      return { ok: false, error: `Stack Exchange search failed with status ${response.status}` };
+      return {
+        ok: false,
+        reason: classifyHttpStatus(response.status),
+        error: `Stack Exchange search failed with status ${response.status}`,
+      };
     }
 
     const body = (await response.json()) as StackExchangeResponse;
@@ -48,7 +55,11 @@ async function fetchStackExchange(windowDays: number): Promise<SourceAdapterResu
 
     return { ok: true, items };
   } catch (error) {
-    return { ok: false, error: error instanceof Error ? error.message : "unknown Stack Exchange fetch error" };
+    return {
+      ok: false,
+      reason: classifyException(error),
+      error: error instanceof Error ? error.message : "unknown Stack Exchange fetch error",
+    };
   } finally {
     clearTimeout(timer);
   }

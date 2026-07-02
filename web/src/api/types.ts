@@ -167,6 +167,15 @@ export interface Insight {
   [key: string]: unknown;
 }
 
+/** src/research/types.ts SourceFailureReason */
+export type SourceFailureReason =
+  | "no-results"
+  | "network-failure"
+  | "authentication-failure"
+  | "api-limit"
+  | "parsing-failure"
+  | "unknown-error";
+
 /** src/research/types.ts FounderReport */
 export interface FounderReport {
   topOpportunities: Opportunity[];
@@ -180,6 +189,8 @@ export interface FounderReport {
     failed: string[];
     skipped: string[];
     ratio: number;
+    failedReasons?: Array<{ id: string; reason: SourceFailureReason }>;
+    partial?: Array<{ id: string; reason: SourceFailureReason; detail: string }>;
   };
   generatedAt: string;
 }
@@ -188,11 +199,13 @@ export interface FounderReport {
 export interface ResearchSession {
   id: string;
   windowDays: number;
+  topic?: string;
   startedAt: string;
   completedAt?: string;
   sourcesUsed: string[];
-  sourcesFailed: Array<{ id: string; error: string }>;
+  sourcesFailed: Array<{ id: string; error: string; reason: SourceFailureReason }>;
   sourcesSkipped: Array<{ id: string; reason: string }>;
+  sourcesPartial: Array<{ id: string; reason: SourceFailureReason; detail: string }>;
   opportunities: Opportunity[];
   report: FounderReport;
   artifactId?: string;
@@ -201,8 +214,13 @@ export interface ResearchSession {
 /** src/research/types.ts ResearchProgressEvent (discriminated union) */
 export type ResearchProgressEvent =
   | { type: "source.start"; sourceId: string }
-  | { type: "source.done"; sourceId: string; itemCount: number }
-  | { type: "source.failed"; sourceId: string; error: string }
+  | {
+      type: "source.done";
+      sourceId: string;
+      itemCount: number;
+      partialFailure?: { reason: SourceFailureReason; detail: string };
+    }
+  | { type: "source.failed"; sourceId: string; error: string; reason?: SourceFailureReason }
   | { type: "progress"; percent: number; message: string }
   | { type: "complete"; session: ResearchSession }
   | { type: "error"; message: string; missing?: string[] };

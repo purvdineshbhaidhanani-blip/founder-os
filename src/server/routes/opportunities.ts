@@ -13,6 +13,7 @@ import type { TopOpportunitiesReport } from "../../opportunities/types.js";
 
 const RunBody = z.object({
   windowDays: z.number().int().positive().max(365).optional(),
+  topic: z.string().trim().min(1).max(200).optional(),
 });
 
 /**
@@ -160,10 +161,15 @@ export function registerOpportunityPipelineRoutes(router: Router, ctx: AppContex
       if (!requireSession(reqCtx)) return;
 
       const windowDays = reqCtx.body.windowDays ?? 30;
+      const topic = reqCtx.body.topic;
       const pipelineId = generateId("pipeline");
       getOrCreateState(pipelineId);
 
-      const runPromise = ctx.research.run(windowDays, (event) => broadcast(pipelineId, { ...event, stage: "research" }));
+      const runPromise = ctx.research.run(
+        windowDays,
+        (event) => broadcast(pipelineId, { ...event, stage: "research" }),
+        topic,
+      );
       const settledPromise: Promise<RunOutcome> = runPromise.then(
         (session) => ({ status: "resolved" as const, session }),
         (error) => ({ status: "rejected" as const, error }),

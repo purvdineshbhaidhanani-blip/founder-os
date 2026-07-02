@@ -15,13 +15,15 @@ const WINDOW_DAYS = 30;
 export default function Home(): React.ReactElement {
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
+  const [topic, setTopic] = useState("");
   const [missingKeysError, setMissingKeysError] = useState<{ message: string; missing: string[] } | null>(null);
 
   const handleStart = async (): Promise<void> => {
     setSubmitting(true);
     setMissingKeysError(null);
     try {
-      const { pipelineId } = await runPipeline(WINDOW_DAYS);
+      const trimmedTopic = topic.trim();
+      const { pipelineId } = await runPipeline(WINDOW_DAYS, trimmedTopic ? trimmedTopic : undefined);
       navigate(`/pipeline/${encodeURIComponent(pipelineId)}/progress`);
     } catch (error) {
       if (isMissingKeysError(error)) {
@@ -42,6 +44,17 @@ export default function Home(): React.ReactElement {
       <div className="home-hero card">
         <h1>Founder Intelligence OS</h1>
         <p className="page-subtitle">Research Window: Last {WINDOW_DAYS} Days</p>
+
+        <label htmlFor="research-topic">Topic (optional)</label>
+        <input
+          id="research-topic"
+          type="text"
+          value={topic}
+          onChange={(e) => setTopic(e.target.value)}
+          placeholder="e.g. accounting software, dev tools, real estate CRM — leave blank for general discovery"
+          disabled={submitting}
+        />
+
         <button type="button" className="start-research-button" onClick={() => void handleStart()} disabled={submitting}>
           {submitting ? "Starting..." : "START RESEARCH"}
         </button>

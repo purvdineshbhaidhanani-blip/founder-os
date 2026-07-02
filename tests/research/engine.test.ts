@@ -31,11 +31,16 @@ function keylessAdapter(id: string, items: RawResearchItem[]): SourceAdapter {
   };
 }
 
-function failingAdapter(id: string, keyless: boolean, error: string): SourceAdapter {
+function failingAdapter(
+  id: string,
+  keyless: boolean,
+  error: string,
+  reason: "no-results" | "network-failure" | "authentication-failure" | "api-limit" | "parsing-failure" | "unknown-error" = "unknown-error",
+): SourceAdapter {
   return {
     id,
     keyless,
-    fetch: async () => ({ ok: false, error }),
+    fetch: async () => ({ ok: false, error, reason }),
   };
 }
 
@@ -66,22 +71,65 @@ describe("ResearchEngine", () => {
     }
   });
 
-  it("completes the run and records sourcesFailed when one adapter fails, keeping successful ones", async () => {
+  it("completes the run and records sourcesFailed (with a classified reason) when one adapter fails, keeping successful ones", async () => {
     const good = keylessAdapter("hackernews", [makeItem("hackernews", "Cool startup launch")]);
-    const bad = failingAdapter("rss", true, "feed unreachable");
+    const bad = failingAdapter("rss", true, "feed unreachable", "network-failure");
     const { engine } = harness({}, [good, bad]);
 
     const events: string[] = [];
     const session = await engine.run(30, (event) => events.push(event.type));
 
     expect(session.sourcesUsed).toEqual(["hackernews"]);
-    expect(session.sourcesFailed).toEqual([{ id: "rss", error: "feed unreachable" }]);
+    expect(session.sourcesFailed).toEqual([{ id: "rss", error: "feed unreachable", reason: "network-failure" }]);
+    expect(session.report.sourceCoverage.failedReasons).toEqual([{ id: "rss", reason: "network-failure" }]);
     expect(events).toContain("source.start");
     expect(events).toContain("source.done");
     expect(events).toContain("source.failed");
     expect(events).toContain("complete");
     expect(session.report).toBeDefined();
     expect(session.artifactId).toBeTruthy();
+  });
+
+  it("threads an optional topic through to every adapter's fetch call and records it on the session", async () => {
+    const seenTopics: Array<string | undefined> = [];
+    const adapter: SourceAdapter = {
+      id: "hackernews",
+      keyless: true,
+      fetch: async (_windowDays, topic) => {
+        seenTopics.push(topic);
+        return { ok: true, items: [] };
+      },
+    };
+    const { engine } = harness({}, [adapter]);
+
+    const session = await engine.run(30, () => undefined, "accounting software");
+
+    expect(seenTopics).toEqual(["accounting software"]);
+    expect(session.topic).toBe("accounting software");
+  });
+
+  it("records sourcesPartial (and surfaces it in the report) when an adapter succeeds with a partialFailure", async () => {
+    const partial: SourceAdapter = {
+      id: "reddit",
+      keyless: true,
+      fetch: async () => ({
+        ok: true,
+        items: [makeItem("reddit", "Some real item")],
+        partialFailure: { reason: "api-limit", detail: "1/2 Reddit endpoint(s) failed" },
+      }),
+    };
+    const { engine } = harness({}, [partial]);
+
+    const session = await engine.run(30, () => undefined);
+
+    expect(session.sourcesUsed).toEqual(["reddit"]);
+    expect(session.sourcesFailed).toEqual([]);
+    expect(session.sourcesPartial).toEqual([
+      { id: "reddit", reason: "api-limit", detail: "1/2 Reddit endpoint(s) failed" },
+    ]);
+    expect(session.report.sourceCoverage.partial).toEqual([
+      { id: "reddit", reason: "api-limit", detail: "1/2 Reddit endpoint(s) failed" },
+    ]);
   });
 
   it("populates sourcesSkipped for keyed sources missing required env, while still running eligible keyless ones", async () => {

@@ -2,7 +2,7 @@ import { nowIso } from "../utils/id.js";
 import { RealityGuard } from "../intelligence/reality-guard.js";
 import type { Insight } from "../intelligence/types.js";
 import { computeResearchConfidence } from "./confidence.js";
-import type { FounderReport, Opportunity } from "./types.js";
+import type { FounderReport, Opportunity, SourceFailureReason } from "./types.js";
 
 const guard = new RealityGuard();
 
@@ -11,6 +11,10 @@ export interface BuildFounderReportOptions {
   sourcesFailed: string[];
   sourcesSkipped: string[];
   sourcesEligibleCount: number;
+  /** Reason classification per fully-failed source id, keyed to `sourcesFailed`. Optional/additive. */
+  failedReasons?: Array<{ id: string; reason: SourceFailureReason }>;
+  /** Sources that succeeded overall but flagged a partial sub-fetch failure. Optional/additive. */
+  sourcesPartial?: Array<{ id: string; reason: SourceFailureReason; detail: string }>;
 }
 
 /**
@@ -43,6 +47,12 @@ export function buildFounderReport(
       failed: options.sourcesFailed,
       skipped: options.sourcesSkipped,
       ratio: Math.round(ratio * 100) / 100,
+      ...(options.failedReasons && options.failedReasons.length > 0
+        ? { failedReasons: options.failedReasons }
+        : {}),
+      ...(options.sourcesPartial && options.sourcesPartial.length > 0
+        ? { partial: options.sourcesPartial }
+        : {}),
     },
     generatedAt: nowIso(),
   };
