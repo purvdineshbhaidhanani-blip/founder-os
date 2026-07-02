@@ -17,17 +17,20 @@ export default function Nav(): React.ReactElement {
     <nav className="nav">
       <div className="nav-brand">Founder OS</div>
       <div className="nav-links">
+        <NavLink to="/" end className={({ isActive }) => (isActive ? "active" : "")}>
+          Home
+        </NavLink>
         <NavLink to="/dashboard" className={({ isActive }) => (isActive ? "active" : "")}>
-          Dashboard
+          Advanced: Dashboard
         </NavLink>
         <NavLink to="/research" className={({ isActive }) => (isActive ? "active" : "")}>
-          Research
+          Advanced: Research
         </NavLink>
         <NavLink to="/history" className={({ isActive }) => (isActive ? "active" : "")}>
-          History
+          Advanced: History
         </NavLink>
         <NavLink to="/settings" className={({ isActive }) => (isActive ? "active" : "")}>
-          Settings
+          Advanced: Settings
         </NavLink>
       </div>
       <div className="nav-user">

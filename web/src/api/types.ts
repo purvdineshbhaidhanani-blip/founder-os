@@ -225,3 +225,129 @@ export interface ResearchSessionSummary {
   artifactId: string;
   createdAt: string;
 }
+
+/**
+ * Opportunity pipeline types, mirroring:
+ *   - src/server/routes/opportunities.ts (PipelineProgressEvent, route shapes)
+ *   - src/opportunities/types.ts (FounderOpportunityReport, TopOpportunitiesReport)
+ * Do not add fields that do not exist in those files.
+ */
+
+/** POST /api/pipeline/run 202 response */
+export interface RunPipelineAccepted {
+  pipelineId: string;
+}
+
+/** POST /api/pipeline/run 422 response (MissingKeysError) */
+export interface RunPipelineMissingKeys {
+  error: string;
+  missing: string[];
+}
+
+export type PipelineStage = "research" | "problems" | "opportunities" | "complete";
+
+/** src/server/routes/opportunities.ts PipelineProgressEvent (discriminated union) */
+export type PipelineProgressEvent =
+  | ({ stage: "research" } & ResearchProgressEvent)
+  | { stage: "problems"; type: "progress"; percent: number; message: string }
+  | { stage: "opportunities"; type: "progress"; percent: number; message: string }
+  | { stage: "complete"; type: "complete"; topOpportunitiesReportId: string; pipelineId: string }
+  | { stage: PipelineStage; type: "error"; message: string; missing?: string[] };
+
+/** src/opportunities/types.ts BuyingIntentResult */
+export interface BuyingIntentResult {
+  score: number;
+  matchingItemCount: number;
+  totalItemCount: number;
+  explanation: string;
+}
+
+/** src/opportunities/types.ts CompetitorMention */
+export interface CompetitorMention {
+  name: string;
+  mentionCount: number;
+  evidenceUrls: string[];
+}
+
+/** src/opportunities/types.ts CompetitionResult */
+export interface CompetitionResult {
+  competitors: CompetitorMention[];
+  competitionScore: number;
+  explanation: string;
+}
+
+export type BuildDifficultyTier = "low" | "medium" | "high";
+
+/** src/opportunities/types.ts BuildDifficultyResult */
+export interface BuildDifficultyResult {
+  tier: BuildDifficultyTier;
+  matchedSignals: string[];
+  explanation: string;
+}
+
+/** src/opportunities/types.ts PricingSignal */
+export interface PricingSignal {
+  extractedPrices: number[];
+  suggestedPriceText: string;
+}
+
+/** src/opportunities/types.ts OpportunityScoreBreakdown */
+export interface OpportunityScoreBreakdown {
+  painFrequency: number;
+  sourceDiversity: number;
+  authorDiversity: number;
+  buyingIntent: number;
+  engagement: number;
+  growth: number;
+  competition: number;
+  confidence: number;
+  weightedTotal: number;
+  explanation: string;
+}
+
+export type FounderRecommendationVerdict = "BUILD" | "WAIT" | "IGNORE";
+
+/** src/opportunities/types.ts FounderRecommendation */
+export interface FounderRecommendation {
+  verdict: FounderRecommendationVerdict;
+  whyBuild: string[];
+  whyNotBuild: string[];
+  risk: string[];
+  explanation: string;
+}
+
+/** src/opportunities/types.ts FounderOpportunityReport */
+export interface FounderOpportunityReport {
+  id: string;
+  clusterId: string;
+  category: string;
+  problem: string;
+  summary: string;
+  painScore: number;
+  buyingIntent: BuyingIntentResult;
+  competition: CompetitionResult;
+  confidence: { band: string; score: number };
+  scoreBreakdown: OpportunityScoreBreakdown;
+  supportingEvidence: { evidenceCount: number; sourceBreakdown: Record<string, number>; urls: string[] };
+  representativeQuotes: Array<{ text: string; url: string; source: string }>;
+  recommendedMvp: string;
+  suggestedPricing: PricingSignal;
+  targetUsers: string;
+  buildDifficulty: BuildDifficultyResult;
+  estimatedTimeToMvp: string;
+  recommendation: FounderRecommendation;
+  createdAt: string;
+  sourceSessionId: string;
+  sourceProblemReportId: string;
+}
+
+/** src/opportunities/types.ts TopOpportunitiesReport — GET /api/pipeline/:id/opportunities response */
+export interface TopOpportunitiesReport {
+  id: string;
+  sourceSessionId: string;
+  sourceProblemReportId: string;
+  opportunities: FounderOpportunityReport[];
+  totalClustersConsidered: number;
+  generatedAt: string;
+  artifactId?: string;
+}

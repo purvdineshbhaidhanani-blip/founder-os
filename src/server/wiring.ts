@@ -20,6 +20,8 @@ import { ModelRouter } from "../routing/index.js";
 import { MultiProjectScheduler } from "../scheduling/index.js";
 import { SettingsManager } from "../settings/index.js";
 import { ResearchEngine } from "../research/index.js";
+import { ClusterRepository, ProblemIntelligenceEngine } from "../problems/index.js";
+import { OpportunityEngine, OpportunityRepository } from "../opportunities/index.js";
 
 /**
  * Every wired subsystem the HTTP server's routes depend on. Composed fresh
@@ -48,6 +50,10 @@ export interface AppContext {
   dashboard: DashboardBackend;
   connectors: ConnectorRegistry;
   research: ResearchEngine;
+  clusterRepository: ClusterRepository;
+  problems: ProblemIntelligenceEngine;
+  opportunityRepository: OpportunityRepository;
+  opportunities: OpportunityEngine;
   commandCenter: CommandCenterBackend;
 }
 
@@ -78,6 +84,10 @@ export function composeAppContext(): AppContext {
   const dashboard = new DashboardBackend({ events: bus, queue, workflowEngine: workflow, agents: runtime });
   const connectors = new ConnectorRegistry();
   const research = new ResearchEngine({ connectors, artifacts, memory, bus });
+  const clusterRepository = new ClusterRepository({ artifacts, memory });
+  const problems = new ProblemIntelligenceEngine({ repository: clusterRepository });
+  const opportunityRepository = new OpportunityRepository({ artifacts, memory });
+  const opportunities = new OpportunityEngine({ repository: opportunityRepository });
 
   observability.attachBus();
 
@@ -116,6 +126,10 @@ export function composeAppContext(): AppContext {
     dashboard,
     connectors,
     research,
+    clusterRepository,
+    problems,
+    opportunityRepository,
+    opportunities,
     commandCenter,
   };
 }

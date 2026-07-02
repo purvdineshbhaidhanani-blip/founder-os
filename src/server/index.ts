@@ -8,6 +8,7 @@ import { registerAuthRoutes } from "./routes/auth.js";
 import { registerDashboardRoutes } from "./routes/dashboard.js";
 import { registerConnectorRoutes } from "./routes/connectors.js";
 import { registerResearchRoutes } from "./routes/research.js";
+import { registerOpportunityPipelineRoutes } from "./routes/opportunities.js";
 import { createLogger } from "../utils/logger.js";
 
 const logger = createLogger("server");
@@ -86,6 +87,7 @@ export function createServer(ctx: AppContext): http.Server {
   registerDashboardRoutes(router, ctx);
   registerConnectorRoutes(router, ctx);
   registerResearchRoutes(router, ctx);
+  registerOpportunityPipelineRoutes(router, ctx);
 
   return http.createServer((req, res) => {
     const url = new URL(req.url ?? "/", "http://localhost");

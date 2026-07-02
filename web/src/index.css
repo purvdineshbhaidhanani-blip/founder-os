@@ -356,3 +356,89 @@ code {
 .notification-warn {
   color: var(--warn);
 }
+
+.home-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+}
+
+.home-hero {
+  text-align: center;
+  max-width: 480px;
+  padding: 3rem 2.5rem;
+}
+
+.home-hero h1 {
+  margin-bottom: 0.5rem;
+}
+
+.start-research-button {
+  margin-top: 1.5rem;
+  padding: 0.85rem 2rem;
+  font-size: 1.05rem;
+}
+
+.export-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.export-actions a {
+  text-decoration: none;
+}
+
+.opportunity-rank-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.opportunity-rank-row {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.opportunity-rank-row:hover {
+  border-color: var(--primary);
+}
+
+.opportunity-rank-number {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--muted);
+  min-width: 2.5rem;
+}
+
+.opportunity-rank-body h3 {
+  margin: 0 0 0.3rem;
+}
+
+.opportunity-rank-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.badge-verdict-build {
+  background: #e6f7ec;
+  color: var(--ok);
+  font-weight: 700;
+}
+
+.badge-verdict-wait {
+  background: #fdf3e1;
+  color: var(--warn);
+  font-weight: 700;
+}
+
+.badge-verdict-ignore {
+  background: #fdecec;
+  color: var(--bad);
+  font-weight: 700;
+}

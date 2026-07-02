@@ -2,14 +2,19 @@ import type {
   ApiErrorBody,
   ConnectorStatusView,
   FounderDashboardView,
+  FounderOpportunityReport,
   LoginResponse,
   MeResponse,
+  PipelineProgressEvent,
   ResearchProgressEvent,
   ResearchSession,
   ResearchSessionSummary,
+  RunPipelineAccepted,
+  RunPipelineMissingKeys,
   RunResearchAccepted,
   RunResearchMissingKeys,
   FounderReport,
+  TopOpportunitiesReport,
 } from "./types";
 
 const API_BASE = "/api";
@@ -126,6 +131,73 @@ export function subscribeProgress(
       try {
         const data = JSON.parse(messageEvent.data);
         onEvent({ type: name, ...data } as ResearchProgressEvent);
+      } catch {
+        // Ignore malformed events rather than crashing the subscriber.
+      }
+    });
+  }
+
+  return () => source.close();
+}
+
+/**
+ * Kicks off the full one-button pipeline (research -> problem clustering ->
+ * opportunity scoring). Resolves with the pipelineId on success (202). On a
+ * 422 (MissingKeysError, thrown before the research stage even starts) the
+ * promise rejects with an ApiError whose `.body` carries
+ * `{ error, missing }` — same shape as `runResearch`'s 422, so
+ * `isMissingKeysError` works for either.
+ */
+export function runPipeline(windowDays: number): Promise<RunPipelineAccepted> {
+  return request<RunPipelineAccepted>("/pipeline/run", {
+    method: "POST",
+    body: JSON.stringify({ windowDays }),
+  });
+}
+
+export function getPipelineOpportunities(pipelineId: string): Promise<TopOpportunitiesReport> {
+  return request<TopOpportunitiesReport>(`/pipeline/${encodeURIComponent(pipelineId)}/opportunities`);
+}
+
+export function getOpportunityDetail(pipelineId: string, opportunityId: string): Promise<FounderOpportunityReport> {
+  return request<FounderOpportunityReport>(
+    `/pipeline/${encodeURIComponent(pipelineId)}/opportunities/${encodeURIComponent(opportunityId)}`,
+  );
+}
+
+/** Builds the download URL for a pipeline's exported report — a plain same-origin link so the browser sends the session cookie on navigation. */
+export function getPipelineExportUrl(pipelineId: string, format: "markdown" | "json"): string {
+  return `${API_BASE}/pipeline/${encodeURIComponent(pipelineId)}/export?format=${format}`;
+}
+
+/**
+ * Subscribes to the SSE progress stream for a pipeline run's pipelineId (the
+ * id returned by `runPipeline`). Named events mirror
+ * src/server/routes/opportunities.ts's PipelineProgressEvent: every
+ * forwarded research-stage event keeps its original name (source.start,
+ * source.done, source.failed, progress, complete), plus the synthetic
+ * "progress" events for the problems/opportunities stages, the final
+ * "complete" event (distinguished from research's own "complete" by its
+ * `stage: "complete"` field), and a synthetic "error" event on fatal
+ * failure.
+ */
+export function subscribePipelineProgress(
+  pipelineId: string,
+  onEvent: (event: PipelineProgressEvent) => void,
+): () => void {
+  const source = new EventSource(
+    `${API_BASE}/pipeline/${encodeURIComponent(pipelineId)}/progress`,
+    { withCredentials: true },
+  );
+
+  const eventNames = ["source.start", "source.done", "source.failed", "progress", "complete", "error"] as const;
+
+  for (const name of eventNames) {
+    source.addEventListener(name, (evt) => {
+      const messageEvent = evt as MessageEvent<string>;
+      try {
+        const data = JSON.parse(messageEvent.data);
+        onEvent(data as PipelineProgressEvent);
       } catch {
         // Ignore malformed events rather than crashing the subscriber.
       }
