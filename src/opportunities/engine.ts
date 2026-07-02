@@ -1,0 +1,139 @@
+import { generateId, nowIso } from "../utils/id.js";
+import { flattenSessionItems, groupByCategory } from "../problems/clustering.js";
+import { computeBuyingIntentScore } from "./buying-intent.js";
+import { extractCompetitionEvidence } from "./competition.js";
+import { estimateBuildDifficulty } from "./difficulty.js";
+import { extractPricingSignal } from "./pricing.js";
+import { getRecommendedMvp, getTargetUsers } from "./mvp-template.js";
+import { computeOpportunityScore } from "./scoring.js";
+import { decideRecommendation } from "./recommendation.js";
+import type { OpportunityRepository } from "./repository.js";
+import type { ProblemCluster, ProblemIntelligenceReport } from "../problems/types.js";
+import type { ResearchSession } from "../research/types.js";
+import type { FounderOpportunityReport, TopOpportunitiesReport } from "./types.js";
+
+export interface OpportunityEngineOptions {
+  repository: OpportunityRepository;
+}
+
+const TOP_N = 10;
+
+function topSourceIdOf(sourceBreakdown: Record<string, number>): string {
+  let bestId = "unknown";
+  let bestCount = -1;
+  for (const [sourceId, count] of Object.entries(sourceBreakdown)) {
+    if (count > bestCount) {
+      bestId = sourceId;
+      bestCount = count;
+    }
+  }
+  return bestId;
+}
+
+function estimatedTimeToMvpFor(tier: "low" | "medium" | "high"): string {
+  if (tier === "low") return "2-4 weeks (heuristic estimate)";
+  if (tier === "medium") return "4-8 weeks (heuristic estimate)";
+  return "8-16+ weeks (heuristic estimate)";
+}
+
+/**
+ * Deterministic, rule-based translation of ProblemIntelligenceReport clusters
+ * into founder-facing, ranked build opportunities. No LLM call — every
+ * formula/threshold is delegated to the fixed-constant modules in this
+ * directory.
+ */
+export class OpportunityEngine {
+  private readonly repository: OpportunityRepository;
+
+  constructor(options: OpportunityEngineOptions) {
+    this.repository = options.repository;
+  }
+
+  async analyze(
+    session: ResearchSession,
+    problemReport: ProblemIntelligenceReport,
+  ): Promise<TopOpportunitiesReport> {
+    const allItems = flattenSessionItems(session);
+    const byCategory = groupByCategory(allItems);
+
+    const built: FounderOpportunityReport[] = [];
+
+    for (const cluster of problemReport.clusters) {
+      built.push(this.buildOpportunityReport(cluster, byCategory, session, problemReport));
+    }
+
+    built.sort((a, b) => b.scoreBreakdown.weightedTotal - a.scoreBreakdown.weightedTotal);
+    const opportunities = built.slice(0, TOP_N);
+
+    const report: TopOpportunitiesReport = {
+      id: generateId("opportunity-report"),
+      sourceSessionId: session.id,
+      sourceProblemReportId: problemReport.id,
+      opportunities,
+      totalClustersConsidered: problemReport.clusters.length,
+      generatedAt: nowIso(),
+    };
+
+    return this.repository.persist(report);
+  }
+
+  private buildOpportunityReport(
+    cluster: ProblemCluster,
+    byCategory: ReturnType<typeof groupByCategory>,
+    session: ResearchSession,
+    problemReport: ProblemIntelligenceReport,
+  ): FounderOpportunityReport {
+    const clusterItems = byCategory.get(cluster.category) ?? [];
+    const rawItems = clusterItems.map((classified) => classified.item);
+
+    const buyingIntent = computeBuyingIntentScore(clusterItems);
+    const competition = extractCompetitionEvidence(rawItems);
+    const difficulty = estimateBuildDifficulty(rawItems);
+    const pricing = extractPricingSignal(rawItems);
+    const scoreBreakdown = computeOpportunityScore({ cluster, buyingIntent, competition });
+    const recommendation = decideRecommendation(scoreBreakdown, cluster, buyingIntent);
+
+    const recommendedMvp = getRecommendedMvp(cluster.category);
+    const topSourceId = topSourceIdOf(cluster.evidence.sourceBreakdown);
+    const targetUsers = getTargetUsers(cluster.category, topSourceId);
+    const estimatedTimeToMvp = estimatedTimeToMvpFor(difficulty.tier);
+
+    const representativeQuotes = cluster.evidence.representativeExamples.map((item) => ({
+      text: (item.title + (item.body ? ` — ${item.body}` : "")).slice(0, 280),
+      url: item.url,
+      source: item.sourceId,
+    }));
+
+    const summary = `${cluster.evidence.evidenceCount} mentions of "${cluster.normalizedStatement}" found across ${cluster.frequency.uniqueSources} source(s).`;
+
+    const report: FounderOpportunityReport = {
+      id: generateId("opportunity"),
+      clusterId: cluster.id,
+      category: cluster.category,
+      problem: cluster.normalizedStatement,
+      summary,
+      painScore: scoreBreakdown.painFrequency,
+      buyingIntent,
+      competition,
+      confidence: { band: cluster.confidence.band, score: cluster.confidence.score },
+      scoreBreakdown,
+      supportingEvidence: {
+        evidenceCount: cluster.evidence.evidenceCount,
+        sourceBreakdown: cluster.evidence.sourceBreakdown,
+        urls: cluster.evidence.originalUrls,
+      },
+      representativeQuotes,
+      recommendedMvp,
+      suggestedPricing: pricing,
+      targetUsers,
+      buildDifficulty: difficulty,
+      estimatedTimeToMvp,
+      recommendation,
+      createdAt: nowIso(),
+      sourceSessionId: session.id,
+      sourceProblemReportId: problemReport.id,
+    };
+
+    return report;
+  }
+}
