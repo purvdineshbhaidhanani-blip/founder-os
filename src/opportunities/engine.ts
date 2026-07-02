@@ -7,6 +7,7 @@ import { extractPricingSignal } from "./pricing.js";
 import { getRecommendedMvp, getTargetUsers } from "./mvp-template.js";
 import { computeOpportunityScore } from "./scoring.js";
 import { decideRecommendation } from "./recommendation.js";
+import { dedupeOpportunities } from "./dedup.js";
 import type { OpportunityRepository } from "./repository.js";
 import type { ProblemCluster, ProblemIntelligenceReport } from "../problems/types.js";
 import type { ResearchSession } from "../research/types.js";
@@ -63,7 +64,12 @@ export class OpportunityEngine {
     }
 
     built.sort((a, b) => b.scoreBreakdown.weightedTotal - a.scoreBreakdown.weightedTotal);
-    const opportunities = built.slice(0, TOP_N);
+
+    // Final duplicate-opportunity safety net (Loop 4 Phase 3), run AFTER
+    // ranking and BEFORE the Top-10 cut — see dedup.ts module doc for the
+    // exact criteria and why dropping (not merging) was chosen.
+    const deduped = dedupeOpportunities(built);
+    const opportunities = deduped.slice(0, TOP_N);
 
     const report: TopOpportunitiesReport = {
       id: generateId("opportunity-report"),

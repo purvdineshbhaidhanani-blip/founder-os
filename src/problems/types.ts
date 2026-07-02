@@ -82,6 +82,16 @@ export interface ProblemCluster {
   confidence: ClusterConfidence;
   createdAt: string; // ISO timestamp
   sourceSessionId: string; // which ResearchSession this was derived from
+  /**
+   * True when this cluster's frequency.growth.label === "rising". Added in
+   * Loop 4 Phase 3 to replace the old behavior of creating a SECOND,
+   * duplicate "trend" cluster (same evidence/frequency) for every rising
+   * cluster, which wasted ranking slots in the Top-10 opportunity list with
+   * two entries pointing at the same underlying evidence. Optional/absent
+   * (not `false`) on non-rising clusters, so existing fixtures/consumers
+   * that don't set it remain valid.
+   */
+  trending?: boolean;
 }
 
 export interface ProblemIntelligenceReport {

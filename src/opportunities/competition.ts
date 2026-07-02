@@ -29,6 +29,56 @@ function isPurelyNumeric(name: string): boolean {
 }
 
 /**
+ * Stop words that mark the boundary of a competitor/product name when they
+ * appear immediately after a trigger phrase like "switched from" or
+ * "alternative to". A real competitor/product name is usually 1-2 words
+ * (e.g. "Trello", "Google Sheets") and the sentence continues with a
+ * conjunction/preposition afterwards — so if a stop word appears before we
+ * hit CAPTURE_WORD_CAP, we trim there instead of blindly taking the fixed
+ * word count. This fixes the confirmed bug where "Switched from FreshBooks
+ * to a spreadsheet" extracted "Freshbooks To" (the word "to" was captured
+ * as if it were part of the competitor name).
+ *
+ * Design choice: when a sentence mentions multiple competitors in one
+ * breath (e.g. "alternative to Notion and Airtable"), we deliberately only
+ * capture the FIRST name and stop at "and" rather than trying to split into
+ * two separate entries — splitting on every conjunction would risk treating
+ * ordinary multi-word product names (e.g. "Notion and Slack" being an
+ * actual product) as false splits, so capturing only the first mention is
+ * the simpler, more conservative, and more auditable behavior.
+ */
+const STOP_WORDS = new Set([
+  "to",
+  "and",
+  "but",
+  "because",
+  "since",
+  "which",
+  "that",
+  "for",
+]);
+
+/** Real competitor/product names captured by this module are usually 1-2 words (e.g. "Trello", "Google Sheets"). */
+const CAPTURE_WORD_CAP = 2;
+
+/**
+ * Takes the raw regex capture group text and returns only the leading words
+ * that form the actual competitor/product name: stops at the first stop
+ * word (see STOP_WORDS doc above) or after CAPTURE_WORD_CAP words,
+ * whichever comes first.
+ */
+function trimToCompetitorName(captured: string): string {
+  const words = captured.split(/\s+/).filter((word) => word.length > 0);
+  const kept: string[] = [];
+  for (const word of words) {
+    if (kept.length >= CAPTURE_WORD_CAP) break;
+    if (STOP_WORDS.has(word)) break;
+    kept.push(word);
+  }
+  return kept.join(" ");
+}
+
+/**
  * Scans raw evidence items for competitor-name mentions using a fixed set of
  * "switched from X" style patterns. More distinct named competitors implies
  * a more crowded market, so competitionScore is inversely proportional to
@@ -45,8 +95,7 @@ export function extractCompetitionEvidence(items: RawResearchItem[]): Competitio
       while ((match = regex.exec(blob)) !== null) {
         const captured = (match[1] ?? "").trim();
         if (captured.length === 0) continue;
-        const words = captured.split(/\s+/).filter((word) => word.length > 0).slice(0, 2);
-        const extracted = words.join(" ").slice(0, 40).trim();
+        const extracted = trimToCompetitorName(captured).slice(0, 40).trim();
         if (extracted.length === 0) continue;
         if (isPurelyNumeric(extracted)) continue;
 

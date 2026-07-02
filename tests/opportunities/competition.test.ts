@@ -50,4 +50,46 @@ describe("extractCompetitionEvidence", () => {
     expect(result.competitors).toHaveLength(1);
     expect(result.competitors[0]!.name).toBe("Google Sheets");
   });
+
+  // Regression tests for the confirmed boundary bug: the fixed 2-word
+  // capture cap used to grab a trailing stop word (e.g. "to") as part of
+  // the competitor name because there was no stop-word/boundary check.
+  describe("stop-word boundary fix (regression)", () => {
+    it("does not swallow the trailing 'to' in 'Switched from FreshBooks to a spreadsheet'", () => {
+      const items: RawResearchItem[] = [
+        makeItem({ url: "u1", title: "Switched from FreshBooks to a spreadsheet" }),
+      ];
+      const result = extractCompetitionEvidence(items);
+      expect(result.competitors).toHaveLength(1);
+      expect(result.competitors[0]!.name).toBe("Freshbooks");
+      expect(result.competitors[0]!.name).not.toBe("Freshbooks To");
+    });
+
+    it("stops at 'because' in 'migrated from Basecamp because it lacked features'", () => {
+      const items: RawResearchItem[] = [
+        makeItem({ url: "u1", title: "I migrated from Basecamp because it lacked features" }),
+      ];
+      const result = extractCompetitionEvidence(items);
+      expect(result.competitors).toHaveLength(1);
+      expect(result.competitors[0]!.name).toBe("Basecamp");
+    });
+
+    it("captures only the first competitor and stops at 'and' in 'alternative to Notion and Airtable'", () => {
+      const items: RawResearchItem[] = [
+        makeItem({ url: "u1", title: "This is a great alternative to Notion and Airtable for teams" }),
+      ];
+      const result = extractCompetitionEvidence(items);
+      expect(result.competitors).toHaveLength(1);
+      expect(result.competitors[0]!.name).toBe("Notion");
+    });
+
+    it("stops at the trailing 'for' in 'instead of Slack for team chat'", () => {
+      const items: RawResearchItem[] = [
+        makeItem({ url: "u1", title: "Instead of Slack for team chat we use email" }),
+      ];
+      const result = extractCompetitionEvidence(items);
+      expect(result.competitors).toHaveLength(1);
+      expect(result.competitors[0]!.name).toBe("Slack");
+    });
+  });
 });

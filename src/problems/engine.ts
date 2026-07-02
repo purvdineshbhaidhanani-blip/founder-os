@@ -16,8 +16,11 @@ export interface ProblemIntelligenceEngineOptions {
 /**
  * Deterministic, rule-based classification of a ResearchSession's items into
  * ProblemClusters — no LLM call. Groups items by category, computes
- * evidence/frequency/confidence per cluster, flags rising clusters as
- * "trend" duplicates, and persists the resulting report.
+ * evidence/frequency/confidence per cluster, flags rising clusters via the
+ * `trending` flag on the ORIGINAL cluster (see ProblemCluster.trending —
+ * this replaced an earlier design that created a second, duplicate "trend"
+ * cluster per rising category, which wasted ranking slots downstream), and
+ * persists the resulting report.
  */
 export class ProblemIntelligenceEngine {
   private readonly repository: ClusterRepository;
@@ -31,7 +34,6 @@ export class ProblemIntelligenceEngine {
     const grouped = groupByCategory(items);
 
     const clusters: ProblemCluster[] = [];
-    const trendClusters: ProblemCluster[] = [];
 
     for (const [category, classifiedItems] of grouped) {
       const categoryItems = classifiedItems.map((classified) => classified.item);
@@ -40,6 +42,9 @@ export class ProblemIntelligenceEngine {
       const confidence = computeClusterConfidence(evidence, frequency);
       const extracted = extractProblem(classifiedItems[0]!, category);
 
+      // A cluster with rising mention volume is flagged `trending: true` on
+      // itself rather than spawning a second, duplicate "trend" cluster
+      // (see ProblemCluster.trending doc comment for why).
       const cluster: ProblemCluster = {
         id: generateId("cluster"),
         category,
@@ -49,28 +54,11 @@ export class ProblemIntelligenceEngine {
         confidence,
         createdAt: nowIso(),
         sourceSessionId: session.id,
+        ...(frequency.growth.label === "rising" ? { trending: true } : {}),
       };
       clusters.push(cluster);
-
-      // Special case: a cluster with rising mention volume is ALSO surfaced
-      // as a "trend" cluster (same evidence/frequency), so trending problems
-      // appear both under their original category and as a trend signal.
-      if (frequency.growth.label === "rising") {
-        const trendExtracted = extractProblem(classifiedItems[0]!, "trend");
-        trendClusters.push({
-          id: generateId("cluster"),
-          category: "trend",
-          normalizedStatement: trendExtracted.normalizedStatement,
-          evidence,
-          frequency,
-          confidence,
-          createdAt: nowIso(),
-          sourceSessionId: session.id,
-        });
-      }
     }
 
-    clusters.push(...trendClusters);
     clusters.sort((a, b) => b.evidence.evidenceCount - a.evidence.evidenceCount);
 
     const totalItemsClassified = items.reduce((count, item) => {

@@ -128,7 +128,7 @@ describe("ProblemIntelligenceEngine.analyze", () => {
     expect(recalled.some((entry) => entry.key === report.id)).toBe(true);
   });
 
-  it("adds a duplicate trend cluster for categories whose growth is rising", async () => {
+  it("flags a rising-growth category with trending:true on a SINGLE cluster, instead of creating a duplicate trend cluster", async () => {
     const now = Date.now();
     const windowDays = 30;
 
@@ -173,18 +173,18 @@ describe("ProblemIntelligenceEngine.analyze", () => {
 
     const report = await engine.analyze(session);
 
-    const bugCluster = report.clusters.find((c) => c.category === "bug");
-    expect(bugCluster).toBeDefined();
-    expect(bugCluster?.frequency.growth.label).toBe("rising");
+    // exactly ONE cluster is produced for this category, not two.
+    const bugClusters = report.clusters.filter((c) => c.category === "bug");
+    expect(bugClusters).toHaveLength(1);
+    const bugCluster = bugClusters[0]!;
+    expect(bugCluster.frequency.growth.label).toBe("rising");
+    expect(bugCluster.trending).toBe(true);
 
-    const trendCluster = report.clusters.find((c) => c.category === "trend");
-    expect(trendCluster).toBeDefined();
-    expect(trendCluster?.normalizedStatement).toBe("This topic is showing rising mention volume.");
-    expect(trendCluster?.evidence.evidenceCount).toBe(bugCluster?.evidence.evidenceCount);
-    expect(trendCluster?.id).not.toBe(bugCluster?.id);
+    // no separate "trend"-category cluster is created anymore.
+    expect(report.clusters.some((c) => c.category === "trend")).toBe(false);
   });
 
-  it("does not add a trend cluster when no category shows rising growth", async () => {
+  it("leaves trending unset (falsy) when no category shows rising growth, and does not add a trend cluster", async () => {
     const items: RawResearchItem[] = [
       makeItem({ url: "https://example.com/1", title: "This is so annoying", sourceId: "reddit" }),
       makeItem({ url: "https://example.com/2", title: "Terrible, hate it", sourceId: "reddit" }),
@@ -197,6 +197,9 @@ describe("ProblemIntelligenceEngine.analyze", () => {
 
     const report = await engine.analyze(session);
     expect(report.clusters.some((c) => c.category === "trend")).toBe(false);
+    for (const cluster of report.clusters) {
+      expect(cluster.trending).toBeFalsy();
+    }
   });
 
   it("counts totalItemsClassified as items matching at least one non-other category", async () => {

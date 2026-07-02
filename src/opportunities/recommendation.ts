@@ -31,7 +31,7 @@ export function decideRecommendation(
   }
   if (buyingIntent.score > 0) {
     whyBuild.push(
-      `${(buyingIntent.score * 100).toFixed(0)}% of evidence (${buyingIntent.matchingItemCount}/${buyingIntent.totalItemCount}) shows explicit buying-intent signal.`,
+      `${(buyingIntent.score * 100).toFixed(0)}% of evidence (${buyingIntent.matchingItemCount}/${buyingIntent.totalItemCount}) shows buying-intent signal (explicit or implicit).`,
     );
   }
   if (cluster.frequency.growth.label === "rising") {
