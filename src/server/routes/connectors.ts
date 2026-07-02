@@ -15,14 +15,15 @@ export interface ConnectorStatusView {
 const RESEARCH_CONNECTOR_IDS = new Set(["github", "youtube", "stackexchange"]);
 
 /**
- * `hackernews` and `rss` are keyless research sources that never appear in
- * the ConnectorRegistry (they need no credentials to run), so they are
- * synthesized here as always-configured entries rather than being added to
- * the registry itself.
+ * `hackernews`, `rss`, and `reddit` are keyless research sources that never
+ * appear in the ConnectorRegistry (they need no credentials to run), so they
+ * are synthesized here as always-configured entries rather than being added
+ * to the registry itself.
  */
 const KEYLESS_RESEARCH_SOURCES: ConnectorStatusView[] = [
   { id: "hackernews", name: "Hacker News", status: "configured", missingEnv: [], required: false },
   { id: "rss", name: "RSS", status: "configured", missingEnv: [], required: false },
+  { id: "reddit", name: "Reddit", status: "configured", missingEnv: [], required: false },
 ];
 
 function missingEnvFromNotes(notes?: string): string[] {

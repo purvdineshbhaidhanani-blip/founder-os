@@ -129,4 +129,39 @@ describe("ResearchEngine", () => {
     const allProjectEntries = await memory.recall({ namespace: "project" });
     expect(allProjectEntries.some((entry) => entry.key === session.id)).toBe(true);
   });
+
+  it("populates totalItemsCollected and durationMs on a successful run", async () => {
+    const good = keylessAdapter("hackernews", [
+      { title: "Cool startup launch one", url: "https://example.com/hackernews/1", sourceId: "hackernews" },
+      { title: "Totally unrelated other headline", url: "https://example.com/hackernews/2", sourceId: "hackernews" },
+    ]);
+    const { engine } = harness({}, [good]);
+
+    const session = await engine.run(30, () => undefined);
+
+    expect(session.totalItemsCollected).toBe(2);
+    expect(typeof session.durationMs).toBe("number");
+    expect(session.durationMs).toBeGreaterThanOrEqual(0);
+    expect(session.durationMs).toBe(Date.parse(session.completedAt!) - Date.parse(session.startedAt));
+  });
+
+  it("dedupes near-identical items collected across adapters before aggregation, reducing item count", async () => {
+    const url = "https://example.com/dup";
+    const adapterA = keylessAdapter("hackernews", [
+      { title: "Founders launch new billing automation tool", url, sourceId: "hackernews", engagement: 3 },
+    ]);
+    const adapterB = keylessAdapter("rss", [
+      { title: "Founders launch new billing automation tool", url, sourceId: "rss", engagement: 10 },
+    ]);
+    const { engine } = harness({}, [adapterA, adapterB]);
+
+    const session = await engine.run(30, () => undefined);
+
+    // Both adapters returned the exact same URL — pass 1 (exact URL dedup) keeps the
+    // first-seen occurrence regardless of engagement, collapsing them to one item.
+    expect(session.totalItemsCollected).toBe(1);
+    const supporting = session.opportunities.flatMap((o) => o.supportingItems);
+    expect(supporting).toHaveLength(1);
+    expect(supporting[0]?.sourceId).toBe("hackernews");
+  });
 });

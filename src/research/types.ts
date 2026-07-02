@@ -15,6 +15,10 @@ export interface RawResearchItem {
   snippet?: string;
   publishedAt?: Timestamp;
   sourceId: string;
+  author?: string;
+  body?: string;
+  engagement?: number;
+  metadata?: Record<string, unknown>;
 }
 
 export interface SourceAdapterSuccess {
@@ -77,6 +81,8 @@ export interface ResearchSession {
   opportunities: Opportunity[];
   report: FounderReport;
   artifactId?: string;
+  totalItemsCollected: number;
+  durationMs: number;
 }
 
 export type ResearchProgressEvent =

@@ -4,6 +4,7 @@ import { youtubeSource } from "../../src/research/sources/youtube.js";
 import { stackExchangeSource } from "../../src/research/sources/stackexchange.js";
 import { hackerNewsSource } from "../../src/research/sources/hackernews.js";
 import { rssSource, parseRssItems } from "../../src/research/sources/rss.js";
+import { redditSource } from "../../src/research/sources/reddit.js";
 
 const originalFetch = global.fetch;
 const originalEnv = { ...process.env };
@@ -155,5 +156,110 @@ describe("source adapters", () => {
       throw new Error("sync throw");
     }) as unknown as typeof fetch;
     await expect(rssSource.fetch(30)).resolves.toMatchObject({ ok: true });
+  });
+
+  it("reddit adapter returns ok:true and maps posts on 200", async () => {
+    const nowSeconds = Math.floor(Date.now() / 1000);
+    global.fetch = vi.fn().mockResolvedValue(
+      jsonResponse({
+        data: {
+          children: [
+            {
+              data: {
+                title: "Show r/SaaS: our new billing tool",
+                permalink: "/r/SaaS/comments/abc123/show/",
+                selftext: "We built a thing.",
+                author: "founder1",
+                created_utc: nowSeconds,
+                score: 42,
+                ups: 42,
+                num_comments: 7,
+                subreddit: "SaaS",
+              },
+            },
+          ],
+        },
+      }),
+    ) as unknown as typeof fetch;
+
+    const result = await redditSource.fetch(30);
+    expect(result.ok).toBe(true);
+    expect(redditSource.keyless).toBe(true);
+    if (result.ok) {
+      expect(result.items.length).toBeGreaterThan(0);
+      const item = result.items[0];
+      expect(item?.sourceId).toBe("reddit");
+      expect(item?.url).toBe("https://reddit.com/r/SaaS/comments/abc123/show/");
+      expect(item?.author).toBe("founder1");
+      expect(item?.body).toBe("We built a thing.");
+      expect(item?.engagement).toBe(42);
+      expect(item?.metadata).toEqual({ numComments: 7, subreddit: "SaaS" });
+    }
+
+    const fetchMock = global.fetch as unknown as ReturnType<typeof vi.fn>;
+    for (const call of fetchMock.mock.calls) {
+      const init = call[1] as { headers?: Record<string, string> } | undefined;
+      expect(init?.headers?.["User-Agent"]).toBeTruthy();
+    }
+  });
+
+  it("reddit adapter returns ok:true with empty items when a subreddit request fails, and never throws", async () => {
+    global.fetch = vi.fn().mockRejectedValue(new Error("network down")) as unknown as typeof fetch;
+    const result = await redditSource.fetch(30);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.items).toEqual([]);
+  });
+
+  it("reddit adapter returns ok:false status per-subreddit but overall ok:true, never throws on non-2xx", async () => {
+    global.fetch = vi.fn().mockResolvedValue(jsonResponse({}, false, 429)) as unknown as typeof fetch;
+    const result = await redditSource.fetch(30);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.items).toEqual([]);
+  });
+
+  it("reddit adapter returns ok:true (empty items) on timeout without throwing", async () => {
+    vi.useFakeTimers();
+    global.fetch = vi.fn().mockImplementation(
+      (_url: string, init?: { signal?: AbortSignal }) =>
+        new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener("abort", () => reject(new Error("This operation was aborted")));
+        }),
+    ) as unknown as typeof fetch;
+
+    const promise = redditSource.fetch(30);
+    await vi.advanceTimersByTimeAsync(8000);
+    await expect(promise).resolves.toMatchObject({ ok: true, items: [] });
+    vi.useRealTimers();
+  });
+
+  it("reddit adapter never throws even if fetch throws synchronously", async () => {
+    global.fetch = vi.fn().mockImplementation(() => {
+      throw new Error("sync throw");
+    }) as unknown as typeof fetch;
+    await expect(redditSource.fetch(30)).resolves.toMatchObject({ ok: true });
+  });
+
+  it("reddit adapter filters posts outside the requested windowDays", async () => {
+    const oldSeconds = Math.floor((Date.now() - 90 * 24 * 60 * 60 * 1000) / 1000);
+    global.fetch = vi.fn().mockResolvedValue(
+      jsonResponse({
+        data: {
+          children: [
+            {
+              data: {
+                title: "Old post from three months ago",
+                permalink: "/r/startups/comments/old1/old/",
+                created_utc: oldSeconds,
+                score: 1,
+              },
+            },
+          ],
+        },
+      }),
+    ) as unknown as typeof fetch;
+
+    const result = await redditSource.fetch(7);
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.items).toEqual([]);
   });
 });

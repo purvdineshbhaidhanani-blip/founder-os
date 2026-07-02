@@ -8,6 +8,7 @@ import type { MemoryEngine } from "../runtime/memory/engine.js";
 import type { EventBus } from "../runtime/events/bus.js";
 import { ALL_SOURCE_ADAPTERS } from "./sources/index.js";
 import { buildFounderReport } from "./report.js";
+import { dedupeItems } from "./dedup.js";
 import type {
   Opportunity,
   RawResearchItem,
@@ -211,7 +212,8 @@ export class ResearchEngine {
       }
     }
 
-    const opportunities = aggregateOpportunities(allItems);
+    const dedupedItems = dedupeItems(allItems);
+    const opportunities = aggregateOpportunities(dedupedItems);
 
     const insights: Insight<unknown>[] = opportunities.slice(0, 5).map((opportunity) =>
       makeInsight({
@@ -238,16 +240,20 @@ export class ResearchEngine {
       sourcesEligibleCount: eligible.length,
     });
 
+    const completedAt = nowIso();
+
     const session: ResearchSession = {
       id: sessionId,
       windowDays,
       startedAt,
-      completedAt: nowIso(),
+      completedAt,
       sourcesUsed,
       sourcesFailed,
       sourcesSkipped: skipped,
       opportunities,
       report,
+      totalItemsCollected: dedupedItems.length,
+      durationMs: Date.parse(completedAt) - Date.parse(startedAt),
     };
 
     const artifact = await this.artifacts.register({
