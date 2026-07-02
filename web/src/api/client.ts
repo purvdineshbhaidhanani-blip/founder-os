@@ -10,7 +10,6 @@ import type {
   ResearchSession,
   ResearchSessionSummary,
   RunPipelineAccepted,
-  RunPipelineMissingKeys,
   RunResearchAccepted,
   RunResearchMissingKeys,
   FounderReport,

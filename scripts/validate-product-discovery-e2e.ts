@@ -22,7 +22,6 @@ import { ArtifactManager } from "../src/runtime/artifacts/manager.js";
 import type { WorkflowNode } from "../src/runtime/workflow/types.js";
 
 import {
-  PRODUCT_DISCOVERY_DEPARTMENT,
   loadProductDiscoveryDepartment,
   PRODUCT_DISCOVERY_DEPARTMENT_AGENTS,
 } from "../src/departments/index.js";
@@ -240,7 +239,7 @@ async function main(): Promise<void> {
   print(`\n[HANDOFF] Spot-checking cross-agent context flow`);
   const problemDiscoveryEntry = (await memory.recall({ namespace: "agent", key: "problem-discovery-agent" }))[0];
   const problemDiscovery = problemDiscoveryEntry?.data as any;
-  print(`  problem-discovery-agent stored: ${!!problemDiscovery?.output ? "OK" : "MISSING"}`);
+  print(`  problem-discovery-agent stored: ${problemDiscovery?.output ? "OK" : "MISSING"}`);
   const finalPackageEntry = (await memory.recall({ namespace: "agent", key: "product-discovery-report-generator" }))[0];
   const finalPackage = (finalPackageEntry?.data as any)?.output;
   print(`  Final package overallConfidence: ${finalPackage?.overallConfidence}`);
