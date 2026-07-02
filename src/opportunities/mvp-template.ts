@@ -24,6 +24,12 @@ const MVP_TEMPLATES: Record<ProblemCategory, string> = {
   praise: "Not a build opportunity — evidence shows satisfaction, not unmet need.",
   trend:
     "A product riding the rising-mention trend identified in this evidence window — validate urgency before committing.",
+  "market-gap":
+    "A net-new product addressing a problem space with no existing solution — validate the gap is real, not just unsearched.",
+  workaround:
+    "A purpose-built product that replaces the manual workaround described in the evidence — a stronger signal than a complaint.",
+  "existing-spending":
+    "A product that captures already-allocated budget by directly displacing the tool users report currently paying for.",
   other: "Insufficient category signal to recommend an MVP shape.",
 };
 

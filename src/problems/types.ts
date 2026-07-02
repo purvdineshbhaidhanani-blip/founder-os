@@ -21,6 +21,9 @@ export type ProblemCategory =
   | "buying-intent"
   | "praise"
   | "trend"
+  | "market-gap"
+  | "workaround"
+  | "existing-spending"
   | "other";
 
 export interface CategoryMatch {
@@ -32,6 +35,8 @@ export interface CategoryMatch {
 export interface ClassifiedItem {
   item: RawResearchItem;
   categories: CategoryMatch[]; // one item can match multiple categories, per spec
+  urgency?: boolean; // true if the item's text matches an urgency-signal phrase
+  emotionalIntensityScore?: number; // 0-1, distinct emotional-intensity phrase match count, same tiering as category confidence (0/1/2/3+ matches -> 0/0.3/0.55/0.8)
 }
 
 export interface ExtractedProblem {

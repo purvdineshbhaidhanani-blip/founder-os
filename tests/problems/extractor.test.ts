@@ -18,6 +18,10 @@ const EXPECTED: Record<ProblemCategory, string> = {
   "buying-intent": "Users express willingness to pay for a solution.",
   praise: "Users express satisfaction or praise.",
   trend: "This topic is showing rising mention volume.",
+  "market-gap": "Users report no existing solution for this problem.",
+  workaround:
+    "Users have built manual workarounds because no product solves this — often a stronger signal than a complaint.",
+  "existing-spending": "Users are already paying for a related solution, demonstrating real budget exists.",
   other: "Uncategorized signal — no specific pattern matched.",
 };
 
