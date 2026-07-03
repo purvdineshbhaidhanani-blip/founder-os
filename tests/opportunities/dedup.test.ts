@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { dedupeOpportunities } from "../../src/opportunities/dedup.js";
+import { defaultCalibration } from "../../src/opportunities/calibration.js";
 import type {
   BuildDifficultyResult,
   BuyingIntentResult,
@@ -121,6 +122,7 @@ function makeReport(
     sourceProblemReportId: "report_1",
     decision,
     semanticCluster,
+    calibration: defaultCalibration(),
     ...rest,
   };
 }

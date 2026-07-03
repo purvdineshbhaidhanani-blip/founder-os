@@ -11,6 +11,7 @@ import { decideRecommendation } from "./recommendation.js";
 import { dedupeOpportunities } from "./dedup.js";
 import { buildFounderDecision } from "./decision.js";
 import { mergeSynonymOpportunities } from "./semantic.js";
+import { attachCalibration, computeAggregateCalibration, defaultCalibration } from "./calibration.js";
 import type { OpportunityRepository } from "./repository.js";
 import type { ProblemCluster, ProblemIntelligenceReport } from "../problems/types.js";
 import type { ResearchSession } from "../research/types.js";
@@ -85,7 +86,17 @@ export class OpportunityEngine {
     // clustering, and for why merging here preserves dedup's output order
     // instead of introducing a new sort.
     const { merged: semanticMerged, aliasGroups } = mergeSynonymOpportunities(deduped);
-    const opportunities = semanticMerged.slice(0, TOP_N);
+    const topSlice = semanticMerged.slice(0, TOP_N);
+
+    // Loop 4 — calibration/diagnostics layer (calibration.ts). Read-only:
+    // attachCalibration only maps the already-ranked, already-sliced list
+    // (preserving its order exactly), never re-sorting or re-scoring it.
+    // The aggregate dashboard is computed separately over `built` (the
+    // full, pre-dedup/pre-slice per-cluster list) so it reflects the whole
+    // run's health, not just the shipped Top-N — see calibration.ts's
+    // computeAggregateCalibration doc.
+    const opportunities = attachCalibration(topSlice);
+    const calibration = computeAggregateCalibration(built, session, problemReport);
 
     const report: TopOpportunitiesReport = {
       id: generateId("opportunity-report"),
@@ -95,6 +106,7 @@ export class OpportunityEngine {
       totalClustersConsidered: problemReport.clusters.length,
       generatedAt: nowIso(),
       semanticMerge: { aliasGroupsApplied: aliasGroups.length, aliasGroups },
+      calibration,
     };
 
     return this.repository.persist(report);
@@ -187,6 +199,11 @@ export class OpportunityEngine {
       sourceProblemReportId: problemReport.id,
       decision,
       semanticCluster,
+      // Trivial, type-valid placeholder — always overwritten by
+      // `attachCalibration` (calibration.ts) for every surviving report in
+      // `analyze` below, exactly like `semanticCluster`'s own placeholder
+      // above. See defaultCalibration's doc.
+      calibration: defaultCalibration(),
     };
 
     return report;

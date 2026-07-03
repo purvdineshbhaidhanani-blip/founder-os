@@ -149,6 +149,13 @@ export interface FounderOpportunityReport {
    * SemanticClusterInfo's doc comment.
    */
   semanticCluster: SemanticClusterInfo;
+  /**
+   * Loop 4 calibration/diagnostics bundle (see calibration.ts) — a
+   * READ-ONLY layer over every field above. Never alters fois, decision, or
+   * this report's rank. Always populated on every report in the shipped
+   * `opportunities` list (see engine.ts's `attachCalibration` call).
+   */
+  calibration: OpportunityCalibration;
 }
 
 export interface TopOpportunitiesReport {
@@ -170,6 +177,14 @@ export interface TopOpportunitiesReport {
    * clean no-op run is visibly proven rather than silently absent.
    */
   semanticMerge: { aliasGroupsApplied: number; aliasGroups: AliasGroupSummary[] };
+  /**
+   * Loop 4 aggregate regression dashboard (see calibration.ts's
+   * `computeAggregateCalibration`) — computed over the FULL pre-dedup,
+   * pre-slice per-cluster opportunity list ("the built opportunity list"),
+   * not just the shipped `opportunities` Top-N, so it reflects the whole
+   * run's health. Read-only diagnostics; never fed back into ranking.
+   */
+  calibration: CalibrationAggregate;
 }
 
 /* ---------------------------------------------------------------------- */
@@ -318,6 +333,141 @@ export interface FounderDecision {
   confidence: DecisionConfidence;
   recommendation: DecisionRecommendation;
   qualityGates: DecisionQualityGate[];
+}
+
+/* ---------------------------------------------------------------------- */
+/* Loop 4 — Calibration & Diagnostics layer (calibration.ts)              */
+/* ---------------------------------------------------------------------- */
+
+/**
+ * One documented, pure-function-derived calibration signal for a single
+ * FounderOpportunityReport — see calibration.ts for each formula. Every
+ * value is a READ-ONLY diagnostic computed from fields already present on
+ * the report (fois, decision, buyingIntent, semanticCluster); none of these
+ * numbers feed back into fois.overall, the report's rank, or its
+ * recommendation/decision verdict.
+ */
+export interface CalibrationMetrics {
+  /** 0-1: 0 = sitting exactly on a BUILD/IGNORE boundary, 1 = one WATCH-band-width (or more) away from both boundaries. See calibration.ts. */
+  rankingStability: number;
+  /** 0-1: fraction of the fixed FOIS dimensions whose `raw` score is >= 40 — how many independent signals actually fired, vs. one lucky dimension. */
+  signalDensity: number;
+  /** decision.evidence.evidenceCount / decision.evidence.uniqueSources (guarded against divide-by-zero) — mentions per source; high with few sources suggests an echo chamber. */
+  evidenceDensity: number;
+  /** 0-1 (guarded/clamped): decision.evidence.crossSourceAgreement / decision.evidence.uniqueSources. */
+  crossSourceConsistency: number;
+  /** 0-1: the dominant entry's `fraction` in decision.intentDistribution (0 if the distribution is empty) — how concentrated the classified intent signal is. */
+  intentConsistency: number;
+  /** 0-1 (guarded): sum of fired fois.penalties points / (fois.overall + that sum) — how much penalty weight relative to the total score. */
+  noiseRatio: number;
+  /** 0-1: (semanticCluster.mergedCount - 1) / semanticCluster.mergedCount — 0 when nothing was merged (mergedCount === 1). */
+  duplicateCompressionRatio: number;
+}
+
+/** One always-evaluated, named quality-diagnostic flag — see calibration.ts's diagnostic definitions. Always present whether fired or not, for transparency (mirrors decision.ts's DecisionQualityGate). */
+export interface CalibrationDiagnosticFlag {
+  flag: string;
+  fired: boolean;
+  reason: string;
+}
+
+/**
+ * DIAGNOSTIC ONLY — see calibration.ts module doc. `rankBefore` is this
+ * report's 1-based index in the actual shipped `opportunities` order.
+ * `rankAfter` is a HYPOTHETICAL 1-based index if the list were instead
+ * sorted by a noise-adjusted score (fois.overall * (1 - noiseRatio)); it is
+ * NEVER applied to the shipped order, which stays sorted by fois.overall.
+ * `movement` = rankBefore - rankAfter (positive = would rank higher/better
+ * under the noise-adjusted view).
+ */
+export interface CalibrationRanking {
+  rankBefore: number;
+  rankAfter: number;
+  movement: number;
+  reason: string;
+}
+
+/**
+ * Only populated (non-null) for opportunities whose
+ * decision.recommendation.verdict === "BUILD" — non-BUILD verdicts get
+ * `null` here rather than a less-meaningful explanation of "why ranked
+ * here" for an opportunity that isn't being recommended to build.
+ */
+export interface CalibrationExplainability {
+  whyRankedHere: string;
+  whyAboveNext: string;
+  topContributingSignals: string[];
+  penaltiesApplied: string[];
+  largestUncertainty: string;
+}
+
+/** Composed from CalibrationDiagnosticFlag firings — see calibration.ts's composition rule. `likely` never removes the opportunity from the shipped list; it only marks it for founder review. */
+export interface CalibrationFalsePositive {
+  likely: boolean;
+  reasons: string[];
+}
+
+/**
+ * Loop 4 calibration/diagnostics bundle attached to every FounderOpportunityReport
+ * in the shipped `opportunities` list — see calibration.ts. Entirely
+ * additive and read-only: nothing here alters fois, decision, or the
+ * report's rank.
+ */
+export interface OpportunityCalibration {
+  metrics: CalibrationMetrics;
+  diagnostics: CalibrationDiagnosticFlag[];
+  ranking: CalibrationRanking;
+  explainability: CalibrationExplainability | null;
+  falsePositive: CalibrationFalsePositive;
+}
+
+/** One fixed-width fois.overall bucket in the threshold diagnostic's observed distribution. */
+export interface CalibrationFoisBucket {
+  range: string;
+  count: number;
+}
+
+/**
+ * ADVISORY ONLY — see calibration.ts's computeThresholdDiagnostic.
+ * `suggestion` is free text; no automatic threshold change is ever applied
+ * anywhere in this codebase from this field. `rejectedPct`/`acceptedPct`/
+ * `uncertainPct` are 0-100 percentages of the `builtOpportunities` list
+ * passed to `computeThresholdDiagnostic`.
+ */
+export interface ThresholdDiagnostic {
+  foisBuildThreshold: number;
+  observedFoisDistribution: CalibrationFoisBucket[];
+  rejectedPct: number;
+  acceptedPct: number;
+  uncertainPct: number;
+  suggestion: string;
+}
+
+/**
+ * Aggregate regression dashboard for a whole OpportunityEngine.analyze()
+ * run — attached to TopOpportunitiesReport. Computed over the full `built`
+ * per-cluster opportunity list (before dedup/semantic-merge/Top-N slicing),
+ * NOT just the shipped Top-N — see calibration.ts's computeAggregateCalibration.
+ */
+export interface CalibrationAggregate {
+  itemsCollected: number;
+  /** null (never fabricated) when the source ResearchSession has no `relevanceFilter` (see calibration.ts) — check `notes` for why. */
+  itemsRemovedByRelevance: number | null;
+  itemsClustered: number;
+  opportunitiesRejectedByGates: number;
+  /** Mean of `confidence.score` (0-1, the SOURCE ProblemCluster's confidence — distinct from decision.confidence). */
+  averageConfidence: number;
+  averageFois: number;
+  averageEvidence: number;
+  averageIntentConcentration: number;
+  averageSourceDiversity: number;
+  /** Mean of `decision.confidence.score` (0-100, the Loop 3 decision-level confidence — distinct from `averageConfidence` above). */
+  averageRecommendationConfidence: number;
+  verdictBreakdown: { build: number; watch: number; ignore: number };
+  falsePositiveCount: number;
+  thresholdDiagnostic: ThresholdDiagnostic;
+  /** Honest caveats about this aggregate's own inputs (e.g. missing relevanceFilter) — never silently dropped. */
+  notes: string[];
 }
 
 /** Referenced for downstream typing convenience — re-exported for callers. */
