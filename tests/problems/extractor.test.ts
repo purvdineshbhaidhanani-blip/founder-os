@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { extractProblem } from "../../src/problems/extractor.js";
+import { extractProblem, extractProblemWithConcepts } from "../../src/problems/extractor.js";
 import type { ClassifiedItem, ProblemCategory } from "../../src/problems/types.js";
 import type { RawResearchItem } from "../../src/research/types.js";
 
@@ -34,4 +34,47 @@ describe("extractProblem", () => {
       expect(extracted.classifiedItem).toBe(classifiedItem);
     });
   }
+});
+
+describe("extractProblemWithConcepts", () => {
+  it("uses the dominant concept's canonical statement + rootCause when a concept group matches", () => {
+    const categoryItems: RawResearchItem[] = [
+      { title: "Zapier is too expensive for what it does", url: "https://example.com/1", sourceId: "reddit" },
+      { title: "I can't afford Zapier anymore", url: "https://example.com/2", sourceId: "hackernews" },
+    ];
+    const result = extractProblemWithConcepts(classifiedItem, categoryItems, "pricing-complaint");
+
+    expect(result.normalizedStatement).toBe("Automation/tooling pricing is too expensive for the value delivered.");
+    expect(result.rootCause).toBe("Pricing Friction");
+    expect(result.conceptBreakdown).toEqual([
+      {
+        conceptId: "automation-too-expensive",
+        canonicalStatement: "Automation/tooling pricing is too expensive for the value delivered.",
+        rootCause: "Pricing Friction",
+        count: 2,
+      },
+    ]);
+  });
+
+  it("falls back to extractProblem's fixed category-level statement when no concept group matches", () => {
+    const categoryItems: RawResearchItem[] = [
+      { title: "I love this, amazing product", url: "https://example.com/1", sourceId: "reddit" },
+    ];
+    const result = extractProblemWithConcepts(classifiedItem, categoryItems, "praise");
+
+    expect(result.normalizedStatement).toBe("Users express satisfaction or praise.");
+    expect(result.rootCause).toBeUndefined();
+    expect(result.conceptBreakdown).toEqual([]);
+  });
+
+  it("falls back safely even for a category WITH registered concept groups when none match this item set", () => {
+    const categoryItems: RawResearchItem[] = [
+      { title: "Something unrelated entirely", url: "https://example.com/1", sourceId: "reddit" },
+    ];
+    const result = extractProblemWithConcepts(classifiedItem, categoryItems, "complaint");
+
+    expect(result.normalizedStatement).toBe("Users express general dissatisfaction.");
+    expect(result.rootCause).toBeUndefined();
+    expect(result.conceptBreakdown).toEqual([]);
+  });
 });

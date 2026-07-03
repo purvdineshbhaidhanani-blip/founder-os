@@ -92,6 +92,34 @@ export interface ProblemCluster {
    * that don't set it remain valid.
    */
   trending?: boolean;
+  /**
+   * Intra-category sub-concept breakdown (Loop 5, Part 2/6) — counts of the
+   * category's OWN concept groups (src/problems/concept.ts) matched across
+   * this cluster's items, e.g. "43 complaints, 12 feature requests..." style
+   * explainability, but always WITHIN this one category (never across other
+   * categories — the one-cluster-per-category invariant is preserved; see
+   * engine.ts's module doc). Absent/empty when no item in the cluster
+   * matched any concept group for its category.
+   */
+  conceptBreakdown?: Array<{ conceptId: string; canonicalStatement: string; rootCause: string; count: number }>;
+  /**
+   * Root cause of the DOMINANT concept (highest-count entry of
+   * `conceptBreakdown`), drawn from concept.ts's fixed RootCause taxonomy.
+   * Absent when no concept group matched any item (falls back to the
+   * category-level `normalizedStatement` with no specific root cause
+   * inferred, rather than guessing one).
+   */
+  rootCause?: string;
+  /**
+   * `evidence.evidenceCount` with near-duplicate (src/problems/near-
+   * duplicate.ts, Part 4) items collapsed to one representative per group.
+   * Exposed as a SEPARATE field rather than changing `evidence.evidenceCount`
+   * itself, which keeps its existing "raw count" meaning for any consumer
+   * that already depends on it.
+   */
+  duplicateAdjustedEvidenceCount?: number;
+  /** Cluster-average of src/problems/evidence-quality.ts's per-item composite score (Part 3), 0-1. */
+  evidenceQualityScore?: number;
 }
 
 export interface ProblemIntelligenceReport {
@@ -103,6 +131,32 @@ export interface ProblemIntelligenceReport {
   totalItemsClassified: number; // items that matched at least one non-"other" category
   generatedAt: string;
   artifactId?: string;
+  /**
+   * Count of raw items filtered out as structural noise (tutorials, docs,
+   * announcements, marketing, newsletters, event promos — see
+   * src/problems/noise-filter.ts) BEFORE category grouping. Never silently
+   * dropped without a visible count, per this codebase's explainability
+   * ethos. Optional/additive (always populated by
+   * `ProblemIntelligenceEngine.analyze`, defaulting to `0`) so hand-built
+   * `ProblemIntelligenceReport` fixtures elsewhere in the codebase (e.g.
+   * tests/opportunities/calibration.test.ts) that predate this field keep
+   * compiling unchanged — mirrors `ResearchSession.sourcesPartial`'s own
+   * doc comment for the identical reason.
+   */
+  totalItemsRejectedAsNoise?: number;
+  /**
+   * Category clusters that were BUILT (evidence/frequency/confidence all
+   * computed) but then rejected by the Part 7 quality gates in engine.ts
+   * before being added to `clusters` — e.g. a low-confidence cluster with
+   * too little raw evidence, or a cluster whose evidence is mostly near-
+   * duplicate content. "Reject silently" is forbidden by this codebase's
+   * whole ethos: every rejection is visible here with a stated, real reason,
+   * just excluded from the founder-facing `clusters` list. Optional/additive
+   * for the same backward-compatibility reason as `totalItemsRejectedAsNoise`
+   * above (always populated by `ProblemIntelligenceEngine.analyze`,
+   * defaulting to `[]`).
+   */
+  rejectedClusters?: Array<{ category: ProblemCategory; reason: string }>;
 }
 
 /** Referenced for downstream typing convenience — re-exported for callers. */

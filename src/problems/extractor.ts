@@ -1,4 +1,6 @@
+import { pickDominantConcept } from "./concept.js";
 import type { ClassifiedItem, ExtractedProblem, ProblemCategory } from "./types.js";
+import type { RawResearchItem } from "../research/types.js";
 
 /**
  * Fixed canonical statements per category — never free-form generated, so
@@ -28,4 +30,46 @@ export function extractProblem(classifiedItem: ClassifiedItem, category: Problem
     category,
     normalizedStatement: CANONICAL_STATEMENTS[category],
   };
+}
+
+export interface ConceptAwareExtraction {
+  normalizedStatement: string;
+  /** Present only when a dominant concept group (concept.ts) was found across the category's items. */
+  rootCause?: string;
+  /** Intra-category concept breakdown — see concept.ts's `pickDominantConcept` doc. Empty array when no item matched any concept group. */
+  conceptBreakdown: Array<{ conceptId: string; canonicalStatement: string; rootCause: string; count: number }>;
+}
+
+/**
+ * Composition layer (Loop 5, Part 2/6): decorates the existing, fixed,
+ * category-level `extractProblem` statement with a richer, sub-concept-aware
+ * statement/root-cause WHEN one of `concept.ts`'s fixed concept groups
+ * matches at least one item in `categoryItems`. `categoryItems` is expected
+ * to be every raw item classified into `category` for this cluster (not
+ * just the first one) — the whole point of this function is to look at ALL
+ * of a category's items rather than only `classifiedItems[0]`, while still
+ * producing exactly ONE normalized statement per category (see the hard
+ * one-cluster-per-category constraint documented in engine.ts).
+ *
+ * SAFE FALLBACK: when no concept group matches ANY item, this falls back to
+ * `extractProblem`'s fixed category-level canonical statement, so no
+ * document/category is ever left without SOME normalized statement.
+ */
+export function extractProblemWithConcepts(
+  classifiedItem: ClassifiedItem,
+  categoryItems: RawResearchItem[],
+  category: ProblemCategory,
+): ConceptAwareExtraction {
+  const { dominant, breakdown } = pickDominantConcept(categoryItems, category);
+
+  if (dominant) {
+    return {
+      normalizedStatement: dominant.canonicalStatement,
+      rootCause: dominant.rootCause,
+      conceptBreakdown: breakdown,
+    };
+  }
+
+  const fallback = extractProblem(classifiedItem, category);
+  return { normalizedStatement: fallback.normalizedStatement, conceptBreakdown: breakdown };
 }

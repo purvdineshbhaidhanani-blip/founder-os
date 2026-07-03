@@ -112,10 +112,42 @@ describe("ProblemIntelligenceEngine.analyze", () => {
     const complaintCluster = report.clusters.find((c) => c.category === "complaint");
     expect(complaintCluster).toBeDefined();
     expect(complaintCluster?.evidence.evidenceCount).toBe(3);
-    expect(complaintCluster?.normalizedStatement).toBe("Users express general dissatisfaction.");
+    // 2 of the 3 items ("Terrible experience...", "Worst tool ever, awful")
+    // match concept.ts's "general-frustration" sub-concept ("terrible",
+    // "awful"); the 3rd ("This is so annoying and frustrating") matches no
+    // concept group, so it doesn't count toward the breakdown. Dominant
+    // concept (count 2) replaces the old fixed category-level fallback
+    // statement with a richer, sub-concept-aware one, and surfaces its root
+    // cause — this is the Loop 5 Part 2/6 capability under test here.
+    expect(complaintCluster?.normalizedStatement).toBe("Users express strong general frustration with the product.");
+    expect(complaintCluster?.rootCause).toBe("Poor UX");
+    expect(complaintCluster?.conceptBreakdown).toEqual([
+      {
+        conceptId: "general-frustration",
+        canonicalStatement: "Users express strong general frustration with the product.",
+        rootCause: "Poor UX",
+        count: 2,
+      },
+    ]);
 
     const praiseCluster = report.clusters.find((c) => c.category === "praise");
     expect(praiseCluster).toBeDefined();
+    // No concept group is registered for "praise" (concept.ts intentionally
+    // excludes praise/trend/other — they don't decompose into root causes),
+    // so it always falls back to the fixed category-level statement.
+    expect(praiseCluster?.normalizedStatement).toBe("Users express satisfaction or praise.");
+    expect(praiseCluster?.rootCause).toBeUndefined();
+    expect(praiseCluster?.conceptBreakdown).toBeUndefined();
+
+    // Part 8 additive report fields are always present and, for this clean
+    // (no noise, no rejected clusters) fixture, both zero/empty.
+    expect(report.totalItemsRejectedAsNoise).toBe(0);
+    expect(report.rejectedClusters).toEqual([]);
+
+    // Part 3/4 additive cluster fields: real, computed numbers.
+    expect(complaintCluster?.evidenceQualityScore).toBeGreaterThan(0);
+    expect(complaintCluster?.evidenceQualityScore).toBeLessThanOrEqual(1);
+    expect(complaintCluster?.duplicateAdjustedEvidenceCount).toBe(3); // no near-duplicates in this fixture
 
     // persisted
     expect(report.artifactId).toBeTruthy();
@@ -217,5 +249,78 @@ describe("ProblemIntelligenceEngine.analyze", () => {
     expect(report.totalItemsAnalyzed).toBe(2);
     expect(report.totalItemsClassified).toBe(1);
     expect(report.clusters.some((c) => c.category === "other")).toBe(true);
+  });
+
+  it("Part 7 quality gate 2: rejects a cluster whose evidence is mostly near-duplicate cross-posted content", async () => {
+    // 6 "bug" items: 5 are near-identical cross-posts of the SAME underlying
+    // complaint (same body text, different source/author/url/title) and 1
+    // is a genuinely distinct bug report. That's one near-duplicate group of
+    // 5 (duplicateCount 4) out of 6 total items -> duplicateRatio 4/6 =
+    // 0.667, over the 0.6 MAX_DUPLICATE_RATIO gate.
+    const duplicateBody =
+      "The app crashes every time I try to export data to CSV format and I lose all my unsaved work";
+    const items: RawResearchItem[] = [
+      makeItem({ url: "https://example.com/d1", title: "Export crashes", body: duplicateBody, sourceId: "reddit", author: "a1" }),
+      makeItem({ url: "https://example.com/d2", title: "App crashes on export", body: duplicateBody, sourceId: "hackernews", author: "a2" }),
+      makeItem({ url: "https://example.com/d3", title: "CSV export is broken", body: duplicateBody, sourceId: "hackernews", author: "a3" }),
+      makeItem({ url: "https://example.com/d4", title: "Losing work on export", body: duplicateBody, sourceId: "reddit", author: "a4" }),
+      makeItem({ url: "https://example.com/d5", title: "Export crash again", body: duplicateBody, sourceId: "reddit", author: "a5" }),
+      makeItem({
+        url: "https://example.com/d6",
+        title: "Different bug entirely",
+        body: "The login page shows a timeout error whenever I try to sign in with SSO enabled",
+        sourceId: "reddit",
+        author: "a6",
+      }),
+    ];
+    const opportunities: Opportunity[] = [
+      { id: "opp_1", title: "Bugs", summary: "s", keywords: [], supportingItems: items, sourceIds: ["reddit", "hackernews"] },
+    ];
+    const session = makeSession(opportunities);
+    const { engine } = harness();
+
+    const report = await engine.analyze(session);
+
+    expect(report.clusters.some((c) => c.category === "bug")).toBe(false);
+    const rejection = report.rejectedClusters?.find((r) => r.category === "bug");
+    expect(rejection).toBeDefined();
+    expect(rejection!.reason).toContain("duplicate ratio");
+    expect(rejection!.reason).toContain("0.67");
+
+    // eslint-disable-next-line no-console
+    console.log(`[quality gate 2 example] bug cluster rejected: "${rejection!.reason}"`);
+  });
+
+  it("Part 7 quality gate 3: rejects a category cluster whose surviving items are mostly noise-filtered away", async () => {
+    // 5 items would classify into "feature-request" (each weakly, via a
+    // single "would be great if" match, confidence 0.3 — below the noise
+    // safety-valve's 0.55 threshold, so it does NOT protect them). 4 of the
+    // 5 ALSO carry 2+ distinct tutorial-list noise phrases and get removed
+    // by the Part 1 noise filter, leaving only 1/5 (20%) surviving —
+    // below the 34% NOISE_DOMINATED_SURVIVAL_RATIO_FLOOR.
+    const items: RawResearchItem[] = [
+      makeItem({ url: "https://example.com/n1", title: "Would be great if there was a step by step tutorial guide to onboarding", sourceId: "reddit" }),
+      makeItem({ url: "https://example.com/n2", title: "Would be great if there was a step by step tutorial for setup", sourceId: "reddit" }),
+      makeItem({ url: "https://example.com/n3", title: "Would be great if there was a step by step tutorial walkthrough", sourceId: "hackernews" }),
+      makeItem({ url: "https://example.com/n4", title: "Would be great if there was a step by step tutorial guide to billing", sourceId: "hackernews" }),
+      makeItem({ url: "https://example.com/n5", title: "Would be great if it supported CSV import", sourceId: "reddit" }),
+    ];
+    const opportunities: Opportunity[] = [
+      { id: "opp_1", title: "Feature requests", summary: "s", keywords: [], supportingItems: items, sourceIds: ["reddit", "hackernews"] },
+    ];
+    const session = makeSession(opportunities);
+    const { engine } = harness();
+
+    const report = await engine.analyze(session);
+
+    expect(report.totalItemsRejectedAsNoise).toBe(4);
+    expect(report.clusters.some((c) => c.category === "feature-request")).toBe(false);
+    const rejection = report.rejectedClusters?.find((r) => r.category === "feature-request");
+    expect(rejection).toBeDefined();
+    expect(rejection!.reason).toContain("survived noise-filtering");
+    expect(rejection!.reason).toContain("1/5");
+
+    // eslint-disable-next-line no-console
+    console.log(`[quality gate 3 example] feature-request cluster rejected: "${rejection!.reason}"`);
   });
 });
