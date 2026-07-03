@@ -156,6 +156,17 @@ export interface FounderOpportunityReport {
    * `opportunities` list (see engine.ts's `attachCalibration` call).
    */
   calibration: OpportunityCalibration;
+  /**
+   * Loop 7 Founder Intelligence bundle (see founder-intelligence.ts) —
+   * competitor intelligence, market-gap detection, market maturity, a
+   * founder-facing build/customer/pricing synthesis, competition pressure,
+   * evidence-backed differentiation strategies, and an always-8-item risk
+   * taxonomy. Additive and READ-ONLY: every field above is left untouched.
+   * Always populated on every report in the shipped `opportunities` list
+   * (see engine.ts's `attachFounderIntelligence` call, run after
+   * `attachCalibration`).
+   */
+  founderIntelligence: FounderIntelligence;
 }
 
 export interface TopOpportunitiesReport {
@@ -468,6 +479,172 @@ export interface CalibrationAggregate {
   thresholdDiagnostic: ThresholdDiagnostic;
   /** Honest caveats about this aggregate's own inputs (e.g. missing relevanceFilter) — never silently dropped. */
   notes: string[];
+}
+
+/* ---------------------------------------------------------------------- */
+/* Loop 7 — Founder Intelligence layer (founder-intelligence.ts)          */
+/* ---------------------------------------------------------------------- */
+
+/**
+ * Fixed 5-tier market-maturity vocabulary shared by Part A (competitor
+ * intelligence) and Part C (`estimateMarketMaturity`) — see
+ * founder-intelligence.ts for the exact, documented rule table.
+ */
+export type MarketMaturityLabel = "emerging" | "growing" | "crowded" | "saturated" | "declining";
+
+/** `estimateMarketMaturity`'s return shape (founder-intelligence.ts Part C). Every branch cites real numbers in `reasons`. */
+export interface MarketMaturityResult {
+  maturity: MarketMaturityLabel;
+  reasons: string[];
+}
+
+export type OpenSourceVsSaas = "open-source" | "saas" | "mixed" | "unknown";
+export type EnterpriseVsSmb = "enterprise" | "smb" | "mixed" | "unknown";
+/** "unknown" is reserved for the zero-competitor case (never a fabricated guess) — see founder-intelligence.ts Part A. */
+export type CompetitorConfidence = "high" | "medium" | "low" | "unknown";
+
+/**
+ * Loop 7, Part A — Competitor Intelligence. Composed entirely from fields
+ * already present on `CompetitionResult`/`PricingSignal` plus a bounded,
+ * already-selected evidence-text sample (`cluster.evidence
+ * .representativeExamples`, max 3 items) — never a new extraction pass and
+ * never an invented competitor name. See founder-intelligence.ts Part A.
+ */
+export interface CompetitorIntelligence {
+  /** Top competitors by `mentionCount` (competitors[] is already sorted desc), capped at `PRIMARY_COMPETITOR_CAP`. */
+  primaryCompetitors: string[];
+  /** Fixed inference from `cluster.category` + competitor count — see founder-intelligence.ts's `competitorCategoryFor`. */
+  competitorCategory: string;
+  /** Reused verbatim from Part C's `estimateMarketMaturity` result — not redefined here. */
+  marketMaturity: MarketMaturityLabel;
+  openSourceVsSaas: OpenSourceVsSaas;
+  enterpriseVsSmb: EnterpriseVsSmb;
+  /** Subset of competitor names whose own evidence (name + evidenceUrls) contains a real indie/bootstrapped signal phrase — often empty; never guessed. */
+  soloFounderFriendlyCompetitors: string[];
+  /** The report's existing `pricing` field reused AS-IS when `extractedPrices.length > 0`, else `null` — never a fabricated price. */
+  pricingEvidence: PricingSignal | null;
+  competitorConfidence: CompetitorConfidence;
+  /** Flattened, deduplicated union of every competitor's `evidenceUrls`. */
+  competitorEvidence: string[];
+  explanation: string;
+}
+
+/** Fixed gap taxonomy — see founder-intelligence.ts Part B's `CONCEPT_ID_TO_GAP`/`CATEGORY_GAP_FALLBACK` lookup tables. */
+export type MarketGapName =
+  | "Missing Features"
+  | "Expensive Pricing"
+  | "Complex UX"
+  | "Missing AI"
+  | "Poor Automation"
+  | "Poor Mobile Experience"
+  | "Slow Support"
+  | "Weak Integrations"
+  | "Missing API"
+  | "Poor Onboarding"
+  | "Weak Documentation"
+  | "Manual Workflow";
+
+/**
+ * One detected market gap — ONLY appears in `FounderIntelligence.marketGaps`
+ * when backed by real evidence (a matched `cluster.conceptBreakdown` entry,
+ * or the category-level fallback when `conceptBreakdown` is absent). Never
+ * listed with zero evidence. See founder-intelligence.ts Part B.
+ */
+export interface MarketGap {
+  gap: MarketGapName;
+  evidenceCount: number;
+  /** `conceptBreakdown[].conceptId`s that matched this gap; empty for the category-level fallback (no concept-level match existed). */
+  exampleConceptIds: string[];
+  confidence: "high" | "medium" | "low";
+}
+
+export type CompetitionPressureLabel = "very-low" | "low" | "medium" | "high" | "very-high";
+
+/** `estimateCompetitionPressure`'s return shape (founder-intelligence.ts Part E). */
+export interface CompetitionPressureResult {
+  pressure: CompetitionPressureLabel;
+  explanation: string;
+}
+
+export type FounderPricingModel = "subscription" | "one-time" | "usage" | "freemium" | "enterprise";
+export type FounderMvpComplexity = "low" | "medium" | "high";
+export type SoloFounderSuitability = "high" | "medium" | "low";
+
+/**
+ * Loop 7, Part D — Founder Opportunity synthesis. A COMPOSITION of
+ * already-computed fields (`decision.recommendation`, `fois`,
+ * `buildDifficulty`, `calibration`) plus this module's own Parts A-C
+ * outputs — never a new verdict engine. `shouldBuild` always mirrors
+ * `decision.recommendation.verdict === "BUILD"` exactly. See
+ * founder-intelligence.ts Part D.
+ */
+export interface FounderOpportunitySynthesis {
+  shouldBuild: boolean;
+  why: string[];
+  whyNot: string[];
+  bestCustomer: string;
+  whyThisCustomer: string;
+  bestPricingModel: FounderPricingModel;
+  /** `buildDifficulty.tier` reused verbatim, never recomputed. */
+  expectedBuildDifficulty: BuildDifficultyTier;
+  expectedMvpComplexity: FounderMvpComplexity;
+  soloFounderSuitability: SoloFounderSuitability;
+}
+
+/** Fixed differentiation-strategy taxonomy — see founder-intelligence.ts Part F. A strategy only appears when directly supported by a real, already-computed signal; an empty array is valid and expected. */
+export type DifferentiationStrategyName =
+  | "AI-first"
+  | "Automation-first"
+  | "Vertical SaaS"
+  | "Lower Pricing"
+  | "Faster UX"
+  | "Developer-first"
+  | "No-code"
+  | "Privacy-first"
+  | "Offline-first";
+
+export interface DifferentiationStrategy {
+  strategy: DifferentiationStrategyName;
+  evidenceReason: string;
+}
+
+/** Fixed 8-item risk taxonomy — ALWAYS all 8 present in `FounderIntelligence.risks`, even when `severity === "low"`. See founder-intelligence.ts Part G. */
+export type FounderRiskName =
+  | "Market Risk"
+  | "Execution Risk"
+  | "Technical Risk"
+  | "Pricing Risk"
+  | "Competition Risk"
+  | "Customer Risk"
+  | "Platform Risk"
+  | "Regulation Risk";
+
+export interface FounderIntelligenceRisk {
+  risk: FounderRiskName;
+  severity: "low" | "medium" | "high";
+  explanation: string;
+}
+
+/**
+ * Loop 7 — Founder Intelligence bundle (founder-intelligence.ts). A
+ * READ-ONLY composition layer over fields already computed elsewhere
+ * (`competition`, `buyingIntent`, `pricing`, `buildDifficulty`, `fois`,
+ * `decision`, `calibration`, plus the source `ProblemCluster`'s
+ * `conceptBreakdown`/`frequency`/`category`) — no re-scan of raw evidence
+ * items, no re-classification, no LLM call. Nothing here alters `fois`,
+ * `decision`, `calibration`, or the report's rank. Attached to every
+ * report in the shipped `opportunities` list by `attachFounderIntelligence`,
+ * run in engine.ts AFTER `attachCalibration` (mirrors that function's
+ * placeholder-then-overwrite pattern — see `defaultFounderIntelligence`).
+ */
+export interface FounderIntelligence {
+  competitorIntelligence: CompetitorIntelligence;
+  marketGaps: MarketGap[];
+  marketMaturity: MarketMaturityResult;
+  founderOpportunity: FounderOpportunitySynthesis;
+  competitionPressure: CompetitionPressureResult;
+  differentiationStrategies: DifferentiationStrategy[];
+  risks: FounderIntelligenceRisk[];
 }
 
 /** Referenced for downstream typing convenience — re-exported for callers. */

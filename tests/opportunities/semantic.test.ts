@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { canonicalizeProblem, mergeSynonymOpportunities } from "../../src/opportunities/semantic.js";
 import { defaultCalibration } from "../../src/opportunities/calibration.js";
+import { defaultFounderIntelligence } from "../../src/opportunities/founder-intelligence.js";
 import { extractProblem } from "../../src/problems/extractor.js";
 import { ArtifactManager } from "../../src/runtime/artifacts/manager.js";
 import { MemoryEngine } from "../../src/runtime/memory/engine.js";
@@ -101,6 +102,7 @@ function makeReport(params: {
     decision: makeDecision(),
     semanticCluster: makeTrivialSemanticCluster(problem, evidenceCount, sourceBreakdown),
     calibration: defaultCalibration(),
+    founderIntelligence: defaultFounderIntelligence(),
   };
 }
 

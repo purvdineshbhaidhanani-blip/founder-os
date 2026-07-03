@@ -12,6 +12,7 @@ import { dedupeOpportunities } from "./dedup.js";
 import { buildFounderDecision } from "./decision.js";
 import { mergeSynonymOpportunities } from "./semantic.js";
 import { attachCalibration, computeAggregateCalibration, defaultCalibration } from "./calibration.js";
+import { attachFounderIntelligence, defaultFounderIntelligence } from "./founder-intelligence.js";
 import type { OpportunityRepository } from "./repository.js";
 import type { ProblemCluster, ProblemIntelligenceReport } from "../problems/types.js";
 import type { ResearchSession } from "../research/types.js";
@@ -95,8 +96,14 @@ export class OpportunityEngine {
     // full, pre-dedup/pre-slice per-cluster list) so it reflects the whole
     // run's health, not just the shipped Top-N — see calibration.ts's
     // computeAggregateCalibration doc.
-    const opportunities = attachCalibration(topSlice);
+    const calibrated = attachCalibration(topSlice);
     const calibration = computeAggregateCalibration(built, session, problemReport);
+
+    // Loop 7 — Founder Intelligence layer (founder-intelligence.ts), run
+    // AFTER attachCalibration so every input it reads off each report
+    // (decision, calibration, fois, ...) is the REAL, final value, never a
+    // placeholder. Read-only: never re-sorts or re-scores the shipped list.
+    const opportunities = attachFounderIntelligence(calibrated, problemReport.clusters);
 
     const report: TopOpportunitiesReport = {
       id: generateId("opportunity-report"),
@@ -204,6 +211,11 @@ export class OpportunityEngine {
       // `analyze` below, exactly like `semanticCluster`'s own placeholder
       // above. See defaultCalibration's doc.
       calibration: defaultCalibration(),
+      // Trivial, type-valid placeholder — always overwritten by
+      // `attachFounderIntelligence` (founder-intelligence.ts, Loop 7) for
+      // every surviving report in `analyze` below, run AFTER
+      // attachCalibration. See defaultFounderIntelligence's doc.
+      founderIntelligence: defaultFounderIntelligence(),
     };
 
     return report;
