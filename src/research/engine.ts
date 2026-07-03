@@ -10,6 +10,7 @@ import { ALL_SOURCE_ADAPTERS } from "./sources/index.js";
 import { classifyException } from "./sources/classify.js";
 import { buildFounderReport } from "./report.js";
 import { dedupeItems } from "./dedup.js";
+import { filterOpportunitiesByRelevance, resolveRelevanceThreshold } from "./relevance.js";
 import type {
   Opportunity,
   RawResearchItem,
@@ -232,7 +233,19 @@ export class ResearchEngine {
     const dedupedItems = dedupeItems(allItems);
     const opportunities = aggregateOpportunities(dedupedItems);
 
-    const insights: Insight<unknown>[] = opportunities.slice(0, 5).map((opportunity) =>
+    // Deterministic, keyword/phrase-pattern relevance filter — same
+    // technique as src/problems/detector.ts's classifyItem, no LLM call.
+    // Filtering here (before opportunities are used to build insights or
+    // stored on the session) transitively protects Loop 2 clustering
+    // (src/problems/clustering.ts's flattenSessionItems) and Loop 3
+    // scoring/ranking (src/opportunities/engine.ts) without modifying
+    // either. `totalItemsCollected` below intentionally stays the true raw
+    // dedupedItems count — filtering must never corrupt that metric.
+    const relevanceThreshold = resolveRelevanceThreshold();
+    const relevanceOutcome = filterOpportunitiesByRelevance(opportunities, relevanceThreshold);
+    const relevantOpportunities = relevanceOutcome.kept;
+
+    const insights: Insight<unknown>[] = relevantOpportunities.slice(0, 5).map((opportunity) =>
       makeInsight({
         topic: opportunity.title,
         finding: { keywords: opportunity.keywords, itemCount: opportunity.supportingItems.length },
@@ -250,7 +263,7 @@ export class ResearchEngine {
       }),
     );
 
-    const report = buildFounderReport(opportunities, insights, {
+    const report = buildFounderReport(relevantOpportunities, insights, {
       sourcesUsed,
       sourcesFailed: sourcesFailed.map((f) => f.id),
       sourcesSkipped: skipped.map((s) => s.id),
@@ -271,10 +284,22 @@ export class ResearchEngine {
       sourcesFailed,
       sourcesSkipped: skipped,
       sourcesPartial,
-      opportunities,
+      opportunities: relevantOpportunities,
       report,
       totalItemsCollected: dedupedItems.length,
       durationMs: Date.parse(completedAt) - Date.parse(startedAt),
+      relevanceFilter: {
+        threshold: relevanceOutcome.threshold,
+        totalEvaluated: relevanceOutcome.totalEvaluated,
+        relevantCount: relevanceOutcome.relevantCount,
+        uncertainCount: relevanceOutcome.uncertainCount,
+        notRelevantCount: relevanceOutcome.notRelevantCount,
+        rejectedSamples: relevanceOutcome.rejected.slice(0, 10).map(({ opportunity, result }) => ({
+          title: opportunity.title,
+          decision: result.decision,
+          reasons: result.reasons,
+        })),
+      },
     };
 
     const artifact = await this.artifacts.register({

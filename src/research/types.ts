@@ -1,5 +1,6 @@
 import type { Timestamp } from "../types/common.js";
 import type { Insight, Source } from "../intelligence/types.js";
+import type { RelevanceDecision, RelevanceThreshold } from "./relevance.js";
 
 /**
  * Research engine surface. A ResearchSession fans out to every eligible
@@ -142,6 +143,23 @@ export interface ResearchSession {
   artifactId?: string;
   totalItemsCollected: number;
   durationMs: number;
+  /**
+   * Outcome of the deterministic relevance filter (`src/research/
+   * relevance.ts`) applied to the raw aggregated opportunities before they
+   * were stored above. Optional/additive: hand-built `ResearchSession`
+   * fixtures elsewhere in the codebase that predate this field keep
+   * compiling unchanged. `rejectedSamples` is capped at the first 10
+   * rejected opportunities for transparency without bloating the session
+   * payload — the full rejection list is not persisted on the session.
+   */
+  relevanceFilter?: {
+    threshold: RelevanceThreshold;
+    totalEvaluated: number;
+    relevantCount: number;
+    uncertainCount: number;
+    notRelevantCount: number;
+    rejectedSamples: Array<{ title: string; decision: RelevanceDecision; reasons: string[] }>;
+  };
 }
 
 export type ResearchProgressEvent =

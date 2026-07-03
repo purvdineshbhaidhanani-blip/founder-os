@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { ConnectorRegistry, BUILTIN_CONNECTORS } from "../../src/connectors/registry.js";
 import { ArtifactManager } from "../../src/runtime/artifacts/manager.js";
 import { MemoryEngine } from "../../src/runtime/memory/engine.js";
@@ -211,5 +211,75 @@ describe("ResearchEngine", () => {
     const supporting = session.opportunities.flatMap((o) => o.supportingItems);
     expect(supporting).toHaveLength(1);
     expect(supporting[0]?.sourceId).toBe("hackernews");
+  });
+
+  describe("relevance filter integration", () => {
+    const ORIGINAL_THRESHOLD = process.env.RELEVANCE_FILTER_THRESHOLD;
+
+    afterEach(() => {
+      if (ORIGINAL_THRESHOLD === undefined) delete process.env.RELEVANCE_FILTER_THRESHOLD;
+      else process.env.RELEVANCE_FILTER_THRESHOLD = ORIGINAL_THRESHOLD;
+    });
+
+    it("populates session.relevanceFilter and excludes not-relevant opportunities from opportunities/report at the default (normal) threshold", async () => {
+      delete process.env.RELEVANCE_FILTER_THRESHOLD;
+
+      const relevant = keylessAdapter("hackernews", [
+        {
+          title: "Founders wasting hours on manual invoicing",
+          url: "https://example.com/relevant-1",
+          sourceId: "hackernews",
+          snippet:
+            "Our team wastes hours doing this manually every week. Please add an export feature to automate it.",
+        },
+      ]);
+      const irrelevant = keylessAdapter("rss", [
+        {
+          title: "Election results announced",
+          url: "https://example.com/irrelevant-1",
+          sourceId: "rss",
+          snippet: "The election results were announced today, and the senator gave a speech to congress.",
+        },
+      ]);
+      const { engine } = harness({}, [relevant, irrelevant]);
+
+      const session = await engine.run(30, () => undefined);
+
+      expect(session.relevanceFilter).toBeDefined();
+      expect(session.relevanceFilter?.threshold).toBe("normal");
+      expect(session.relevanceFilter?.totalEvaluated).toBe(2);
+      expect(session.relevanceFilter?.notRelevantCount).toBe(1);
+      expect(session.relevanceFilter?.rejectedSamples).toHaveLength(1);
+      expect(session.relevanceFilter?.rejectedSamples[0]?.decision).toBe("not-relevant");
+
+      // The politically-themed item must be excluded from opportunities/report...
+      const titles = session.opportunities.map((o) => o.title);
+      expect(titles.some((t) => t.includes("Election"))).toBe(false);
+      expect(session.report.topOpportunities.map((o) => o.title)).not.toContain("Election results announced");
+
+      // ...but totalItemsCollected stays the honest raw count, unaffected by relevance filtering.
+      expect(session.totalItemsCollected).toBe(2);
+    });
+
+    it("respects RELEVANCE_FILTER_THRESHOLD=strict, filtering out low-signal opportunities that 'normal' would keep", async () => {
+      process.env.RELEVANCE_FILTER_THRESHOLD = "strict";
+
+      const noSignal = keylessAdapter("hackernews", [
+        {
+          title: "Team lunch update",
+          url: "https://example.com/no-signal-1",
+          sourceId: "hackernews",
+          snippet: "The office had a nice team lunch today and the weather was pleasant.",
+        },
+      ]);
+      const { engine } = harness({}, [noSignal]);
+
+      const session = await engine.run(30, () => undefined);
+
+      expect(session.relevanceFilter?.threshold).toBe("strict");
+      expect(session.relevanceFilter?.uncertainCount).toBe(1);
+      expect(session.opportunities).toHaveLength(0);
+      expect(session.totalItemsCollected).toBe(1);
+    });
   });
 });
