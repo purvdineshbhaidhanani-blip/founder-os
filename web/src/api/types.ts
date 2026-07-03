@@ -336,6 +336,84 @@ export interface FounderRecommendation {
   explanation: string;
 }
 
+/**
+ * Loop 3 Founder Decision layer types, mirroring src/opportunities/types.ts.
+ * Do not add fields that do not exist there.
+ */
+
+/** src/opportunities/types.ts IntentDistributionEntry */
+export interface IntentDistributionEntry {
+  intent: string;
+  count: number;
+  fraction: number;
+}
+
+export type DecisionFreshness = "fresh" | "aging" | "stale" | "unknown";
+
+/** src/opportunities/types.ts DecisionEvidence */
+export interface DecisionEvidence {
+  evidenceCount: number;
+  uniqueSources: number;
+  uniqueAuthors: number;
+  freshness: DecisionFreshness;
+  crossSourceAgreement: number;
+  echoChamber: boolean;
+  explanation: string;
+}
+
+/** src/opportunities/types.ts DecisionReasoning */
+export interface DecisionReasoning {
+  whyThisMatters: string;
+  whyNow: string;
+  whoExperiences: string;
+  whatEvidence: string;
+  whyFoundersPay: string;
+  biggestUncertainty: string;
+  biggestImplementationRisk: string;
+}
+
+/** src/opportunities/types.ts DecisionConfidenceContributor */
+export interface DecisionConfidenceContributor {
+  name: string;
+  points: number;
+  reason: string;
+}
+
+/** src/opportunities/types.ts DecisionConfidence */
+export interface DecisionConfidence {
+  score: number;
+  band: "high" | "medium" | "low";
+  contributors: DecisionConfidenceContributor[];
+  weaknesses: string[];
+}
+
+/** src/opportunities/types.ts DecisionQualityGate */
+export interface DecisionQualityGate {
+  name: string;
+  fired: boolean;
+  reason: string;
+}
+
+export type FounderDecisionVerdict = "BUILD" | "WATCH" | "IGNORE";
+
+/** src/opportunities/types.ts DecisionRecommendation */
+export interface DecisionRecommendation {
+  verdict: FounderDecisionVerdict;
+  justification: string;
+  primaryRisk: string;
+  primaryOpportunity: string;
+}
+
+/** src/opportunities/types.ts FounderDecision */
+export interface FounderDecision {
+  intentDistribution: IntentDistributionEntry[];
+  evidence: DecisionEvidence;
+  reasoning: DecisionReasoning;
+  confidence: DecisionConfidence;
+  recommendation: DecisionRecommendation;
+  qualityGates: DecisionQualityGate[];
+}
+
 /** src/opportunities/types.ts FounderOpportunityReport */
 export interface FounderOpportunityReport {
   id: string;
@@ -359,6 +437,8 @@ export interface FounderOpportunityReport {
   createdAt: string;
   sourceSessionId: string;
   sourceProblemReportId: string;
+  /** Loop 3 Founder Decision layer — see FounderDecision above. */
+  decision: FounderDecision;
 }
 
 /** src/opportunities/types.ts TopOpportunitiesReport — GET /api/pipeline/:id/opportunities response */

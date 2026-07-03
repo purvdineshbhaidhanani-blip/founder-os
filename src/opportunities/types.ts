@@ -134,6 +134,21 @@ export interface FounderOpportunityReport {
   createdAt: string;
   sourceSessionId: string;
   sourceProblemReportId: string;
+  /**
+   * Loop 3 Founder Decision layer (see decision.ts) — a composition of
+   * intent distribution, evidence/echo-chamber intelligence, structured
+   * reasoning, a NEW explainable decision-level confidence, quality gates,
+   * and a freshly-derived BUILD/WATCH/IGNORE verdict. Additive: every field
+   * above (including `recommendation`, which keeps its own BUILD/WAIT/
+   * IGNORE vocabulary) is left untouched for existing UI/export consumers.
+   */
+  decision: FounderDecision;
+  /**
+   * Loop 3 Part A semantic-alias merge metadata (see semantic.ts). Always
+   * populated, even when no merge occurred (the common case) — see
+   * SemanticClusterInfo's doc comment.
+   */
+  semanticCluster: SemanticClusterInfo;
 }
 
 export interface TopOpportunitiesReport {
@@ -144,6 +159,165 @@ export interface TopOpportunitiesReport {
   totalClustersConsidered: number;
   generatedAt: string;
   artifactId?: string;
+  /**
+   * Diagnostic summary of the Loop 3 Part A semantic-alias merge pass (see
+   * semantic.ts's `mergeSynonymOpportunities`), run in engine.ts AFTER
+   * dedupeOpportunities and BEFORE the Top-N slice. `aliasGroupsApplied` is
+   * 0 in the common case where no two surviving opportunities' `problem`
+   * statements collided under the fixed alias map — expected, since
+   * category-based clustering already de-duplicates most synonyms upstream
+   * (see semantic.ts module doc). Always present (never omitted), so a
+   * clean no-op run is visibly proven rather than silently absent.
+   */
+  semanticMerge: { aliasGroupsApplied: number; aliasGroups: AliasGroupSummary[] };
+}
+
+/* ---------------------------------------------------------------------- */
+/* Loop 3, Part A — semantic (canonical-alias) clustering (semantic.ts)   */
+/* ---------------------------------------------------------------------- */
+
+/**
+ * Per-surviving-opportunity semantic-cluster metadata, attached by
+ * `mergeSynonymOpportunities` (semantic.ts) to every report it returns —
+ * merged or not. When a report was not merged with anything (the common
+ * case, see semantic.ts module doc), `aliases` is empty and `mergedCount`
+ * is 1: the fields are still populated so "Cluster Title / Aliases /
+ * Mention Count / Supporting Sources" is always answerable per-opportunity,
+ * never conditionally present.
+ */
+export interface SemanticClusterInfo {
+  /** The alias map's canonical group name if `problem` matched a known synonym group, else `problem` itself. */
+  canonicalTitle: string;
+  /** Other reports' `problem` statements merged into this survivor (excludes the survivor's own `problem`); empty if no merge occurred. */
+  aliases: string[];
+  /** Combined `supportingEvidence.evidenceCount` across every merged report (== this report's own count if no merge occurred). */
+  mentionCount: number;
+  /** Union of `supportingEvidence.sourceBreakdown` keys across every merged report, sorted. */
+  supportingSources: string[];
+  /** How many opportunity reports were merged into this survivor; 1 means no merge occurred. */
+  mergedCount: number;
+}
+
+/** One non-trivial (2+ member) alias-collision group found by `mergeSynonymOpportunities`. Only groups that actually merged something appear here — see semantic.ts. */
+export interface AliasGroupSummary {
+  canonical: string;
+  /** The specific alias-map phrase that triggered the match. */
+  matchedAlias: string;
+  /** `problem` statement of every report in this group, survivor included. */
+  memberProblems: string[];
+  survivorId: string;
+  /** ids of the reports that were merged away (dropped in favor of the survivor). */
+  mergedReportIds: string[];
+}
+
+/** `canonicalizeProblem`'s return shape — see semantic.ts. */
+export interface CanonicalizationResult {
+  canonical: string;
+  /** The alias-map phrase that matched, or null if `text` did not match any known synonym group (canonical falls back to `text.trim()`). */
+  matchedAlias: string | null;
+}
+
+/** `mergeSynonymOpportunities`'s return shape — see semantic.ts. */
+export interface SemanticMergeResult {
+  /** Surviving reports, each augmented with `semanticCluster`, in the same relative order as the input (see semantic.ts module doc on ordering). */
+  merged: FounderOpportunityReport[];
+  aliasGroups: AliasGroupSummary[];
+}
+
+/* ---------------------------------------------------------------------- */
+/* Loop 3, Parts B-G — Founder Decision layer (decision.ts)               */
+/* ---------------------------------------------------------------------- */
+
+/** One founder-facing intent bucket's share of a cluster's classified items — see decision.ts's `computeIntentDistribution`. */
+export interface IntentDistributionEntry {
+  intent: string;
+  /** Number of DISTINCT items carrying this intent (an item matching e.g. both "bug" and "complaint" counts once under "Founder Pain", not twice). */
+  count: number;
+  /** `count / clusterItems.length`. NOTE: fractions across entries do not necessarily sum to 1.0, since one item can carry multiple simultaneous intents. */
+  fraction: number;
+}
+
+/** Freshness label for a cluster's evidence — see decision.ts's `computeFreshness`. Never fabricated: "unknown" when no item carries `publishedAt`. */
+export type DecisionFreshness = "fresh" | "aging" | "stale" | "unknown";
+
+/** Evidence-quality + echo-chamber read for a Founder Decision — see decision.ts Part C. */
+export interface DecisionEvidence {
+  evidenceCount: number;
+  uniqueSources: number;
+  uniqueAuthors: number;
+  freshness: DecisionFreshness;
+  /** Count of distinct sources that EACH independently contain at least one item carrying the cluster's dominant intent. */
+  crossSourceAgreement: number;
+  /** True when one source accounts for >= the module's dominant-source-share threshold of all evidence — an echo-chamber risk. */
+  echoChamber: boolean;
+  explanation: string;
+}
+
+/** Structured, fact-grounded narrative for a Founder Decision — see decision.ts Part D. Every field must cite a real number from the input; never a generic platitude. */
+export interface DecisionReasoning {
+  whyThisMatters: string;
+  whyNow: string;
+  whoExperiences: string;
+  whatEvidence: string;
+  whyFoundersPay: string;
+  biggestUncertainty: string;
+  biggestImplementationRisk: string;
+}
+
+/** One named, documented contributor to `DecisionConfidence.score` — see decision.ts Part E. */
+export interface DecisionConfidenceContributor {
+  name: string;
+  points: number;
+  reason: string;
+}
+
+/**
+ * A NEW, decision-level, explainable 0-100 confidence score — distinct from
+ * (but reading, as one input) the source `ProblemCluster.confidence` band.
+ * Does not modify or replace `src/problems/confidence.ts` or the report's
+ * existing `confidence` field. See decision.ts Part E.
+ */
+export interface DecisionConfidence {
+  score: number;
+  band: "high" | "medium" | "low";
+  contributors: DecisionConfidenceContributor[];
+  weaknesses: string[];
+}
+
+/** One quality gate evaluated for a Founder Decision — always present (fired or not), for transparency. See decision.ts Part G. */
+export interface DecisionQualityGate {
+  name: string;
+  fired: boolean;
+  reason: string;
+}
+
+export type FounderDecisionVerdict = "BUILD" | "WATCH" | "IGNORE";
+
+/**
+ * Freshly-computed BUILD/WATCH/IGNORE verdict from fois.overall + this
+ * decision's own confidence + quality gates — NOT a copy of the report's
+ * existing `recommendation.verdict` (which keeps its own WAIT vocabulary
+ * untouched for existing consumers). See decision.ts Part F.
+ */
+export interface DecisionRecommendation {
+  verdict: FounderDecisionVerdict;
+  justification: string;
+  primaryRisk: string;
+  primaryOpportunity: string;
+}
+
+/**
+ * Founder Decision — Loop 3's composition layer over the already-computed
+ * recommendation/confidence/fois/buyingIntent/competition/evidence outputs.
+ * Additive to FounderOpportunityReport; see decision.ts module doc.
+ */
+export interface FounderDecision {
+  intentDistribution: IntentDistributionEntry[];
+  evidence: DecisionEvidence;
+  reasoning: DecisionReasoning;
+  confidence: DecisionConfidence;
+  recommendation: DecisionRecommendation;
+  qualityGates: DecisionQualityGate[];
 }
 
 /** Referenced for downstream typing convenience — re-exported for callers. */

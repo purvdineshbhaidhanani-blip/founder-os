@@ -5,14 +5,57 @@ import type {
   BuyingIntentResult,
   CompetitionResult,
   FoisBreakdown,
+  FounderDecision,
   FounderOpportunityReport,
   OpportunityScoreBreakdown,
   PricingSignal,
+  SemanticClusterInfo,
 } from "../../src/opportunities/types.js";
 
 const buyingIntent: BuyingIntentResult = { score: 0.5, matchingItemCount: 1, totalItemCount: 2, explanation: "x" };
 const difficulty: BuildDifficultyResult = { tier: "low", matchedSignals: [], explanation: "heuristic estimate, not an engineering estimate" };
 const pricing: PricingSignal = { extractedPrices: [], suggestedPriceText: "x" };
+
+/**
+ * Minimal valid FounderDecision fixture for dedup tests, which only
+ * exercise dedupeOpportunities' URL-overlap/competitor-name logic and don't
+ * assert anything about the Loop 3 decision layer — present purely so the
+ * FounderOpportunityReport literal type-checks (see decision.test.ts for
+ * real Founder Decision behavior coverage).
+ */
+const decision: FounderDecision = {
+  intentDistribution: [],
+  evidence: {
+    evidenceCount: 2,
+    uniqueSources: 1,
+    uniqueAuthors: 1,
+    freshness: "unknown",
+    crossSourceAgreement: 0,
+    echoChamber: false,
+    explanation: "x",
+  },
+  reasoning: {
+    whyThisMatters: "x",
+    whyNow: "x",
+    whoExperiences: "x",
+    whatEvidence: "x",
+    whyFoundersPay: "x",
+    biggestUncertainty: "x",
+    biggestImplementationRisk: "x",
+  },
+  confidence: { score: 50, band: "medium", contributors: [], weaknesses: [] },
+  recommendation: { verdict: "WATCH", justification: "x", primaryRisk: "x", primaryOpportunity: "x" },
+  qualityGates: [],
+};
+
+/** Minimal valid SemanticClusterInfo fixture — see semantic.test.ts for real Part A merge behavior coverage. */
+const semanticCluster: SemanticClusterInfo = {
+  canonicalTitle: "Users express general dissatisfaction.",
+  aliases: [],
+  mentionCount: 2,
+  supportingSources: [],
+  mergedCount: 1,
+};
 
 function makeScoreBreakdown(weightedTotal: number): OpportunityScoreBreakdown {
   return {
@@ -76,6 +119,8 @@ function makeReport(
     createdAt: "2026-01-01T00:00:00.000Z",
     sourceSessionId: "session_1",
     sourceProblemReportId: "report_1",
+    decision,
+    semanticCluster,
     ...rest,
   };
 }

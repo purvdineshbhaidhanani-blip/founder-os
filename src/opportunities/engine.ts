@@ -9,10 +9,12 @@ import { computeOpportunityScore } from "./scoring.js";
 import { computeFois } from "./fois.js";
 import { decideRecommendation } from "./recommendation.js";
 import { dedupeOpportunities } from "./dedup.js";
+import { buildFounderDecision } from "./decision.js";
+import { mergeSynonymOpportunities } from "./semantic.js";
 import type { OpportunityRepository } from "./repository.js";
 import type { ProblemCluster, ProblemIntelligenceReport } from "../problems/types.js";
 import type { ResearchSession } from "../research/types.js";
-import type { FounderOpportunityReport, TopOpportunitiesReport } from "./types.js";
+import type { FounderOpportunityReport, SemanticClusterInfo, TopOpportunitiesReport } from "./types.js";
 
 export interface OpportunityEngineOptions {
   repository: OpportunityRepository;
@@ -74,7 +76,16 @@ export class OpportunityEngine {
     // ranking and BEFORE the Top-10 cut — see dedup.ts module doc for the
     // exact criteria and why dropping (not merging) was chosen.
     const deduped = dedupeOpportunities(built);
-    const opportunities = deduped.slice(0, TOP_N);
+
+    // Loop 3 Part A: a second, semantic-level (canonical-alias) safety net,
+    // run AFTER dedup's stricter URL/competitor-based pass and BEFORE the
+    // Top-10 cut, so a synonym collision dedup's exact-match rules missed
+    // still only occupies one Top-N slot. See semantic.ts module doc for
+    // why this is expected to be a clean no-op given upstream category
+    // clustering, and for why merging here preserves dedup's output order
+    // instead of introducing a new sort.
+    const { merged: semanticMerged, aliasGroups } = mergeSynonymOpportunities(deduped);
+    const opportunities = semanticMerged.slice(0, TOP_N);
 
     const report: TopOpportunitiesReport = {
       id: generateId("opportunity-report"),
@@ -83,6 +94,7 @@ export class OpportunityEngine {
       opportunities,
       totalClustersConsidered: problemReport.clusters.length,
       generatedAt: nowIso(),
+      semanticMerge: { aliasGroupsApplied: aliasGroups.length, aliasGroups },
     };
 
     return this.repository.persist(report);
@@ -109,6 +121,34 @@ export class OpportunityEngine {
     const topSourceId = topSourceIdOf(cluster.evidence.sourceBreakdown);
     const targetUsers = getTargetUsers(cluster.category, topSourceId);
     const estimatedTimeToMvp = estimatedTimeToMvpFor(difficulty.tier);
+
+    // Loop 3 Founder Decision layer (decision.ts, Parts B-G) — a
+    // composition over the signals already computed above. Additive: none
+    // of the fields above are modified by this call.
+    const decision = buildFounderDecision({
+      cluster,
+      clusterItems,
+      buyingIntent,
+      competition,
+      pricing,
+      buildDifficulty: difficulty,
+      fois,
+      recommendation,
+      targetUsers,
+    });
+
+    // Trivial "no merge yet" default — semantic.ts's mergeSynonymOpportunities
+    // (run once over the whole ranked list, after dedup, in `analyze` below)
+    // overwrites this on every surviving report, merged or not. Set here so
+    // the object is fully and validly typed even between construction and
+    // that later pass.
+    const semanticCluster: SemanticClusterInfo = {
+      canonicalTitle: cluster.normalizedStatement,
+      aliases: [],
+      mentionCount: cluster.evidence.evidenceCount,
+      supportingSources: Object.keys(cluster.evidence.sourceBreakdown).sort(),
+      mergedCount: 1,
+    };
 
     const representativeQuotes = cluster.evidence.representativeExamples.map((item) => ({
       text: (item.title + (item.body ? ` — ${item.body}` : "")).slice(0, 280),
@@ -145,6 +185,8 @@ export class OpportunityEngine {
       createdAt: nowIso(),
       sourceSessionId: session.id,
       sourceProblemReportId: problemReport.id,
+      decision,
+      semanticCluster,
     };
 
     return report;
