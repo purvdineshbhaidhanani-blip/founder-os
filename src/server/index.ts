@@ -1,3 +1,4 @@
+import "./load-env.js";
 import http, { type IncomingMessage, type ServerResponse } from "node:http";
 import fs from "node:fs";
 import path from "node:path";
