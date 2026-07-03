@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "updatedAt": "2026-07-01T09:36:05.391Z",
+  "updatedAt": "2026-07-03T18:23:02.873Z",
   "agents": [
     {
       "id": "agent_f448d3a8-b4eb-4ee9-985d-e1b5fc75dad2",
@@ -3904,6 +3904,421 @@
         {
           "version": "1.0.0",
           "timestamp": "2026-07-01T09:36:05.391Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_a76f0de5-5af0-4bf6-b0ba-17156d48bdca",
+      "name": "chief-architect",
+      "displayName": "Chief Architect",
+      "category": "architecture",
+      "version": "1.0.0",
+      "owner": "founder-os-master-team",
+      "description": "Owns system architecture, module boundaries, and final architectural approval for Founder OS.",
+      "capabilities": [
+        "System architecture design and review",
+        "Dependency management across src/research, src/problems, src/opportunities, src/server, web",
+        "Enforce module boundaries between pipeline stages",
+        "Conduct design reviews for every new module before implementation",
+        "Grant final architectural approval before a change proceeds",
+        "Prevent regressions to established invariants (e.g. one-cluster-per-category)"
+      ],
+      "dependencies": [
+        "master-cto-orchestrator",
+        "integration-orchestrator-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "architecture",
+        "governance",
+        "founder-os"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/chief-architect.md",
+      "blueprintId": "chief-architect",
+      "blueprintHash": "12a617bb06ce94eb",
+      "createdAt": "2026-07-03T18:22:32.430Z",
+      "updatedAt": "2026-07-03T18:22:32.430Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-03T18:22:32.430Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_7d5703aa-8394-47ee-b785-4fc9a03bf2d2",
+      "name": "research-intelligence-agent",
+      "displayName": "Research Intelligence Agent",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "founder-os-master-team",
+      "description": "Owns the research collection and problem-intelligence pipeline: evidence quality, extraction, clustering, noise filtering, root cause.",
+      "capabilities": [
+        "Research pipeline correctness (src/research/**)",
+        "Evidence quality scoring",
+        "Problem extraction and normalization",
+        "Semantic clustering of equivalent problems",
+        "Noise filtering (tutorials, marketing, announcements)",
+        "Root cause analysis",
+        "Evidence validation and near-duplicate detection"
+      ],
+      "dependencies": [
+        "chief-architect",
+        "testing-qa-agent",
+        "integration-orchestrator-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "research",
+        "problem-intelligence",
+        "founder-os"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/research-intelligence-agent.md",
+      "blueprintId": "research-intelligence-agent",
+      "blueprintHash": "3c3a013ab3a75ad4",
+      "createdAt": "2026-07-03T18:22:37.740Z",
+      "updatedAt": "2026-07-03T18:22:37.740Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-03T18:22:37.740Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_7dcd4da6-9963-48e8-bce5-99f1d1fb8f50",
+      "name": "founder-intelligence-agent",
+      "displayName": "Founder Intelligence Agent",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "founder-os-master-team",
+      "description": "Synthesizes ranked opportunities into founder-facing business insight: competitor intel, market gaps, pricing, executive summaries.",
+      "capabilities": [
+        "Founder-facing report synthesis",
+        "Business insight composition from existing scored opportunities",
+        "Opportunity summaries",
+        "Executive summaries",
+        "Business playbook generation (MVP, pricing model, target customer)",
+        "Founder recommendations grounded in cited evidence"
+      ],
+      "dependencies": [
+        "decision-validation-agent",
+        "founder-copilot-agent",
+        "testing-qa-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "founder-intelligence",
+        "business-insight",
+        "founder-os"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/founder-intelligence-agent.md",
+      "blueprintId": "founder-intelligence-agent",
+      "blueprintHash": "ff8a7b7761d67333",
+      "createdAt": "2026-07-03T18:22:42.713Z",
+      "updatedAt": "2026-07-03T18:22:42.713Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-03T18:22:42.713Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_0fb2cc4b-5551-4b09-bd72-ae03f95c2202",
+      "name": "decision-validation-agent",
+      "displayName": "Decision & Validation Agent",
+      "category": "review",
+      "version": "1.0.0",
+      "owner": "founder-os-master-team",
+      "description": "Adversarially reviews existing BUILD/WATCH/IGNORE verdicts with counter-evidence, confidence review, and risk analysis.",
+      "capabilities": [
+        "Decision reasoning composition",
+        "Counter-evidence generation against a nominal verdict",
+        "BUILD/WAIT/IGNORE (WATCH) validation, loud not silent",
+        "Confidence review — reduce only when justified, explain either way",
+        "Risk analysis across the founder-risk taxonomy",
+        "Decision consistency across the opportunity set"
+      ],
+      "dependencies": [
+        "founder-intelligence-agent",
+        "testing-qa-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "decision",
+        "validation",
+        "founder-os"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/decision-validation-agent.md",
+      "blueprintId": "decision-validation-agent",
+      "blueprintHash": "f364affd5d5b2a96",
+      "createdAt": "2026-07-03T18:22:43.705Z",
+      "updatedAt": "2026-07-03T18:22:43.705Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-03T18:22:43.705Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_79f2c6e1-301f-44e3-bb99-9721a384df7b",
+      "name": "founder-copilot-agent",
+      "displayName": "Founder Copilot Agent",
+      "category": "documentation",
+      "version": "1.0.0",
+      "owner": "founder-os-master-team",
+      "description": "Conversational, read-only explainability layer answering founder questions about opportunities, risk, and evidence — never a new source of truth.",
+      "capabilities": [
+        "Conversational reasoning over existing reports",
+        "Founder Q&A grounded in cited evidence",
+        "Explainability of scores and verdicts",
+        "Opportunity explanation",
+        "Risk explanation",
+        "Report explanation",
+        "Evidence navigation (surfacing representative quotes/URLs)"
+      ],
+      "dependencies": [
+        "founder-intelligence-agent",
+        "decision-validation-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "copilot",
+        "explainability",
+        "founder-os"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/founder-copilot-agent.md",
+      "blueprintId": "founder-copilot-agent",
+      "blueprintHash": "ed46f5607c3e3534",
+      "createdAt": "2026-07-03T18:22:49.519Z",
+      "updatedAt": "2026-07-03T18:22:49.519Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-03T18:22:49.519Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_5b6722a2-96c2-414b-a56c-a17f791ec1a6",
+      "name": "testing-qa-agent",
+      "displayName": "Testing & QA Agent",
+      "category": "qa",
+      "version": "1.0.0",
+      "owner": "founder-os-master-team",
+      "description": "Owns regression, unit, integration, and invariant verification across the whole Founder OS pipeline.",
+      "capabilities": [
+        "Regression testing across the full suite",
+        "Unit testing for new modules",
+        "Integration testing across pipeline stages",
+        "Performance testing where relevant",
+        "Invariant verification (e.g. one-cluster-per-category, byte-for-byte non-regression)",
+        "Output verification against each loop's stated success criteria"
+      ],
+      "dependencies": [
+        "integration-orchestrator-agent",
+        "chief-architect"
+      ],
+      "status": "active",
+      "tags": [
+        "qa",
+        "testing",
+        "founder-os"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/testing-qa-agent.md",
+      "blueprintId": "testing-qa-agent",
+      "blueprintHash": "e0de7ccf33361659",
+      "createdAt": "2026-07-03T18:22:50.439Z",
+      "updatedAt": "2026-07-03T18:22:50.439Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-03T18:22:50.439Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_8c7e93db-59b1-42b0-b4a2-145b43f040b0",
+      "name": "performance-optimization-agent",
+      "displayName": "Performance Optimization Agent",
+      "category": "engineering",
+      "version": "1.0.0",
+      "owner": "founder-os-master-team",
+      "description": "Improves latency, memory, and complexity of the Founder OS pipeline without changing any scoring behavior.",
+      "capabilities": [
+        "Performance profiling",
+        "Caching strategy",
+        "Memory optimization",
+        "Reducing redundant computation passes",
+        "Algorithmic complexity reduction",
+        "Latency optimization"
+      ],
+      "dependencies": [
+        "testing-qa-agent",
+        "chief-architect"
+      ],
+      "status": "active",
+      "tags": [
+        "performance",
+        "optimization",
+        "founder-os"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/performance-optimization-agent.md",
+      "blueprintId": "performance-optimization-agent",
+      "blueprintHash": "a56bf05699f95c08",
+      "createdAt": "2026-07-03T18:22:56.445Z",
+      "updatedAt": "2026-07-03T18:22:56.445Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-03T18:22:56.445Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_f5cd1a42-7260-4d53-bd9c-a1ec431442e5",
+      "name": "security-reliability-agent",
+      "displayName": "Security & Reliability Agent",
+      "category": "devops",
+      "version": "1.0.0",
+      "owner": "founder-os-master-team",
+      "description": "Owns API stability, error handling, production reliability, security review, and configuration validation for the server layer.",
+      "capabilities": [
+        "API stability review",
+        "Error handling audit",
+        "Production reliability (restart/failure behavior)",
+        "Security review (injection, secret handling, auth boundaries)",
+        "Configuration validation (env var handling, defaults)",
+        "Failure recovery design"
+      ],
+      "dependencies": [
+        "testing-qa-agent",
+        "chief-architect"
+      ],
+      "status": "active",
+      "tags": [
+        "security",
+        "reliability",
+        "founder-os"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/security-reliability-agent.md",
+      "blueprintId": "security-reliability-agent",
+      "blueprintHash": "822fb3043bedacf1",
+      "createdAt": "2026-07-03T18:22:57.288Z",
+      "updatedAt": "2026-07-03T18:22:57.288Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-03T18:22:57.288Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_837c91eb-9705-42a5-a289-d45899f0fd97",
+      "name": "integration-orchestrator-agent",
+      "displayName": "Integration Orchestrator Agent",
+      "category": "engineering",
+      "version": "1.0.0",
+      "owner": "founder-os-master-team",
+      "description": "Coordinates the specialized agents, merges their outputs, prevents duplicated work and architecture drift, and runs final integration verification.",
+      "capabilities": [
+        "Coordinate every specialized agent's scoped task",
+        "Assign work matching each agent's declared module boundary",
+        "Merge outputs from multiple agents without conflict",
+        "Prevent duplicated work across agents",
+        "Prevent architecture drift from the Chief Architect's approved design",
+        "Run final cross-cutting verification (full suite, scope check)",
+        "Approve integration before handing off to the Master CTO Orchestrator"
+      ],
+      "dependencies": [
+        "chief-architect",
+        "research-intelligence-agent",
+        "founder-intelligence-agent",
+        "decision-validation-agent",
+        "testing-qa-agent",
+        "performance-optimization-agent",
+        "security-reliability-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "orchestration",
+        "integration",
+        "founder-os"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/integration-orchestrator-agent.md",
+      "blueprintId": "integration-orchestrator-agent",
+      "blueprintHash": "c7427bb0febd61da",
+      "createdAt": "2026-07-03T18:23:02.016Z",
+      "updatedAt": "2026-07-03T18:23:02.016Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-03T18:23:02.016Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_15ee97f0-a7ab-4caa-88b3-ffc0d15b30b7",
+      "name": "master-cto-orchestrator",
+      "displayName": "Master CTO Orchestrator",
+      "category": "architecture",
+      "version": "1.0.0",
+      "owner": "founder-os-master-team",
+      "description": "The highest authority over the permanent Founder OS agent team: planning, task decomposition, and final approval on every commit and quality gate.",
+      "capabilities": [
+        "Planning and task decomposition for every Mega Loop",
+        "Agent selection for each sub-task",
+        "Execution ordering across agents",
+        "Conflict resolution between agents",
+        "Architecture approval (in consultation with the Chief Architect)",
+        "Merge approval",
+        "Regression approval",
+        "Commit approval",
+        "Quality gate approval",
+        "Final implementation approval",
+        "Failure recovery coordination",
+        "Context management across a long-running loop",
+        "Progress tracking across all 9 specialized agents"
+      ],
+      "dependencies": [
+        "chief-architect",
+        "integration-orchestrator-agent",
+        "research-intelligence-agent",
+        "founder-intelligence-agent",
+        "decision-validation-agent",
+        "founder-copilot-agent",
+        "testing-qa-agent",
+        "performance-optimization-agent",
+        "security-reliability-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "orchestration",
+        "governance",
+        "founder-os",
+        "master"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/master-cto-orchestrator.md",
+      "blueprintId": "master-cto-orchestrator",
+      "blueprintHash": "2001c5706ce5dd72",
+      "createdAt": "2026-07-03T18:23:02.873Z",
+      "updatedAt": "2026-07-03T18:23:02.873Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-03T18:23:02.873Z",
           "action": "created"
         }
       ]
