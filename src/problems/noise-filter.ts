@@ -5,9 +5,11 @@ import type { RawResearchItem } from "../research/types.js";
  * Noise filter — a pre-classification pass that screens out raw research
  * items that are structurally NOT user problem signal (tutorials, official
  * docs, product announcements, marketing/SEO listicles, newsletters, event
- * promos) before they ever reach `groupByCategory`. Deterministic substring
- * matching against fixed phrase lists, same philosophy as detector.ts — no
- * LLM call, no invented certainty.
+ * promos, opinion pieces, pure how-to questions, spam, self-promotional
+ * showcases, hiring posts, demo/walkthrough promos) before they ever reach
+ * `groupByCategory`. Deterministic substring matching against fixed phrase
+ * lists, same philosophy as detector.ts — no LLM call, no invented
+ * certainty.
  *
  * This module is intentionally conservative: every noise-list phrase list
  * below exists to catch ONE recognizable document archetype, and a SAFETY
@@ -43,10 +45,42 @@ const NEWSLETTER_PHRASES = ["this week in", "weekly roundup", "newsletter", "dig
 const EVENT_PHRASES = ["webinar", "join us at", "register now for", "conference"];
 
 /**
+ * Loop 6, Part D — six ADDITIONAL noise archetypes, appended after the
+ * original six (which are untouched: same phrases, same order, same safety-
+ * valve threshold). Each gets the exact same treatment as the original six —
+ * counted toward the multi-match/single-match rules below and protected by
+ * the SAME safety valve (`NOISE_SAFETY_VALVE_MIN_CATEGORY_CONFIDENCE`,
+ * unchanged) — no new logic branch was needed since `classifyDocumentType`
+ * already iterates `NOISE_PHRASE_LISTS` generically.
+ */
+
+/** Opinion pieces without a concrete complaint: "in my opinion, X" is a stance, not a problem report. */
+const OPINION_PHRASES = ["in my opinion", "i think", "imo", "personally i believe"];
+
+/** Pure how-to questions: asking for help, distinct from tutorial CONTENT (which teaches; this just asks). */
+const QUESTION_PHRASES = ["does anyone know how to", "can someone explain", "how do i"];
+
+/** Spam/promotional copy unrelated to any specific product's real problem signal. */
+const SPAM_PHRASES = ["click here", "limited time offer", "buy now", "free trial sign up now"];
+
+/** Self-promotional project showcases ("look what I built"), not a problem report about an existing product. */
+const SHOWCASE_PHRASES = ["check out my project", "built this over the weekend", "show hn:", "just launched"];
+
+/** Recruiting/job-posting copy. */
+const HIRING_PHRASES = ["we're hiring", "join our team", "now recruiting", "open position"];
+
+/** Product-demo/walkthrough promotion — showing off a feature, not reporting a problem with one. */
+const DEMO_PHRASES = ["watch this demo", "see it in action", "product walkthrough video"];
+
+/**
  * Every fixed noise-phrase list, keyed by the noise archetype it detects.
  * `noiseType` on the result is the FIRST list (in this object's key order)
  * that matched at least one phrase — reported for explainability when an
- * item happens to match more than one archetype at once.
+ * item happens to match more than one archetype at once. The six Part D
+ * entries are appended AFTER the original six, so any item that would have
+ * matched one of the original six archetypes first keeps reporting that
+ * exact same `noiseType` as before this change (byte-for-byte unchanged
+ * behavior for all pre-existing noise types).
  */
 const NOISE_PHRASE_LISTS: Record<string, string[]> = {
   tutorial: TUTORIAL_PHRASES,
@@ -55,6 +89,12 @@ const NOISE_PHRASE_LISTS: Record<string, string[]> = {
   marketing: MARKETING_PHRASES,
   newsletter: NEWSLETTER_PHRASES,
   events: EVENT_PHRASES,
+  opinion: OPINION_PHRASES,
+  question: QUESTION_PHRASES,
+  spam: SPAM_PHRASES,
+  showcase: SHOWCASE_PHRASES,
+  hiring: HIRING_PHRASES,
+  demo: DEMO_PHRASES,
 };
 
 /**
@@ -107,7 +147,7 @@ export interface DocumentTypeVerdict {
  *
  * Rule (documented exactly, no hidden logic):
  *   1. Collect every DISTINCT noise-list phrase that appears in the item's
- *      title+body blob, across all six lists.
+ *      title+body blob, across all twelve lists (see `NOISE_PHRASE_LISTS`).
  *   2. If 2+ distinct phrases matched -> noise.
  *   3. Else if exactly 1 phrase matched -> noise ONLY IF the title is <= 8
  *      words (SINGLE_MATCH_MARKETING_TITLE_WORD_COUNT_THRESHOLD): a short,

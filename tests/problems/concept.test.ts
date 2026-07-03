@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { CONCEPT_GROUPS, extractConcept, pickDominantConcept } from "../../src/problems/concept.js";
+import { CAUSE_CHAIN_MAPPING, CONCEPT_GROUPS, deriveCauseChain, extractConcept, pickDominantConcept } from "../../src/problems/concept.js";
+import type { RootCause } from "../../src/problems/concept.js";
 import type { RawResearchItem } from "../../src/research/types.js";
 import type { ProblemCategory } from "../../src/problems/types.js";
 
@@ -8,9 +9,16 @@ function makeItem(overrides: Partial<RawResearchItem> & { url: string }): RawRes
 }
 
 describe("CONCEPT_GROUPS", () => {
-  it("has ~20 fixed groups, each with a valid category and a non-empty trigger list", () => {
-    expect(CONCEPT_GROUPS.length).toBeGreaterThanOrEqual(18);
-    expect(CONCEPT_GROUPS.length).toBeLessThanOrEqual(22);
+  it("has the original ~20 fixed groups PLUS Loop 6's ~28 additional groups, each with a valid category and a non-empty trigger list", () => {
+    // Loop 6, Part A added ~28 new concept groups (pricing x2, authentication,
+    // billing x2, performance, latency, integrations, automation, api,
+    // import, export, permissions, notifications, analytics, security,
+    // reliability, enterprise, mobile, ux, ai, workflow, support, migration,
+    // search, customization, scheduling, collaboration) on top of the
+    // original 20, none of which were removed/modified — see concept.ts's
+    // module doc for the full breakdown.
+    expect(CONCEPT_GROUPS.length).toBeGreaterThanOrEqual(44);
+    expect(CONCEPT_GROUPS.length).toBeLessThanOrEqual(52);
     for (const group of CONCEPT_GROUPS) {
       expect(group.triggerPhrases.length).toBeGreaterThan(0);
       expect(group.canonicalStatement.length).toBeGreaterThan(0);
@@ -176,5 +184,130 @@ describe("pickDominantConcept — mixed-concept breakdown and tie-break", () => 
     const { dominant, breakdown } = pickDominantConcept([], "complaint");
     expect(dominant).toBeNull();
     expect(breakdown).toEqual([]);
+  });
+});
+
+describe("Loop 6, Part A — new concept groups (Authentication/Billing/Performance/Security/Support examples)", () => {
+  it("Authentication: 'can't log in' resolves to authentication-login-failures in category bug", () => {
+    const item = makeItem({ url: "https://example.com/auth1", title: "I can't log in no matter what I try, so frustrating" });
+    const result = extractConcept(item, "bug");
+    expect(result).toEqual({
+      conceptId: "authentication-login-failures",
+      canonicalStatement: "Users cannot authenticate: login, 2FA, SSO, or password reset is broken.",
+      rootCause: "Reliability/Bugs",
+    });
+  });
+
+  it("Billing: 'double charged' + 'wrong invoice' resolves to billing-invoice-errors in category pricing-complaint", () => {
+    const item = makeItem({ url: "https://example.com/bill1", title: "I was double charged and the wrong invoice keeps showing up" });
+    const result = extractConcept(item, "pricing-complaint");
+    expect(result?.conceptId).toBe("billing-invoice-errors");
+    expect(result?.rootCause).toBe("Reliability/Bugs");
+  });
+
+  it("Billing: 'can't cancel subscription' + 'billing support unresponsive' resolves to cant-cancel-or-unresponsive-billing-support", () => {
+    const item = makeItem({ url: "https://example.com/bill2", title: "I can't cancel subscription and billing support unresponsive for weeks" });
+    const result = extractConcept(item, "pricing-complaint");
+    expect(result?.conceptId).toBe("cant-cancel-or-unresponsive-billing-support");
+    expect(result?.rootCause).toBe("Support Gap");
+  });
+
+  it("Performance: 'takes too long to load' + 'laggy' resolves to performance-app-is-slow in category bug", () => {
+    const item = makeItem({ url: "https://example.com/perf1", title: "This is so laggy and takes too long to load every time" });
+    const result = extractConcept(item, "bug");
+    expect(result?.conceptId).toBe("performance-app-is-slow");
+    expect(result?.rootCause).toBe("Performance");
+  });
+
+  it("Latency: 'high latency' + 'slow api response' resolves to api-latency-under-load in category bug", () => {
+    const item = makeItem({ url: "https://example.com/lat1", title: "We're seeing high latency and a slow api response under load" });
+    const result = extractConcept(item, "bug");
+    expect(result?.conceptId).toBe("api-latency-under-load");
+    expect(result?.rootCause).toBe("Performance");
+  });
+
+  it("Security: 'security vulnerability' + 'not soc2 compliant' resolves to security-and-compliance-concerns, using the NEW Security/Compliance root cause", () => {
+    const item = makeItem({ url: "https://example.com/sec1", title: "We found a security vulnerability and they are not soc2 compliant" });
+    const result = extractConcept(item, "complaint");
+    expect(result).toEqual({
+      conceptId: "security-and-compliance-concerns",
+      canonicalStatement: "Users are concerned about a security vulnerability or a missing compliance certification (e.g. SOC2).",
+      rootCause: "Security/Compliance",
+    });
+  });
+
+  it("Support: 'support is slow' + 'tickets go unanswered' resolves to support-slow-and-unresponsive in category complaint", () => {
+    const item = makeItem({ url: "https://example.com/sup1", title: "Support is slow and tickets go unanswered for days" });
+    const result = extractConcept(item, "complaint");
+    expect(result?.conceptId).toBe("support-slow-and-unresponsive");
+    expect(result?.rootCause).toBe("Support Gap");
+  });
+
+  it("pickDominantConcept — 3 distinct authentication-failure phrasings all resolve to authentication-login-failures with count 3 (real computed number)", () => {
+    const items: RawResearchItem[] = [
+      makeItem({ url: "https://example.com/a1", title: "I can't log in no matter what I try" }),
+      makeItem({ url: "https://example.com/a2", title: "My 2fa broken after the last update" }),
+      makeItem({ url: "https://example.com/a3", title: "Password reset fails every single time" }),
+    ];
+    const { dominant, breakdown } = pickDominantConcept(items, "bug");
+    expect(dominant?.conceptId).toBe("authentication-login-failures");
+    expect(dominant?.count).toBe(3);
+    expect(breakdown).toHaveLength(1);
+
+    // eslint-disable-next-line no-console
+    console.log(`[Loop 6 Part A, Authentication example] dominant="${dominant!.conceptId}", count=${dominant!.count}/3`);
+  });
+});
+
+describe("Loop 6, Part B — CAUSE_CHAIN_MAPPING / deriveCauseChain", () => {
+  it("CAUSE_CHAIN_MAPPING has exactly one row per RootCause value (11 total, including the new Security/Compliance)", () => {
+    const allRootCauses: RootCause[] = [
+      "Poor UX",
+      "Pricing Friction",
+      "Manual Process",
+      "Missing Integration",
+      "Reliability/Bugs",
+      "Support Gap",
+      "Onboarding Friction",
+      "Performance",
+      "Lack of Automation",
+      "Vendor Lock-in",
+      "Security/Compliance",
+    ];
+    expect(Object.keys(CAUSE_CHAIN_MAPPING)).toHaveLength(11);
+    for (const rootCause of allRootCauses) {
+      const row = CAUSE_CHAIN_MAPPING[rootCause];
+      expect(row.businessCause.length).toBeGreaterThan(0);
+      expect(row.technicalCause.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("deriveCauseChain composes observedProblem + rootCause into a full CauseChain using the fixed mapping (Pricing Friction example)", () => {
+    const chain = deriveCauseChain("Automation/tooling pricing is too expensive for the value delivered.", "Pricing Friction");
+    expect(chain).toEqual({
+      observedProblem: "Automation/tooling pricing is too expensive for the value delivered.",
+      underlyingCause: "Pricing Friction",
+      businessCause: "Perceived value doesn't match price point.",
+      technicalCause: "No usage-based tiering to capture willingness to pay.",
+    });
+  });
+
+  it("deriveCauseChain — Reliability/Bugs example matches the mission's own illustrative mapping", () => {
+    const chain = deriveCauseChain("The product is unreliable / frequently broken.", "Reliability/Bugs");
+    expect(chain.businessCause).toBe("Trust erosion from repeated failures.");
+    expect(chain.technicalCause).toBe("Insufficient test coverage or monitoring on the failing path.");
+  });
+
+  it("deriveCauseChain — the new Security/Compliance root cause resolves to its own documented business/technical cause", () => {
+    const chain = deriveCauseChain(
+      "Users are concerned about a security vulnerability or a missing compliance certification (e.g. SOC2).",
+      "Security/Compliance",
+    );
+    expect(chain.underlyingCause).toBe("Security/Compliance");
+    expect(chain.businessCause).toContain("Enterprise/regulated buyers");
+    expect(chain.technicalCause).toContain("SOC2");
+
+    // eslint-disable-next-line no-console
+    console.log(`[Loop 6 Part B, causeChain example] ${JSON.stringify(chain)}`);
   });
 });

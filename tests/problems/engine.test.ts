@@ -323,4 +323,92 @@ describe("ProblemIntelligenceEngine.analyze", () => {
     // eslint-disable-next-line no-console
     console.log(`[quality gate 3 example] feature-request cluster rejected: "${rejection!.reason}"`);
   });
+
+  it("Loop 6: attaches causeChain, severity, and groupingReason to a real analyzed cluster (Zapier pricing example)", async () => {
+    // Phrasing chosen so each item matches BOTH detector.ts's pricing-complaint
+    // CATEGORY_PATTERNS (so it actually lands in the "pricing-complaint"
+    // bucket via the real classifyItem/groupByCategory pipeline, not just
+    // concept.ts's own trigger list) AND concept.ts's automation-too-expensive
+    // trigger phrases ("too expensive"/"overpriced" are common to both lists).
+    const items: RawResearchItem[] = [
+      makeItem({ url: "https://example.com/p1", title: "Zapier is too expensive for a small team like ours", sourceId: "reddit", author: "alice", engagement: 10 }),
+      makeItem({ url: "https://example.com/p2", title: "This tool is honestly overpriced for what it delivers, cancelling now", sourceId: "hackernews", author: "bob", engagement: 4 }),
+      makeItem({ url: "https://example.com/p3", title: "Totally overpriced software, need this fixed asap before we lose more money", sourceId: "hackernews", author: "carol", engagement: 2 }),
+    ];
+    const opportunities: Opportunity[] = [
+      { id: "opp_1", title: "Pricing", summary: "s", keywords: [], supportingItems: items, sourceIds: ["reddit", "hackernews"] },
+    ];
+    const session = makeSession(opportunities);
+    const { engine } = harness();
+
+    const report = await engine.analyze(session);
+    const pricingCluster = report.clusters.find((c) => c.category === "pricing-complaint");
+    expect(pricingCluster).toBeDefined();
+
+    // Part B: causeChain, derived from the already-computed dominant rootCause "Pricing Friction".
+    expect(pricingCluster?.causeChain).toEqual({
+      observedProblem: "Automation/tooling pricing is too expensive for the value delivered.",
+      underlyingCause: "Pricing Friction",
+      businessCause: "Perceived value doesn't match price point.",
+      technicalCause: "No usage-based tiering to capture willingness to pay.",
+    });
+
+    // Part C: severity — real computed numbers, not fabricated.
+    expect(pricingCluster?.severity).toBeDefined();
+    expect(pricingCluster!.severity!.severity).toBeGreaterThanOrEqual(0);
+    expect(pricingCluster!.severity!.severity).toBeLessThanOrEqual(100);
+    expect(pricingCluster!.severity!.moneyCost).toBe("high"); // Pricing Friction rootCause
+    expect(pricingCluster!.severity!.timeCost).toBe("low");
+    expect(pricingCluster!.severity!.urgency).toBeCloseTo((1 / 3) * 100, 0); // only p3 ("asap") carries an urgency phrase
+    expect(pricingCluster!.severity!.reasons.length).toBeGreaterThan(0);
+
+    // Part F: groupingReason cites the dominant concept id + match count.
+    expect(pricingCluster?.groupingReason).toContain("automation-too-expensive");
+    expect(pricingCluster?.groupingReason).toContain("3/3");
+
+    // Part E: no near-duplicates in this fixture (distinct wording) -> both duplicate metrics are their "no signal" defaults.
+    expect(pricingCluster?.crossSourceDuplicateCount).toBe(0);
+    expect(pricingCluster?.semanticDuplicateGroupCount).toBeUndefined();
+
+    // eslint-disable-next-line no-console
+    console.log(
+      `[Loop 6 example] causeChain=${JSON.stringify(pricingCluster!.causeChain)}, severity=${pricingCluster!.severity!.severity}, groupingReason="${pricingCluster!.groupingReason}"`,
+    );
+  });
+
+  it("Loop 6 Part E: surfaces crossSourceDuplicateCount and semanticDuplicateGroupCount on a surviving cluster", async () => {
+    const slowLaggyBody =
+      "The app is so slow and laggy, it takes too long to load every single time I open it and it feels completely broken, extremely frustrating";
+    const items: RawResearchItem[] = [
+      makeItem({ url: "https://example.com/x1", title: "Slow app", body: slowLaggyBody, sourceId: "reddit", author: "a1" }),
+      makeItem({ url: "https://example.com/x2", title: "App feels laggy", body: slowLaggyBody, sourceId: "hackernews", author: "a2" }),
+      makeItem({
+        url: "https://example.com/x3",
+        title: "Totally different report",
+        body: "the login page shows a timeout error whenever I try to sign in with sso enabled",
+        sourceId: "reddit",
+        author: "a3",
+      }),
+    ];
+    const opportunities: Opportunity[] = [
+      { id: "opp_1", title: "Bugs", summary: "s", keywords: [], supportingItems: items, sourceIds: ["reddit", "hackernews"] },
+    ];
+    const session = makeSession(opportunities);
+    const { engine } = harness();
+
+    const report = await engine.analyze(session);
+    const bugCluster = report.clusters.find((c) => c.category === "bug");
+    expect(bugCluster).toBeDefined();
+
+    // x1/x2 share IDENTICAL body text (near-duplicate) across 2 distinct sourceIds (reddit, hackernews) -> 1 cross-source group.
+    expect(bugCluster?.crossSourceDuplicateCount).toBe(1);
+    // x1/x2 ALSO both map to the "performance-app-is-slow" concept.ts group -> 1 semantic duplicate group.
+    expect(bugCluster?.semanticDuplicateGroupCount).toBe(1);
+    expect(bugCluster?.semanticDuplicateConceptIds).toEqual(["performance-app-is-slow"]);
+
+    // eslint-disable-next-line no-console
+    console.log(
+      `[Loop 6 Part E example] crossSourceDuplicateCount=${bugCluster!.crossSourceDuplicateCount}, semanticDuplicateGroupCount=${bugCluster!.semanticDuplicateGroupCount}, conceptIds=${JSON.stringify(bugCluster!.semanticDuplicateConceptIds)}`,
+    );
+  });
 });

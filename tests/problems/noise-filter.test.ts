@@ -158,3 +158,79 @@ describe("noise filter reduces uncategorized ('other') signal — real before/af
     expect(afterOtherCount).toBeLessThan(beforeOtherCount);
   });
 });
+
+describe("Loop 6, Part D — six additional noise archetypes (opinion/question/spam/showcase/hiring/demo)", () => {
+  it("flags an opinion piece as noise (2 distinct opinion phrases -> multi-match rule)", () => {
+    const item = makeItem({ url: "https://example.com/o1", title: "In my opinion, I think this whole industry is overrated" });
+    const verdict = classifyDocumentType(item);
+    expect(verdict.isNoise).toBe(true);
+    expect(verdict.noiseType).toBe("opinion");
+    expect(verdict.reasons.some((r) => r.includes("opinion"))).toBe(true);
+  });
+
+  it("flags a pure how-to question as noise (1 phrase, short title -> single-match rule)", () => {
+    const item = makeItem({ url: "https://example.com/q1", title: "How do I reset my password" });
+    const verdict = classifyDocumentType(item);
+    expect(verdict.isNoise).toBe(true);
+    expect(verdict.noiseType).toBe("question");
+  });
+
+  it("flags spam content as noise (3 distinct spam phrases -> multi-match rule)", () => {
+    const item = makeItem({ url: "https://example.com/s1", title: "Click here for a limited time offer, buy now!" });
+    const verdict = classifyDocumentType(item);
+    expect(verdict.isNoise).toBe(true);
+    expect(verdict.noiseType).toBe("spam");
+  });
+
+  it("flags a self-promotional project showcase as noise (2 distinct showcase phrases -> multi-match rule)", () => {
+    const item = makeItem({ url: "https://example.com/sh1", title: "Check out my project, just launched after months of work" });
+    const verdict = classifyDocumentType(item);
+    expect(verdict.isNoise).toBe(true);
+    expect(verdict.noiseType).toBe("showcase");
+  });
+
+  it("flags a hiring/recruiting post as noise (3 distinct hiring phrases -> multi-match rule)", () => {
+    const item = makeItem({ url: "https://example.com/h1", title: "We're hiring! Join our team, now recruiting engineers" });
+    const verdict = classifyDocumentType(item);
+    expect(verdict.isNoise).toBe(true);
+    expect(verdict.noiseType).toBe("hiring");
+  });
+
+  it("flags a demo/walkthrough promo as noise (2 distinct demo phrases -> multi-match rule)", () => {
+    const item = makeItem({ url: "https://example.com/d1", title: "Watch this demo, see it in action right now" });
+    const verdict = classifyDocumentType(item);
+    expect(verdict.isNoise).toBe(true);
+    expect(verdict.noiseType).toBe("demo");
+  });
+
+  it("SAFETY VALVE still protects a spam-flavored title that ALSO contains a real, confident complaint (unchanged threshold, reused)", () => {
+    const item = makeItem({
+      url: "https://example.com/valve1",
+      title: "Buy now, limited time offer — this app is terrible, hate it, awful experience",
+    });
+    const classifiedResult = classifyItem(item);
+    const complaintMatch = classifiedResult.categories.find((m) => m.category === "complaint");
+    expect(complaintMatch?.confidence).toBeGreaterThanOrEqual(NOISE_SAFETY_VALVE_MIN_CATEGORY_CONFIDENCE);
+
+    const verdict = classifyDocumentType(item);
+    expect(verdict.isNoise).toBe(false);
+    expect(verdict.reasons.some((r) => r.includes("Safety valve"))).toBe(true);
+
+    // eslint-disable-next-line no-console
+    console.log(`[Loop 6 Part D safety-valve example] reasons=${JSON.stringify(verdict.reasons)}`);
+  });
+
+  it("filterNoiseItems partitions a batch containing all six NEW archetypes correctly", () => {
+    const items: RawResearchItem[] = [
+      makeItem({ url: "https://example.com/n1", title: "In my opinion, I think this whole industry is overrated" }),
+      makeItem({ url: "https://example.com/n2", title: "Click here for a limited time offer, buy now!" }),
+      makeItem({ url: "https://example.com/n3", title: "Check out my project, just launched after months of work" }),
+      makeItem({ url: "https://example.com/n4", title: "We're hiring! Join our team, now recruiting engineers" }),
+      makeItem({ url: "https://example.com/n5", title: "Watch this demo, see it in action right now" }),
+      makeItem({ url: "https://example.com/real", title: "This app keeps crashing every time I open it" }),
+    ];
+    const result = filterNoiseItems(items);
+    expect(result.noiseCount).toBe(5);
+    expect(result.kept.map((i) => i.url)).toEqual(["https://example.com/real"]);
+  });
+});

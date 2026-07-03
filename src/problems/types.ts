@@ -120,6 +120,103 @@ export interface ProblemCluster {
   duplicateAdjustedEvidenceCount?: number;
   /** Cluster-average of src/problems/evidence-quality.ts's per-item composite score (Part 3), 0-1. */
   evidenceQualityScore?: number;
+  /**
+   * Root-cause chain (Loop 6, Part B) — a deterministic, rule-based
+   * decomposition of the cluster's `normalizedStatement` into a business-
+   * level and technical-level cause, keyed off the DOMINANT concept's
+   * `rootCause` (src/problems/concept.ts). See `CAUSE_CHAIN_MAPPING` in
+   * concept.ts for the exact, documented one-row-per-root-cause mapping
+   * table. Absent when no concept group matched any item (same condition as
+   * `rootCause` being absent) — there is no root cause to chain from.
+   */
+  causeChain?: CauseChain;
+  /**
+   * Deterministic severity scoring (Loop 6, Part C) — see
+   * src/problems/severity.ts's `computeSeverity` for the full, documented
+   * derivation. Computed ONCE per cluster from data already produced earlier
+   * in this same pipeline pass (frequency, per-item urgency/emotional-
+   * intensity already on ClassifiedItem, category, rootCause) — no new scan
+   * over raw items.
+   */
+  severity?: ClusterSeverity;
+  /**
+   * Count of this category's near-duplicate GROUPS (src/problems/near-
+   * duplicate.ts's `findNearDuplicates`) that span 2+ DISTINCT `sourceId`s —
+   * a real cross-posting signal (the same complaint independently surfacing
+   * on more than one platform), stronger than same-source reposts. Derived
+   * as a cheap post-processing step over `findNearDuplicates`'s existing
+   * output (Loop 6, Part E) — no second O(n²) pass.
+   */
+  crossSourceDuplicateCount?: number;
+  /**
+   * Count of near-duplicate groups (Part 4, prior loop) that are ALSO
+   * "semantic duplicates": every item in the group maps to the SAME
+   * concept.ts concept id, not just similar body text (Loop 6, Part E). A
+   * doubly-confirmed signal — same wording AND same underlying concept.
+   */
+  semanticDuplicateGroupCount?: number;
+  /** The concept id(s) (concept.ts) that had at least one semantic-duplicate group, for explainability. Empty/absent when `semanticDuplicateGroupCount` is 0. */
+  semanticDuplicateConceptIds?: string[];
+  /**
+   * Explainability (Loop 6, Part F): states WHY this cluster's
+   * `normalizedStatement`/`rootCause` were chosen — cites the dominant
+   * concept id and how many of the category's items matched its trigger
+   * phrases, or explicitly states that no concept-level sub-pattern matched
+   * and the category-level fallback statement was used. Kept as a SEPARATE
+   * field from `ClusterConfidence.explanation` (which explains the
+   * confidence SCORE, not the grouping) so `opportunities/decision.ts`'s
+   * existing `{band,score,explanation}` read of `ClusterConfidence` is
+   * unchanged.
+   */
+  groupingReason?: string;
+}
+
+/**
+ * Root-cause chain shape (src/problems/concept.ts's `deriveCauseChain` +
+ * `CAUSE_CHAIN_MAPPING`, Loop 6 Part B). Named/exported here (rather than
+ * inlined on `ProblemCluster`) so concept.ts can import and return this
+ * exact shape without re-declaring it.
+ */
+export interface CauseChain {
+  /** The cluster's own `normalizedStatement` — what was actually observed/reported. */
+  observedProblem: string;
+  /** The dominant concept's `rootCause` (concept.ts), verbatim. */
+  underlyingCause: string;
+  /** Fixed, rootCause-keyed business-level "why this matters to the business" statement. */
+  businessCause: string;
+  /** Fixed, rootCause-keyed technical-level "what's likely broken/missing under the hood" statement. */
+  technicalCause: string;
+}
+
+/**
+ * Deterministic severity composite (src/problems/severity.ts, Loop 6 Part
+ * C). Every numeric sub-score is 0-100 for a consistent, explainable scale;
+ * `severity` itself is a fixed, documented weighted composite of
+ * frequency/urgency/businessImpact/emotionalFriction (weights sum to 1.0,
+ * asserted in tests/problems/severity.test.ts) — see severity.ts's
+ * `SEVERITY_WEIGHTS`.
+ */
+export interface ClusterSeverity {
+  /** 0-100 weighted composite — see severity.ts's `SEVERITY_WEIGHTS`. */
+  severity: number;
+  /** 0-100, derived from `cluster.frequency.mentions`/growth (already computed). */
+  frequency: number;
+  /** 0-100, the fraction of this category's ClassifiedItems with `urgency === true` (already computed by detector.ts), scaled to 0-100. */
+  urgency: number;
+  /** 0-100, derived from category + rootCause (see severity.ts's fixed lookup tables). */
+  businessImpact: number;
+  /** Derived from rootCause — see severity.ts's `TIME_COST_BY_ROOT_CAUSE`. */
+  timeCost: "low" | "medium" | "high";
+  /** Derived from rootCause — see severity.ts's `MONEY_COST_BY_ROOT_CAUSE`. */
+  moneyCost: "low" | "medium" | "high";
+  /** 0-100, the average `emotionalIntensityScore` (0-1, already computed by detector.ts) across this category's ClassifiedItems, scaled to 0-100. */
+  emotionalFriction: number;
+  /** 0-100 — see severity.ts's documented developer/customer friction split rule (per-category weight table). */
+  developerFriction: number;
+  /** 0-100 — see severity.ts's documented developer/customer friction split rule (per-category weight table). */
+  customerFriction: number;
+  /** Human-readable, generated from the actual inputs — every number cited is real, never fabricated. */
+  reasons: string[];
 }
 
 export interface ProblemIntelligenceReport {

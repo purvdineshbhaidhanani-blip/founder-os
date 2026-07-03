@@ -1,4 +1,6 @@
+import { extractConcept } from "./concept.js";
 import type { RawResearchItem } from "../research/types.js";
+import type { ProblemCategory } from "./types.js";
 
 /**
  * Near-duplicate detection at the BODY-TEXT level, operating on classified
@@ -111,16 +113,16 @@ export function findNearDuplicates(items: RawResearchItem[]): NearDuplicateResul
 }
 
 /**
- * Keeps exactly one representative item per near-duplicate group: the
- * earliest-`publishedAt` item if any group member carries a publish date,
- * else the first-encountered item. Used to compute a duplicate-adjusted
- * evidence count for confidence purposes — this does NOT mutate or replace
- * `ClusterEvidence.evidenceCount` (which keeps its existing "raw count"
- * meaning for backward compatibility); the adjusted count is exposed
- * separately on `ProblemCluster.duplicateAdjustedEvidenceCount`.
+ * Keeps exactly one representative item per near-duplicate GROUP (already
+ * computed): the earliest-`publishedAt` item if any group member carries a
+ * publish date, else the first-encountered item. Extracted from
+ * `dedupeForEvidence` (Loop 6) so a caller that already has `groups` in hand
+ * (e.g. engine.ts, which also needs them for Part E's semantic/cross-source
+ * duplicate metrics) can reuse them here too, instead of calling
+ * `findNearDuplicates` a second time. `dedupeForEvidence` below is now a
+ * thin, behavior-identical wrapper over this function.
  */
-export function dedupeForEvidence(items: RawResearchItem[]): RawResearchItem[] {
-  const { groups } = findNearDuplicates(items);
+export function dedupeGroups(groups: RawResearchItem[][]): RawResearchItem[] {
   return groups.map((group) => {
     if (group.length === 1) return group[0]!;
     const dated = group.filter((item) => Boolean(item.publishedAt));
@@ -131,4 +133,91 @@ export function dedupeForEvidence(items: RawResearchItem[]): RawResearchItem[] {
     }
     return earliest;
   });
+}
+
+/**
+ * Keeps exactly one representative item per near-duplicate group. Used to
+ * compute a duplicate-adjusted evidence count for confidence purposes — this
+ * does NOT mutate or replace `ClusterEvidence.evidenceCount` (which keeps
+ * its existing "raw count" meaning for backward compatibility); the adjusted
+ * count is exposed separately on `ProblemCluster.duplicateAdjustedEvidenceCount`.
+ */
+export function dedupeForEvidence(items: RawResearchItem[]): RawResearchItem[] {
+  const { groups } = findNearDuplicates(items);
+  return dedupeGroups(groups);
+}
+
+/**
+ * Loop 6, Part E — duplicate intelligence, built ENTIRELY as post-processing
+ * over `findNearDuplicates`'s existing output. No new O(n²) pass: a near-
+ * duplicate group already establishes "high body-text overlap" for its
+ * members by construction (that's what put them in the same group), so the
+ * only new work here is a cheap O(n) scan of the (already small) `groups`
+ * array itself.
+ */
+
+export interface SemanticDuplicateGroup {
+  /** The concept id (concept.ts) every item in this group maps to. */
+  conceptId: string;
+  items: RawResearchItem[];
+}
+
+/**
+ * A near-duplicate GROUP (body-text overlap already established by group
+ * membership) is additionally flagged "semantic" when EVERY member maps to
+ * the SAME concept.ts concept id for `category` — a doubly-confirmed
+ * duplicate signal (same wording AND same underlying concept), distinct from
+ * (and stronger than) a plain near-identical-text group whose members might
+ * coincidentally not share a concept match. Groups of size 1 (no near-
+ * duplicate at all) and groups where members match no concept, or map to
+ * DIFFERENT concepts, are never flagged.
+ *
+ * Takes the ALREADY-COMPUTED `groups` from `findNearDuplicates` (not raw
+ * items) so callers that already called `findNearDuplicates` once (e.g.
+ * engine.ts) never pay for a second O(n²) near-duplicate pass — see
+ * `findSemanticDuplicates` below for a raw-items convenience wrapper used by
+ * direct unit tests.
+ */
+export function findSemanticDuplicateGroups(groups: RawResearchItem[][], category: ProblemCategory): SemanticDuplicateGroup[] {
+  const semanticGroups: SemanticDuplicateGroup[] = [];
+  for (const group of groups) {
+    if (group.length < 2) continue;
+    const conceptIds = group.map((item) => extractConcept(item, category)?.conceptId ?? null);
+    const first = conceptIds[0]!;
+    if (first !== null && conceptIds.every((id) => id === first)) {
+      semanticGroups.push({ conceptId: first, items: group });
+    }
+  }
+  return semanticGroups;
+}
+
+/**
+ * Convenience wrapper for callers (e.g. direct unit tests) that have not
+ * already computed near-duplicate groups — internally calls
+ * `findNearDuplicates` once. Engine.ts does NOT use this wrapper (it already
+ * has `groups` in hand from its own `findNearDuplicates` call and passes
+ * them directly to `findSemanticDuplicateGroups` to avoid a redundant O(n²)
+ * pass).
+ */
+export function findSemanticDuplicates(items: RawResearchItem[], category: ProblemCategory): SemanticDuplicateGroup[] {
+  const { groups } = findNearDuplicates(items);
+  return findSemanticDuplicateGroups(groups, category);
+}
+
+/**
+ * Cross-source duplicate signal: counts near-duplicate GROUPS (from the
+ * ALREADY-COMPUTED `groups`) that span 2+ DISTINCT `sourceId`s — the same
+ * underlying complaint independently surfacing on more than one platform,
+ * which is stronger corroboration than the same person/source reposting the
+ * identical text once. Takes `groups` directly (not raw items) for the same
+ * no-redundant-O(n²)-pass reason as `findSemanticDuplicateGroups` above.
+ */
+export function countCrossSourceDuplicateGroups(groups: RawResearchItem[][]): number {
+  return groups.filter((group) => group.length >= 2 && new Set(group.map((item) => item.sourceId)).size >= 2).length;
+}
+
+/** Convenience wrapper mirroring `findSemanticDuplicates` — internally calls `findNearDuplicates` once. Not used by engine.ts (see above). */
+export function countCrossSourceDuplicates(items: RawResearchItem[]): number {
+  const { groups } = findNearDuplicates(items);
+  return countCrossSourceDuplicateGroups(groups);
 }

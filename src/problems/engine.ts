@@ -7,7 +7,9 @@ import { computeClusterConfidence } from "./confidence.js";
 import { extractProblemWithConcepts } from "./extractor.js";
 import { filterNoiseItems } from "./noise-filter.js";
 import { computeAverageEvidenceQuality } from "./evidence-quality.js";
-import { dedupeForEvidence, findNearDuplicates } from "./near-duplicate.js";
+import { countCrossSourceDuplicateGroups, dedupeGroups, findNearDuplicates, findSemanticDuplicateGroups } from "./near-duplicate.js";
+import { deriveCauseChain } from "./concept.js";
+import { computeSeverity } from "./severity.js";
 import type { ClusterRepository } from "./repository.js";
 import type { ResearchSession } from "../research/types.js";
 import type { ClassifiedItem, ProblemCluster, ProblemIntelligenceReport } from "./types.js";
@@ -143,13 +145,16 @@ function evaluateQualityGates(params: {
 
 /**
  * Deterministic, rule-based classification of a ResearchSession's items into
- * ProblemClusters — no LLM call. Pipeline (Loop 5):
+ * ProblemClusters — no LLM call. Pipeline (Loop 5, extended by Loop 6):
  *   flatten -> noise-filter (Part 1) -> groupByCategory (UNCHANGED) ->
- *   per category: dedupe-for-evidence + near-duplicate ratio (Part 4) ->
+ *   per category: near-duplicate detection ONCE (Part 4, groups reused below) ->
  *   evidence-quality (Part 3) -> dominant concept + root cause (Part 2) ->
  *   confidence, now evidence-quality/duplicate-ratio aware (Part 5) ->
- *   build cluster with new explainability fields (Part 6/8) -> quality
- *   gates (Part 7) -> sort -> report with new aggregate fields (Part 8).
+ *   root-cause chain (Loop 6 Part B) -> severity (Loop 6 Part C) ->
+ *   semantic/cross-source duplicate metrics from the SAME near-duplicate
+ *   groups (Loop 6 Part E) -> grouping-reason explainability (Loop 6 Part F)
+ *   -> build cluster with all explainability fields (Part 6/8, Loop 6 A-F)
+ *   -> quality gates (Part 7) -> sort -> report with aggregate fields (Part 8).
  * Flags rising clusters via the `trending` flag on the ORIGINAL cluster (see
  * ProblemCluster.trending — this replaced an earlier design that created a
  * second, duplicate "trend" cluster per rising category, which wasted
@@ -186,9 +191,15 @@ export class ProblemIntelligenceEngine {
 
       // Part 4: near-duplicate detection (body-text level) + a duplicate-
       // adjusted evidence count, WITHOUT changing evidence.evidenceCount's
-      // existing raw-count meaning.
-      const { duplicateCount } = findNearDuplicates(categoryItems);
-      const duplicateAdjustedEvidenceCount = dedupeForEvidence(categoryItems).length;
+      // existing raw-count meaning. `findNearDuplicates` is called ONCE per
+      // category — its `groups` output is reused below for BOTH the
+      // duplicate-adjusted evidence count AND Part E's semantic/cross-source
+      // duplicate metrics, rather than re-scanning categoryItems again for
+      // each (see near-duplicate.ts's `dedupeGroups`/`findSemanticDuplicateGroups`/
+      // `countCrossSourceDuplicateGroups`, all of which take these precomputed
+      // `groups` directly instead of raw items).
+      const { groups: nearDuplicateGroups, duplicateCount } = findNearDuplicates(categoryItems);
+      const duplicateAdjustedEvidenceCount = dedupeGroups(nearDuplicateGroups).length;
       const duplicateRatio = categoryItems.length > 0 ? duplicateCount / categoryItems.length : 0;
 
       // Part 3: cluster-average evidence quality.
@@ -205,6 +216,32 @@ export class ProblemIntelligenceEngine {
       // Part 5: confidence now blends in evidence quality + duplicate ratio.
       const confidence = computeClusterConfidence(evidence, frequency, evidenceQualityScore, duplicateRatio);
 
+      // Part B: root-cause chain — one dictionary lookup keyed off the
+      // rootCause ALREADY resolved by extractProblemWithConcepts above; no
+      // new classification pass. Absent under the same condition as
+      // `rootCause` itself (no dominant concept found).
+      const causeChain = extracted.rootCause ? deriveCauseChain(extracted.normalizedStatement, extracted.rootCause) : undefined;
+
+      // Part C: severity — computed ONCE per cluster from values already in
+      // scope in this same loop iteration (category, rootCause, frequency,
+      // classifiedItems). See severity.ts's module doc for exactly what's
+      // reused vs newly aggregated (one O(category-size) pass, not a new
+      // pass over the full item list).
+      const severity = computeSeverity({ category, rootCause: extracted.rootCause, frequency, classifiedItems });
+
+      // Part E: semantic + cross-source duplicate metrics — cheap
+      // post-processing over `nearDuplicateGroups` computed above, no
+      // additional O(n²) pass.
+      const semanticDuplicateGroups = findSemanticDuplicateGroups(nearDuplicateGroups, category);
+      const crossSourceDuplicateCount = countCrossSourceDuplicateGroups(nearDuplicateGroups);
+
+      // Part F: explainability — states WHY this cluster's normalizedStatement/
+      // rootCause were chosen, citing the dominant concept id + trigger match
+      // count (already resolved above by extractProblemWithConcepts).
+      const groupingReason = extracted.dominantConceptId
+        ? `Grouped under concept "${extracted.dominantConceptId}" (${extracted.dominantConceptCount}/${categoryItems.length} item(s) in category "${category}" matched its trigger phrases) — the dominant sub-concept for this cluster.`
+        : `No concept.ts sub-pattern matched any of this category's ${categoryItems.length} item(s); grouped under the fixed category-level fallback statement for "${category}".`;
+
       const cluster: ProblemCluster = {
         id: generateId("cluster"),
         category,
@@ -219,6 +256,16 @@ export class ProblemIntelligenceEngine {
         ...(extracted.rootCause ? { rootCause: extracted.rootCause } : {}),
         duplicateAdjustedEvidenceCount,
         evidenceQualityScore,
+        ...(causeChain ? { causeChain } : {}),
+        severity,
+        crossSourceDuplicateCount,
+        ...(semanticDuplicateGroups.length > 0
+          ? {
+              semanticDuplicateGroupCount: semanticDuplicateGroups.length,
+              semanticDuplicateConceptIds: [...new Set(semanticDuplicateGroups.map((g) => g.conceptId))],
+            }
+          : {}),
+        groupingReason,
       };
 
       // Part 7: quality gates, applied AFTER the cluster is fully built,

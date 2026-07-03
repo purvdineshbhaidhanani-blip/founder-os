@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { dedupeForEvidence, findNearDuplicates } from "../../src/problems/near-duplicate.js";
+import {
+  countCrossSourceDuplicateGroups,
+  countCrossSourceDuplicates,
+  dedupeForEvidence,
+  findNearDuplicates,
+  findSemanticDuplicateGroups,
+  findSemanticDuplicates,
+} from "../../src/problems/near-duplicate.js";
 import type { RawResearchItem } from "../../src/research/types.js";
 
 function makeItem(overrides: Partial<RawResearchItem> & { url: string }): RawResearchItem {
@@ -114,5 +121,80 @@ describe("dedupeForEvidence", () => {
     ];
     const result = dedupeForEvidence(items);
     expect(result).toHaveLength(2);
+  });
+});
+
+describe("Loop 6, Part E — findSemanticDuplicates / findSemanticDuplicateGroups", () => {
+  const slowLaggyBody =
+    "The app is so slow and laggy, it takes too long to load every single time I open it and it feels completely broken, extremely frustrating";
+
+  it("flags a near-duplicate group as SEMANTIC when every member maps to the SAME concept.ts concept id", () => {
+    const a = makeItem({ url: "https://example.com/sem1", title: "Slow app", body: slowLaggyBody, sourceId: "reddit" });
+    const b = makeItem({ url: "https://example.com/sem2", title: "So laggy lately", body: slowLaggyBody, sourceId: "hackernews" });
+
+    const result = findSemanticDuplicates([a, b], "bug");
+    expect(result).toHaveLength(1);
+    expect(result[0]!.conceptId).toBe("performance-app-is-slow");
+    expect(result[0]!.items.map((i) => i.url).sort()).toEqual([a.url, b.url].sort());
+  });
+
+  it("does NOT flag a near-duplicate group as semantic when no item in the group matches any concept for that category", () => {
+    const body = "this happened to me too honestly, we experienced the exact same painful situation as everyone else here";
+    const a = makeItem({ url: "https://example.com/nc1", title: "t", body });
+    const b = makeItem({ url: "https://example.com/nc2", title: "t2", body });
+
+    // Confirm the pair IS still a body-text near-duplicate (that part is unaffected)...
+    const { groups } = findNearDuplicates([a, b]);
+    expect(groups.some((g) => g.length === 2)).toBe(true);
+
+    // ...but it's not flagged SEMANTIC, because the body matches no "bug" concept group.
+    const result = findSemanticDuplicates([a, b], "bug");
+    expect(result).toEqual([]);
+  });
+
+  it("does NOT flag a group of 1 (no near-duplicate at all) as semantic", () => {
+    const a = makeItem({ url: "https://example.com/single1", title: "t", body: slowLaggyBody });
+    expect(findSemanticDuplicates([a], "bug")).toEqual([]);
+  });
+
+  it("findSemanticDuplicateGroups reuses an ALREADY-COMPUTED `groups` array (no internal findNearDuplicates call, Part G)", () => {
+    const a = makeItem({ url: "https://example.com/reuse1", title: "t", body: slowLaggyBody });
+    const b = makeItem({ url: "https://example.com/reuse2", title: "t2", body: slowLaggyBody });
+    const { groups } = findNearDuplicates([a, b]);
+
+    const result = findSemanticDuplicateGroups(groups, "bug");
+    expect(result).toHaveLength(1);
+    expect(result[0]!.conceptId).toBe("performance-app-is-slow");
+  });
+});
+
+describe("Loop 6, Part E — countCrossSourceDuplicates / countCrossSourceDuplicateGroups", () => {
+  const duplicateBody = "the export feature crashes every time I try to export a csv file larger than 10000 rows";
+
+  it("counts a near-duplicate group spanning 2+ DISTINCT sourceIds as a cross-source duplicate group", () => {
+    const a = makeItem({ url: "https://example.com/cs1", title: "t", body: duplicateBody, sourceId: "github-issue" });
+    const b = makeItem({ url: "https://example.com/cs2", title: "t2", body: duplicateBody, sourceId: "reddit" });
+    expect(countCrossSourceDuplicates([a, b])).toBe(1);
+  });
+
+  it("does NOT count a same-source repost group as cross-source", () => {
+    const a = makeItem({ url: "https://example.com/ss1", title: "t", body: duplicateBody, sourceId: "reddit" });
+    const b = makeItem({ url: "https://example.com/ss2", title: "t2", body: duplicateBody, sourceId: "reddit" });
+    expect(countCrossSourceDuplicates([a, b])).toBe(0);
+  });
+
+  it("returns 0 when there are no near-duplicate groups at all", () => {
+    const a = makeItem({ url: "https://example.com/none1", title: "t", body: "aaaa bbbb cccc dddd" });
+    const b = makeItem({ url: "https://example.com/none2", title: "t2", body: "wxyz vuts qrst" });
+    expect(countCrossSourceDuplicates([a, b])).toBe(0);
+  });
+
+  it("countCrossSourceDuplicateGroups reuses an ALREADY-COMPUTED `groups` array (no internal findNearDuplicates call, Part G)", () => {
+    const a = makeItem({ url: "https://example.com/reuse-cs1", title: "t", body: duplicateBody, sourceId: "github-issue" });
+    const b = makeItem({ url: "https://example.com/reuse-cs2", title: "t2", body: duplicateBody, sourceId: "reddit" });
+    const c = makeItem({ url: "https://example.com/reuse-cs3", title: "t3", body: duplicateBody, sourceId: "reddit" });
+    const { groups } = findNearDuplicates([a, b, c]);
+
+    expect(countCrossSourceDuplicateGroups(groups)).toBe(1);
   });
 });

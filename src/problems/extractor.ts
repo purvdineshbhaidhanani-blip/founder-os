@@ -1,4 +1,5 @@
 import { pickDominantConcept } from "./concept.js";
+import type { RootCause } from "./concept.js";
 import type { ClassifiedItem, ExtractedProblem, ProblemCategory } from "./types.js";
 import type { RawResearchItem } from "../research/types.js";
 
@@ -34,10 +35,27 @@ export function extractProblem(classifiedItem: ClassifiedItem, category: Problem
 
 export interface ConceptAwareExtraction {
   normalizedStatement: string;
-  /** Present only when a dominant concept group (concept.ts) was found across the category's items. */
-  rootCause?: string;
+  /**
+   * Present only when a dominant concept group (concept.ts) was found across
+   * the category's items. Typed as the precise `RootCause` union (tightened
+   * in Loop 6, Part B — was a loose `string` before) since the value is
+   * always drawn directly from concept.ts's fixed taxonomy; this lets
+   * `deriveCauseChain` (concept.ts) be called with it directly, with no
+   * unsafe cast. `ProblemCluster.rootCause` itself stays `string` for
+   * backward compatibility (RootCause is assignable to string).
+   */
+  rootCause?: RootCause;
   /** Intra-category concept breakdown — see concept.ts's `pickDominantConcept` doc. Empty array when no item matched any concept group. */
   conceptBreakdown: Array<{ conceptId: string; canonicalStatement: string; rootCause: string; count: number }>;
+  /**
+   * The dominant concept's own id/match-count (Loop 6, Part F), surfaced
+   * separately from `conceptBreakdown` so engine.ts can build a
+   * `groupingReason` explanation string without re-deriving "which entry was
+   * dominant" from the breakdown array. Absent under the same condition as
+   * `rootCause` (no concept group matched any item).
+   */
+  dominantConceptId?: string;
+  dominantConceptCount?: number;
 }
 
 /**
@@ -67,6 +85,8 @@ export function extractProblemWithConcepts(
       normalizedStatement: dominant.canonicalStatement,
       rootCause: dominant.rootCause,
       conceptBreakdown: breakdown,
+      dominantConceptId: dominant.conceptId,
+      dominantConceptCount: dominant.count,
     };
   }
 
