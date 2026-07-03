@@ -234,3 +234,94 @@ describe("Loop 6, Part D — six additional noise archetypes (opinion/question/s
     expect(result.kept.map((i) => i.url)).toEqual(["https://example.com/real"]);
   });
 });
+
+describe("Part 1 — filterConfidence / keepReason / noiseReason (additive fields)", () => {
+  it("a clean 3-phrase tutorial with NO competing real-category signal gets high filterConfidence (0.9) and a noiseReason", () => {
+    const item = makeItem({
+      url: "https://example.com/fc1",
+      title: "How to get started: a step by step tutorial for beginners",
+    });
+    const verdict = classifyDocumentType(item);
+    expect(verdict.isNoise).toBe(true);
+    // noiseSignal tier(3 matches)=0.8, realSignal=0 -> filterConfidence = 0.5 + 0.8/2 = 0.9.
+    expect(verdict.filterConfidence).toBeCloseTo(0.9, 5);
+    expect(verdict.keepReason).toBeUndefined();
+    expect(verdict.noiseReason).toBeDefined();
+    expect(verdict.noiseReason).toContain("tutorial");
+    expect(verdict.noiseReason).toContain("3 distinct noise phrase(s)");
+  });
+
+  it("a short-title single marketing-phrase match with no real-category signal gets moderate filterConfidence (0.65)", () => {
+    const item = makeItem({ url: "https://example.com/fc2", title: "Top 10 productivity tools" });
+    const verdict = classifyDocumentType(item);
+    expect(verdict.isNoise).toBe(true);
+    // noiseSignal tier(1 match)=0.3, realSignal=0 -> filterConfidence = 0.5 + 0.3/2 = 0.65.
+    expect(verdict.filterConfidence).toBeCloseTo(0.65, 5);
+    expect(verdict.noiseReason).toContain("marketing");
+  });
+
+  it("a long-title incidental single noise-phrase match (kept) gets LOW filterConfidence (0.35) and a keepReason citing the long-form title", () => {
+    const item = makeItem({
+      url: "https://example.com/fc3",
+      title: "I wrote a long post exploring why our onboarding tutorial confused so many new users last quarter",
+    });
+    const verdict = classifyDocumentType(item);
+    expect(verdict.isNoise).toBe(false);
+    // noiseSignal tier(1 match)=0.3, realSignal=0 -> filterConfidence = 0.5 - 0.3/2 = 0.35.
+    expect(verdict.filterConfidence).toBeCloseTo(0.35, 5);
+    expect(verdict.noiseReason).toBeUndefined();
+    expect(verdict.keepReason).toBeDefined();
+    expect(verdict.keepReason).toContain("word(s)");
+    expect(verdict.keepReason).toContain("long-form content");
+  });
+
+  it("a real, confident bug report with zero noise phrases gets HIGH filterConfidence (0.775) and a plain keepReason", () => {
+    const item = makeItem({ url: "https://example.com/fc4", title: "This app keeps crashing every time I open it" });
+    const verdict = classifyDocumentType(item);
+    expect(verdict.isNoise).toBe(false);
+    // noiseSignal=0 (no noise phrases), realSignal=confidenceForMatchCount(2 bug matches)=0.55
+    // -> filterConfidence = 0.5 - (0 - 0.55)/2 = 0.775.
+    expect(verdict.filterConfidence).toBeCloseTo(0.775, 5);
+    expect(verdict.keepReason).toBe("No noise-list phrases matched any of the 12 noise archetypes.");
+  });
+
+  it("a safety-valve rescue nets a MODERATE filterConfidence (0.625) and a keepReason citing the rescuing category", () => {
+    const item = makeItem({
+      url: "https://example.com/fc5",
+      title: "Step by step tutorial: why this tool is terrible, hate it, awful experience",
+    });
+    const verdict = classifyDocumentType(item);
+    expect(verdict.isNoise).toBe(false);
+    // noiseSignal tier(2 matches)=0.55, realSignal=confidenceForMatchCount(3 complaint matches)=0.8
+    // -> filterConfidence = 0.5 - (0.55 - 0.8)/2 = 0.625.
+    expect(verdict.filterConfidence).toBeCloseTo(0.625, 5);
+    expect(verdict.keepReason).toBeDefined();
+    expect(verdict.keepReason).toContain("safety valve");
+    expect(verdict.keepReason).toContain("complaint");
+
+    // eslint-disable-next-line no-console
+    console.log(
+      `[Part 1 example] filterConfidence=${verdict.filterConfidence}, keepReason="${verdict.keepReason}"`,
+    );
+  });
+
+  it("filterConfidence is always within [0,1] and every verdict has exactly one of keepReason/noiseReason set", () => {
+    const items: RawResearchItem[] = [
+      makeItem({ url: "https://example.com/fc6", title: "Official docs: API reference for the SDK" }),
+      makeItem({ url: "https://example.com/fc7", title: "Would be great if it supported dark mode" }),
+      makeItem({ url: "https://example.com/fc8", title: "This week in tech: weekly roundup newsletter digest" }),
+    ];
+    for (const item of items) {
+      const verdict = classifyDocumentType(item);
+      expect(verdict.filterConfidence).toBeGreaterThanOrEqual(0);
+      expect(verdict.filterConfidence).toBeLessThanOrEqual(1);
+      if (verdict.isNoise) {
+        expect(verdict.noiseReason).toBeDefined();
+        expect(verdict.keepReason).toBeUndefined();
+      } else {
+        expect(verdict.keepReason).toBeDefined();
+        expect(verdict.noiseReason).toBeUndefined();
+      }
+    }
+  });
+});

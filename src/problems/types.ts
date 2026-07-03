@@ -169,6 +169,25 @@ export interface ProblemCluster {
    * unchanged.
    */
   groupingReason?: string;
+  /**
+   * Raw, pre-normalization matched trigger phrases (Part 1, additive) — the
+   * union, deduped, of `CategoryMatch.matchedPatterns` (detector.ts) across
+   * every item in this category that matched THIS cluster's `category`,
+   * capped at `MAX_SYMPTOMS_PER_CLUSTER` (see ai-problem-intelligence.ts) for
+   * payload size. Distinct from `rootCause` (the one-phrase underlying
+   * cause, e.g. "Poor UX") and `normalizedStatement` (the canonical single
+   * sentence) — `symptoms` is the literal list of surface-level trigger
+   * phrases observed, e.g. ["too many clicks", "hard to learn", "confusing"]
+   * for a "Poor UX" rootCause. Computed by
+   * `ai-problem-intelligence.ts`'s `enrichCategoryIntelligence` from data
+   * already in scope in the same per-category loop iteration (no new item
+   * scan). Optional/additive — same backward-compatibility reasoning as
+   * every other optional field on this interface (hand-built `ProblemCluster`
+   * fixtures elsewhere in the codebase, e.g. tests/opportunities/*.test.ts's
+   * `makeCluster` helpers, predate this field and must keep compiling
+   * unchanged).
+   */
+  symptoms?: string[];
 }
 
 /**

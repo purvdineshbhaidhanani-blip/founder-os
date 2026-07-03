@@ -4,10 +4,7 @@ import { flattenSessionItems, groupByCategory } from "./clustering.js";
 import { buildClusterEvidence } from "./evidence.js";
 import { computeFrequency } from "./frequency.js";
 import { computeClusterConfidence } from "./confidence.js";
-import { extractProblemWithConcepts } from "./extractor.js";
-import { filterNoiseItems } from "./noise-filter.js";
-import { computeAverageEvidenceQuality } from "./evidence-quality.js";
-import { countCrossSourceDuplicateGroups, dedupeGroups, findNearDuplicates, findSemanticDuplicateGroups } from "./near-duplicate.js";
+import { runAiProblemIntelligence, enrichCategoryIntelligence } from "./ai-problem-intelligence.js";
 import { deriveCauseChain } from "./concept.js";
 import { computeSeverity } from "./severity.js";
 import type { ClusterRepository } from "./repository.js";
@@ -145,20 +142,33 @@ function evaluateQualityGates(params: {
 
 /**
  * Deterministic, rule-based classification of a ResearchSession's items into
- * ProblemClusters — no LLM call. Pipeline (Loop 5, extended by Loop 6):
- *   flatten -> noise-filter (Part 1) -> groupByCategory (UNCHANGED) ->
- *   per category: near-duplicate detection ONCE (Part 4, groups reused below) ->
- *   evidence-quality (Part 3) -> dominant concept + root cause (Part 2) ->
- *   confidence, now evidence-quality/duplicate-ratio aware (Part 5) ->
- *   root-cause chain (Loop 6 Part B) -> severity (Loop 6 Part C) ->
- *   semantic/cross-source duplicate metrics from the SAME near-duplicate
- *   groups (Loop 6 Part E) -> grouping-reason explainability (Loop 6 Part F)
- *   -> build cluster with all explainability fields (Part 6/8, Loop 6 A-F)
- *   -> quality gates (Part 7) -> sort -> report with aggregate fields (Part 8).
+ * ProblemClusters — no LLM call. Pipeline (Loop 5, extended by Loop 6, and
+ * formalized into an explicit "AI Problem Intelligence" stage below):
+ *   flatten -> AI Problem Intelligence Stage 1: noise-filter
+ *   (ai-problem-intelligence.ts's `runAiProblemIntelligence`, Part 1) ->
+ *   groupByCategory (UNCHANGED) -> per category, AI Problem Intelligence
+ *   Stage 2 (`enrichCategoryIntelligence`): near-duplicate detection ONCE
+ *   (Part 4, groups reused below) -> evidence-quality (Part 3) -> dominant
+ *   concept + root cause + symptoms (Part 2, Part 1) -> semantic/cross-
+ *   source duplicate metrics from the SAME near-duplicate groups (Loop 6
+ *   Part E) -> back in engine.ts (cluster-building proper): confidence, now
+ *   evidence-quality/duplicate-ratio aware (Part 5) -> root-cause chain
+ *   (Loop 6 Part B) -> severity (Loop 6 Part C) -> grouping-reason
+ *   explainability (Loop 6 Part F) -> build cluster with all explainability
+ *   fields (Part 6/8, Loop 6 A-F) -> quality gates (Part 7) -> sort ->
+ *   report with aggregate fields (Part 8).
  * Flags rising clusters via the `trending` flag on the ORIGINAL cluster (see
  * ProblemCluster.trending — this replaced an earlier design that created a
  * second, duplicate "trend" cluster per rising category, which wasted
  * ranking slots downstream), and persists the resulting report.
+ *
+ * See ai-problem-intelligence.ts's module doc for why this is a documented
+ * TWO-STAGE composition (Stage 1 global/pre-group, Stage 2 per-category/
+ * post-group) rather than one single pre-group call — the near-duplicate/
+ * evidence-quality/concept-extraction steps are inherently category-scoped
+ * in this codebase's existing design, and computing them globally would
+ * change their output, violating this refactor's byte-for-byte-identical
+ * requirement.
  */
 export class ProblemIntelligenceEngine {
   private readonly repository: ClusterRepository;
@@ -170,8 +180,12 @@ export class ProblemIntelligenceEngine {
   async analyze(session: ResearchSession): Promise<ProblemIntelligenceReport> {
     const items = flattenSessionItems(session);
 
-    // Part 1: noise filter, BEFORE category grouping.
-    const { kept: keptItems, noiseCount: totalItemsRejectedAsNoise } = filterNoiseItems(items);
+    // AI Problem Intelligence Stage 1 (Part 1/2): noise filter, BEFORE
+    // category grouping. `runAiProblemIntelligence` is a thin composition
+    // over noise-filter.ts's `classifyDocumentType`/detector.ts's
+    // `classifyItem` — see ai-problem-intelligence.ts's module doc.
+    const aiIntel = runAiProblemIntelligence(items);
+    const { filteredItems: keptItems, totalItemsRejectedAsNoise } = aiIntel;
 
     // Grouped from the FULL (pre-noise-filter) item list, used ONLY as the
     // Part 7 gate-3 "how much of this category's raw signal was noise"
@@ -187,28 +201,24 @@ export class ProblemIntelligenceEngine {
     const rejectedClusters: ProblemIntelligenceReport["rejectedClusters"] = [];
 
     for (const [category, classifiedItems] of grouped) {
-      const categoryItems = classifiedItems.map((classified) => classified.item);
-
-      // Part 4: near-duplicate detection (body-text level) + a duplicate-
-      // adjusted evidence count, WITHOUT changing evidence.evidenceCount's
-      // existing raw-count meaning. `findNearDuplicates` is called ONCE per
-      // category — its `groups` output is reused below for BOTH the
-      // duplicate-adjusted evidence count AND Part E's semantic/cross-source
-      // duplicate metrics, rather than re-scanning categoryItems again for
-      // each (see near-duplicate.ts's `dedupeGroups`/`findSemanticDuplicateGroups`/
-      // `countCrossSourceDuplicateGroups`, all of which take these precomputed
-      // `groups` directly instead of raw items).
-      const { groups: nearDuplicateGroups, duplicateCount } = findNearDuplicates(categoryItems);
-      const duplicateAdjustedEvidenceCount = dedupeGroups(nearDuplicateGroups).length;
-      const duplicateRatio = categoryItems.length > 0 ? duplicateCount / categoryItems.length : 0;
-
-      // Part 3: cluster-average evidence quality.
-      const evidenceQualityScore = computeAverageEvidenceQuality(categoryItems);
-
-      // Part 2/6: dominant sub-concept + intra-category breakdown, computed
-      // from ALL of this category's items (not just classifiedItems[0]),
-      // with a safe fallback to the fixed category-level statement.
-      const extracted = extractProblemWithConcepts(classifiedItems[0]!, categoryItems, category);
+      // AI Problem Intelligence Stage 2 (Part 1/2/3/4/6): near-duplicate
+      // detection (body-text level, groups reused for both the duplicate-
+      // adjusted evidence count and Part E's semantic/cross-source metrics),
+      // cluster-average evidence quality, dominant sub-concept + root cause,
+      // and the raw `symptoms` trigger-phrase list — see
+      // ai-problem-intelligence.ts's `enrichCategoryIntelligence` for exactly
+      // which existing function each field's value comes from.
+      const intel = enrichCategoryIntelligence(category, classifiedItems);
+      const {
+        categoryItems,
+        duplicateRatio,
+        duplicateAdjustedEvidenceCount,
+        evidenceQualityScore,
+        extracted,
+        semanticDuplicateGroups,
+        crossSourceDuplicateCount,
+        symptoms,
+      } = intel;
 
       const evidence = buildClusterEvidence(categoryItems);
       const frequency = computeFrequency(categoryItems, session.windowDays);
@@ -229,11 +239,9 @@ export class ProblemIntelligenceEngine {
       // pass over the full item list).
       const severity = computeSeverity({ category, rootCause: extracted.rootCause, frequency, classifiedItems });
 
-      // Part E: semantic + cross-source duplicate metrics — cheap
-      // post-processing over `nearDuplicateGroups` computed above, no
-      // additional O(n²) pass.
-      const semanticDuplicateGroups = findSemanticDuplicateGroups(nearDuplicateGroups, category);
-      const crossSourceDuplicateCount = countCrossSourceDuplicateGroups(nearDuplicateGroups);
+      // Part E: semantic + cross-source duplicate metrics — already computed
+      // above by `enrichCategoryIntelligence` (Stage 2), as cheap post-
+      // processing over its own `nearDuplicateGroups`, no additional O(n²) pass.
 
       // Part F: explainability — states WHY this cluster's normalizedStatement/
       // rootCause were chosen, citing the dominant concept id + trigger match
@@ -266,6 +274,7 @@ export class ProblemIntelligenceEngine {
             }
           : {}),
         groupingReason,
+        symptoms,
       };
 
       // Part 7: quality gates, applied AFTER the cluster is fully built,

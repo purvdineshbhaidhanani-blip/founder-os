@@ -1,5 +1,6 @@
 import { classifyItem } from "./detector.js";
 import type { RawResearchItem } from "../research/types.js";
+import type { CategoryMatch } from "./types.js";
 
 /**
  * Noise filter — a pre-classification pass that screens out raw research
@@ -138,6 +139,65 @@ export interface DocumentTypeVerdict {
   isNoise: boolean;
   noiseType?: string;
   reasons: string[];
+  /**
+   * 0-1, deterministic — see `deriveFilterConfidence` below for the exact
+   * formula. Additive sibling of `reasons` (Part 1): expresses HOW confident
+   * this isNoise/kept verdict is, not just what it is.
+   */
+  filterConfidence: number;
+  /** Populated only when `isNoise === false`. Explains WHY the item was kept — cites the safety-valve category match, or states no noise phrases matched. */
+  keepReason?: string;
+  /** Populated only when `isNoise === true`. Cites the matched noise archetype and the specific phrases that triggered it. */
+  noiseReason?: string;
+}
+
+/**
+ * Tiered "how many distinct phrase hits" strength, 0/1/2/3+ -> 0/0.3/0.55/0.8.
+ * Mirrors detector.ts's own (private, not exported) `confidenceForMatchCount`
+ * tiering verbatim, so this codebase has ONE consistent match-count-to-
+ * strength scale rather than two independently-tuned magic-number tables.
+ * Duplicated here (rather than imported) only because detector.ts doesn't
+ * export it.
+ */
+function matchCountTierStrength(matchCount: number): number {
+  if (matchCount >= 3) return 0.8;
+  if (matchCount === 2) return 0.55;
+  if (matchCount === 1) return 0.3;
+  return 0;
+}
+
+/**
+ * Deterministic `filterConfidence` derivation (Part 1, additive — does NOT
+ * affect `isNoise` itself, which is decided entirely by the existing rule
+ * above).
+ *
+ * Rule, exactly:
+ *   1. noiseSignal = matchCountTierStrength(number of distinct noise-list
+ *      phrases matched) — 0/0.3/0.55/0.8 for 0/1/2/3+ matches.
+ *   2. realSignal = the item's best non-"other" ClassifiedItem category
+ *      confidence (0 if it only matched "other").
+ *   3. margin = clamp(noiseSignal - realSignal, -1, 1).
+ *   4. If the FINAL isNoise === true: filterConfidence = clamp01(0.5 + margin/2).
+ *      A strong noise signal with no competing real-category signal pushes
+ *      confidence toward 1 (e.g. 3+ phrases, no real match -> 0.5+0.4=0.9).
+ *      A borderline single noise-phrase match up against an equally weak
+ *      real-category match nets to 0.5 (genuinely ambiguous).
+ *   5. If the FINAL isNoise === false: filterConfidence = clamp01(0.5 - margin/2)
+ *      — the symmetric mirror. A confident real-category match with zero
+ *      noise phrases pushes confidence toward 1 (e.g. realSignal 0.8, no
+ *      noise match -> 0.5+0.4=0.9, "high confidence it's a keeper" per the
+ *      spec). Zero noise phrases AND zero real-category match (a bland,
+ *      unclassified-but-not-noise item) nets to 0.5 — no signal either way.
+ *      A safety-valve rescue with a STRONG opposing noise signal can net
+ *      below 0.5 even though the item survives — that is intentional: it
+ *      flags a genuinely borderline "kept, but noisy" case rather than
+ *      claiming false certainty.
+ */
+function deriveFilterConfidence(params: { isNoise: boolean; noiseSignal: number; realSignal: number }): number {
+  const { isNoise, noiseSignal, realSignal } = params;
+  const margin = Math.max(-1, Math.min(1, noiseSignal - realSignal));
+  const raw = isNoise ? 0.5 + margin / 2 : 0.5 - margin / 2;
+  return Math.max(0, Math.min(1, raw));
 }
 
 /**
@@ -176,6 +236,7 @@ export function classifyDocumentType(item: RawResearchItem): DocumentTypeVerdict
   }
 
   let isNoise: boolean;
+  let singleMatchTitleWords: number | undefined;
   if (matchedPhrases.length >= MULTI_MATCH_NOISE_PHRASE_COUNT_THRESHOLD) {
     isNoise = true;
     reasons.push(
@@ -183,6 +244,7 @@ export function classifyDocumentType(item: RawResearchItem): DocumentTypeVerdict
     );
   } else if (matchedPhrases.length === 1) {
     const words = titleWordCount(item.title);
+    singleMatchTitleWords = words;
     isNoise = words <= SINGLE_MATCH_MARKETING_TITLE_WORD_COUNT_THRESHOLD;
     reasons.push(
       `1 noise phrase matched; title has ${words} word(s) (threshold <= ${SINGLE_MATCH_MARKETING_TITLE_WORD_COUNT_THRESHOLD}) -> ${
@@ -194,14 +256,25 @@ export function classifyDocumentType(item: RawResearchItem): DocumentTypeVerdict
     reasons.push("No noise-list phrases matched.");
   }
 
+  // Always classify once now (previously only inside the isNoise branch, for
+  // the safety-valve check) — the SAME classifyItem call is now also reused
+  // to derive `filterConfidence`'s realSignal below, so this is still exactly
+  // one classification call per item, just no longer conditional.
+  const classified = classifyItem(item);
+  const bestRealMatch: CategoryMatch | undefined = classified.categories
+    .filter((match) => match.category !== "other")
+    .reduce<CategoryMatch | undefined>((best, match) => (!best || match.confidence > best.confidence ? match : best), undefined);
+  const realSignal = bestRealMatch?.confidence ?? 0;
+
+  let safetyValveRescue: { category: string; confidence: number } | undefined;
   if (isNoise) {
-    const classified = classifyItem(item);
     const realMatch = classified.categories.find(
       (match) => match.category !== "other" && match.confidence >= NOISE_SAFETY_VALVE_MIN_CATEGORY_CONFIDENCE,
     );
     if (realMatch) {
       isNoise = false;
       noiseType = undefined;
+      safetyValveRescue = { category: realMatch.category, confidence: realMatch.confidence };
       reasons.push(
         `Safety valve: item also matches real category "${realMatch.category}" at confidence ${realMatch.confidence.toFixed(
           2,
@@ -210,7 +283,22 @@ export function classifyDocumentType(item: RawResearchItem): DocumentTypeVerdict
     }
   }
 
-  return { isNoise, noiseType, reasons };
+  const noiseSignal = matchCountTierStrength(matchedPhrases.length);
+  const filterConfidence = deriveFilterConfidence({ isNoise, noiseSignal, realSignal });
+
+  let keepReason: string | undefined;
+  let noiseReason: string | undefined;
+  if (isNoise) {
+    noiseReason = `Classified as noise (archetype: "${noiseType}"); ${matchedPhrases.length} distinct noise phrase(s) matched: ${matchedPhrases.join(", ")}.`;
+  } else if (safetyValveRescue) {
+    keepReason = `Kept via safety valve: matches real category "${safetyValveRescue.category}" at confidence ${safetyValveRescue.confidence.toFixed(2)} >= ${NOISE_SAFETY_VALVE_MIN_CATEGORY_CONFIDENCE}, despite matching a noise-list phrase.`;
+  } else if (matchedPhrases.length === 0) {
+    keepReason = "No noise-list phrases matched any of the 12 noise archetypes.";
+  } else {
+    keepReason = `1 noise phrase matched ("${matchedPhrases[0]}") but title has ${singleMatchTitleWords} word(s), above the ${SINGLE_MATCH_MARKETING_TITLE_WORD_COUNT_THRESHOLD}-word single-match threshold — read as long-form content, not noise.`;
+  }
+
+  return { isNoise, noiseType, reasons, filterConfidence, keepReason, noiseReason };
 }
 
 export interface NoiseFilterResult {

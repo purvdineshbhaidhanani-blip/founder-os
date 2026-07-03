@@ -4,6 +4,21 @@ import { MemoryEngine } from "../../src/runtime/memory/engine.js";
 import { InMemoryStore } from "../../src/runtime/memory/store.js";
 import { ClusterRepository } from "../../src/problems/repository.js";
 import { ProblemIntelligenceEngine } from "../../src/problems/engine.js";
+import { flattenSessionItems, groupByCategory } from "../../src/problems/clustering.js";
+import { filterNoiseItems } from "../../src/problems/noise-filter.js";
+import {
+  countCrossSourceDuplicateGroups,
+  dedupeGroups,
+  findNearDuplicates,
+  findSemanticDuplicateGroups,
+} from "../../src/problems/near-duplicate.js";
+import { computeAverageEvidenceQuality } from "../../src/problems/evidence-quality.js";
+import { extractProblemWithConcepts } from "../../src/problems/extractor.js";
+import { buildClusterEvidence } from "../../src/problems/evidence.js";
+import { computeFrequency } from "../../src/problems/frequency.js";
+import { computeClusterConfidence } from "../../src/problems/confidence.js";
+import { deriveCauseChain } from "../../src/problems/concept.js";
+import { computeSeverity } from "../../src/problems/severity.js";
 import type { FounderReport, Opportunity, RawResearchItem, ResearchSession } from "../../src/research/types.js";
 
 class StubStorage {
@@ -370,9 +385,14 @@ describe("ProblemIntelligenceEngine.analyze", () => {
     expect(pricingCluster?.crossSourceDuplicateCount).toBe(0);
     expect(pricingCluster?.semanticDuplicateGroupCount).toBeUndefined();
 
+    // Part 1 (this loop, additive): symptoms — the raw, deduped trigger
+    // phrases matched for "pricing-complaint" across p1/p2/p3 ("too
+    // expensive" from p1; "overpriced" from both p2 and p3, deduped to one).
+    expect(pricingCluster?.symptoms).toEqual(["too expensive", "overpriced"]);
+
     // eslint-disable-next-line no-console
     console.log(
-      `[Loop 6 example] causeChain=${JSON.stringify(pricingCluster!.causeChain)}, severity=${pricingCluster!.severity!.severity}, groupingReason="${pricingCluster!.groupingReason}"`,
+      `[Loop 6 example] causeChain=${JSON.stringify(pricingCluster!.causeChain)}, severity=${pricingCluster!.severity!.severity}, groupingReason="${pricingCluster!.groupingReason}", symptoms=${JSON.stringify(pricingCluster!.symptoms)}`,
     );
   });
 
@@ -409,6 +429,144 @@ describe("ProblemIntelligenceEngine.analyze", () => {
     // eslint-disable-next-line no-console
     console.log(
       `[Loop 6 Part E example] crossSourceDuplicateCount=${bugCluster!.crossSourceDuplicateCount}, semanticDuplicateGroupCount=${bugCluster!.semanticDuplicateGroupCount}, conceptIds=${JSON.stringify(bugCluster!.semanticDuplicateConceptIds)}`,
+    );
+  });
+
+  it("Part 3 — a real analyzed cluster has all 11 conceptual OUTPUT fields populated with real, non-placeholder values", async () => {
+    const items: RawResearchItem[] = [
+      makeItem({ url: "https://example.com/c1", title: "This is so frustrating and I hate using this tool", sourceId: "reddit", author: "alice", engagement: 8 }),
+      makeItem({ url: "https://example.com/c2", title: "Terrible experience, hate it, awful all around", sourceId: "hackernews", author: "bob", engagement: 5 }),
+      makeItem({ url: "https://example.com/c3", title: "Absolutely awful, this is so frustrating too", sourceId: "hackernews", author: "carol", engagement: 2 }),
+    ];
+    const opportunities: Opportunity[] = [
+      { id: "opp_1", title: "Complaints", summary: "s", keywords: [], supportingItems: items, sourceIds: ["reddit", "hackernews"] },
+    ];
+    const session = makeSession(opportunities);
+    const { engine } = harness();
+
+    const report = await engine.analyze(session);
+    const cluster = report.clusters.find((c) => c.category === "complaint");
+    expect(cluster).toBeDefined();
+    const c = cluster!;
+
+    // 1. Canonical Problem
+    expect(c.normalizedStatement).toBe("Users express strong general frustration with the product.");
+    // 2. Root Cause
+    expect(c.rootCause).toBe("Poor UX");
+    // 3. Symptoms (Part 1, new) — real, deduped trigger phrases, not a placeholder.
+    expect(c.symptoms).toBeDefined();
+    expect(c.symptoms!.length).toBeGreaterThan(0);
+    expect(c.symptoms).toEqual(["hate", "frustrat", "so frustrating", "hate using this", "terrible", "awful"]);
+    // 4. Evidence Count
+    expect(c.evidence.evidenceCount).toBe(3);
+    // 5. Source Diversity
+    expect(c.frequency.uniqueSources).toBe(2);
+    // 6. Author Diversity
+    expect(c.frequency.uniqueAuthors).toBe(3);
+    // 7. Evidence Quality
+    expect(c.evidenceQualityScore).toBeGreaterThan(0);
+    expect(c.evidenceQualityScore).toBeLessThanOrEqual(1);
+    // 8. Confidence
+    expect(c.confidence.band).toBeDefined();
+    expect(c.confidence.score).toBeGreaterThan(0);
+    expect(c.confidence.explanation.length).toBeGreaterThan(0);
+    // 9. Representative Quotes
+    expect(c.evidence.representativeExamples.length).toBeGreaterThan(0);
+    // 10. Problem Type
+    expect(c.category).toBe("complaint");
+    // 11. Cluster Size (duplicate-adjusted, more accurate than raw evidenceCount)
+    expect(c.duplicateAdjustedEvidenceCount).toBe(3);
+
+    // eslint-disable-next-line no-console
+    console.log(
+      `[Part 3 example] normalizedStatement="${c.normalizedStatement}", rootCause="${c.rootCause}", symptoms=${JSON.stringify(c.symptoms)}, evidenceCount=${c.evidence.evidenceCount}, uniqueSources=${c.frequency.uniqueSources}, uniqueAuthors=${c.frequency.uniqueAuthors}, evidenceQualityScore=${c.evidenceQualityScore!.toFixed(3)}, confidence=${JSON.stringify(c.confidence)}, category="${c.category}", duplicateAdjustedEvidenceCount=${c.duplicateAdjustedEvidenceCount}`,
+    );
+  });
+
+  it("REGRESSION (Part 2 correctness proof): the new two-stage AI Problem Intelligence composition (ai-problem-intelligence.ts, called from the refactored engine.ts) produces a cluster IDENTICAL, field-for-field, to directly calling the exact OLD inline sequence of underlying functions — proving the refactor changed WHERE the logic lives, not WHAT it computes", async () => {
+    const now = Date.now();
+    const slowLaggyBody =
+      "The app is so slow and laggy, it takes too long to load every single time I open it and it feels completely broken, extremely frustrating";
+    const items: RawResearchItem[] = [
+      makeItem({ url: "https://example.com/rx1", title: "Slow app", body: slowLaggyBody, sourceId: "reddit", author: "a1", publishedAt: new Date(now).toISOString() }),
+      makeItem({ url: "https://example.com/rx2", title: "App feels laggy", body: slowLaggyBody, sourceId: "hackernews", author: "a2", publishedAt: new Date(now - 1 * DAY_MS).toISOString() }),
+      makeItem({
+        url: "https://example.com/rx3",
+        title: "Totally different report",
+        body: "the login page shows a timeout error whenever I try to sign in with sso enabled",
+        sourceId: "reddit",
+        author: "a3",
+        publishedAt: new Date(now - 2 * DAY_MS).toISOString(),
+      }),
+    ];
+    const opportunities: Opportunity[] = [
+      { id: "opp_1", title: "Bugs", summary: "s", keywords: [], supportingItems: items, sourceIds: ["reddit", "hackernews"] },
+    ];
+    const session = makeSession(opportunities);
+    const { engine } = harness();
+
+    // ---- ACTUAL: the real engine, using the refactored two-stage pipeline ----
+    const report = await engine.analyze(session);
+    const actual = report.clusters.find((c) => c.category === "bug");
+    expect(actual).toBeDefined();
+
+    // ---- EXPECTED: shadow-computed by calling the EXACT OLD inline sequence
+    // engine.ts used BEFORE this loop's Part 2 refactor — the very same
+    // functions, called in the very same order, on the very same inputs.
+    // Nothing here is new logic; it is the pre-refactor engine.ts code,
+    // reproduced verbatim to prove the refactor is behavior-preserving.
+    const rawItems = flattenSessionItems(session);
+    const { kept } = filterNoiseItems(rawItems);
+    const grouped = groupByCategory(kept);
+    const classifiedItems = grouped.get("bug")!;
+    const categoryItems = classifiedItems.map((c) => c.item);
+
+    const { groups: nearDuplicateGroups, duplicateCount } = findNearDuplicates(categoryItems);
+    const duplicateAdjustedEvidenceCount = dedupeGroups(nearDuplicateGroups).length;
+    const duplicateRatio = categoryItems.length > 0 ? duplicateCount / categoryItems.length : 0;
+    const evidenceQualityScore = computeAverageEvidenceQuality(categoryItems);
+    const extracted = extractProblemWithConcepts(classifiedItems[0]!, categoryItems, "bug");
+    const evidence = buildClusterEvidence(categoryItems);
+    const frequency = computeFrequency(categoryItems, session.windowDays);
+    const confidence = computeClusterConfidence(evidence, frequency, evidenceQualityScore, duplicateRatio);
+    const causeChain = extracted.rootCause ? deriveCauseChain(extracted.normalizedStatement, extracted.rootCause) : undefined;
+    const severity = computeSeverity({ category: "bug", rootCause: extracted.rootCause, frequency, classifiedItems });
+    const semanticDuplicateGroups = findSemanticDuplicateGroups(nearDuplicateGroups, "bug");
+    const crossSourceDuplicateCount = countCrossSourceDuplicateGroups(nearDuplicateGroups);
+    const groupingReason = extracted.dominantConceptId
+      ? `Grouped under concept "${extracted.dominantConceptId}" (${extracted.dominantConceptCount}/${categoryItems.length} item(s) in category "bug" matched its trigger phrases) — the dominant sub-concept for this cluster.`
+      : `No concept.ts sub-pattern matched any of this category's ${categoryItems.length} item(s); grouped under the fixed category-level fallback statement for "bug".`;
+
+    // Every field that existed BEFORE this loop must match exactly.
+    expect(actual!.category).toBe("bug");
+    expect(actual!.normalizedStatement).toBe(extracted.normalizedStatement);
+    expect(actual!.evidence).toEqual(evidence);
+    expect(actual!.frequency).toEqual(frequency);
+    expect(actual!.confidence).toEqual(confidence);
+    expect(actual!.rootCause).toEqual(extracted.rootCause);
+    expect(actual!.conceptBreakdown).toEqual(extracted.conceptBreakdown.length > 0 ? extracted.conceptBreakdown : undefined);
+    expect(actual!.duplicateAdjustedEvidenceCount).toBe(duplicateAdjustedEvidenceCount);
+    expect(actual!.evidenceQualityScore).toBe(evidenceQualityScore);
+    expect(actual!.causeChain).toEqual(causeChain);
+    expect(actual!.severity).toEqual(severity);
+    expect(actual!.crossSourceDuplicateCount).toBe(crossSourceDuplicateCount);
+    if (semanticDuplicateGroups.length > 0) {
+      expect(actual!.semanticDuplicateGroupCount).toBe(semanticDuplicateGroups.length);
+      expect(actual!.semanticDuplicateConceptIds).toEqual([...new Set(semanticDuplicateGroups.map((g) => g.conceptId))]);
+    } else {
+      expect(actual!.semanticDuplicateGroupCount).toBeUndefined();
+    }
+    expect(actual!.groupingReason).toBe(groupingReason);
+    expect(actual!.trending).toEqual(frequency.growth.label === "rising" ? true : undefined);
+
+    // The ONLY additive field beyond this exact old computation: `symptoms`
+    // (Part 1, new). Everything else above is byte-for-byte identical to
+    // the pre-refactor engine.ts's own inline computation.
+    expect(actual!.symptoms).toBeDefined();
+
+    // eslint-disable-next-line no-console
+    console.log(
+      `[Regression proof] actual cluster field count matches shadow-computed old-path cluster exactly (plus 1 new additive field: symptoms=${JSON.stringify(actual!.symptoms)}).`,
     );
   });
 });
