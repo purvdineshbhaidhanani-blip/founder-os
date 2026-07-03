@@ -201,7 +201,16 @@ describe("OpportunityEngine.analyze", () => {
     expect(topReport.opportunities.length).toBeGreaterThan(0);
     expect(topReport.opportunities.length).toBeLessThanOrEqual(10);
 
-    // sorted descending by weightedTotal
+    // sorted descending by fois.overall — the ranking key as of the FOIS
+    // migration (engine.ts:66). This fixture's weightedTotal order happens
+    // to coincide with its fois.overall order (see fois.test.ts for cases
+    // where they diverge), so the legacy weightedTotal-descending check
+    // below still holds and is kept as an extra invariant, not weakened.
+    for (let i = 1; i < topReport.opportunities.length; i += 1) {
+      expect(topReport.opportunities[i - 1]!.fois.overall).toBeGreaterThanOrEqual(
+        topReport.opportunities[i]!.fois.overall,
+      );
+    }
     for (let i = 1; i < topReport.opportunities.length; i += 1) {
       expect(topReport.opportunities[i - 1]!.scoreBreakdown.weightedTotal).toBeGreaterThanOrEqual(
         topReport.opportunities[i]!.scoreBreakdown.weightedTotal,
@@ -220,6 +229,11 @@ describe("OpportunityEngine.analyze", () => {
       expect(opp.competition).toBeDefined();
       expect(opp.confidence.band).toBeTruthy();
       expect(opp.scoreBreakdown).toBeDefined();
+      expect(opp.fois).toBeDefined();
+      expect(opp.fois.overall).toBeGreaterThanOrEqual(0);
+      expect(opp.fois.overall).toBeLessThanOrEqual(100);
+      expect(Array.isArray(opp.fois.dimensions)).toBe(true);
+      expect(opp.fois.dimensions.length).toBeGreaterThan(0);
       expect(opp.supportingEvidence.evidenceCount).toBeGreaterThan(0);
       expect(Array.isArray(opp.representativeQuotes)).toBe(true);
       expect(opp.recommendedMvp).toBeTruthy();
@@ -251,6 +265,7 @@ describe("OpportunityEngine.analyze", () => {
     expect(buyingIntentOpp).toBeDefined();
     expect(complaintOpp).toBeDefined();
     expect(buyingIntentOpp!.scoreBreakdown.weightedTotal).toBeGreaterThan(complaintOpp!.scoreBreakdown.weightedTotal);
+    expect(buyingIntentOpp!.fois.overall).toBeGreaterThan(complaintOpp!.fois.overall);
     expect(buyingIntentOpp!.buyingIntent.score).toBeGreaterThan(0);
 
     const praiseOpp = topReport.opportunities.find((o) => o.category === "praise");

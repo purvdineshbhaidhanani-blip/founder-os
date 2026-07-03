@@ -4,6 +4,7 @@ import type {
   BuildDifficultyResult,
   BuyingIntentResult,
   CompetitionResult,
+  FoisBreakdown,
   FounderOpportunityReport,
   OpportunityScoreBreakdown,
   PricingSignal,
@@ -26,6 +27,17 @@ function makeScoreBreakdown(weightedTotal: number): OpportunityScoreBreakdown {
     weightedTotal,
     explanation: "x",
   };
+}
+
+/**
+ * Minimal valid FoisBreakdown fixture for dedup tests, which only exercise
+ * dedupeOpportunities' URL-overlap/competitor-name logic and don't assert
+ * anything about FOIS itself — `fois` is here purely so the
+ * FounderOpportunityReport literal type-checks (see fois.test.ts for real
+ * FOIS behavior coverage).
+ */
+function makeFois(overall: number): FoisBreakdown {
+  return { overall, dimensions: [], reasons: [], weaknesses: [], penalties: [] };
 }
 
 function makeCompetition(names: string[]): CompetitionResult {
@@ -52,6 +64,7 @@ function makeReport(
     competition: makeCompetition([]),
     confidence: { band: "medium", score: 0.5 },
     scoreBreakdown: makeScoreBreakdown(weightedTotal),
+    fois: makeFois(Math.round(weightedTotal * 100)),
     supportingEvidence: { evidenceCount: 2, sourceBreakdown: {}, urls: [] },
     representativeQuotes: [],
     recommendedMvp: "x",

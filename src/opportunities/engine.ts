@@ -6,6 +6,7 @@ import { estimateBuildDifficulty } from "./difficulty.js";
 import { extractPricingSignal } from "./pricing.js";
 import { getRecommendedMvp, getTargetUsers } from "./mvp-template.js";
 import { computeOpportunityScore } from "./scoring.js";
+import { computeFois } from "./fois.js";
 import { decideRecommendation } from "./recommendation.js";
 import { dedupeOpportunities } from "./dedup.js";
 import type { OpportunityRepository } from "./repository.js";
@@ -63,7 +64,11 @@ export class OpportunityEngine {
       built.push(this.buildOpportunityReport(cluster, byCategory, session, problemReport));
     }
 
-    built.sort((a, b) => b.scoreBreakdown.weightedTotal - a.scoreBreakdown.weightedTotal);
+    // Ranking driver: Founder Opportunity Intelligence Score (fois.ts),
+    // replacing scoreBreakdown.weightedTotal per the Loop 2 mission.
+    // scoreBreakdown itself is left untouched for existing UI/export
+    // consumers.
+    built.sort((a, b) => b.fois.overall - a.fois.overall);
 
     // Final duplicate-opportunity safety net (Loop 4 Phase 3), run AFTER
     // ranking and BEFORE the Top-10 cut — see dedup.ts module doc for the
@@ -98,6 +103,7 @@ export class OpportunityEngine {
     const pricing = extractPricingSignal(rawItems);
     const scoreBreakdown = computeOpportunityScore({ cluster, buyingIntent, competition });
     const recommendation = decideRecommendation(scoreBreakdown, cluster, buyingIntent);
+    const fois = computeFois({ cluster, clusterItems, rawItems, buyingIntent, competition, pricing });
 
     const recommendedMvp = getRecommendedMvp(cluster.category);
     const topSourceId = topSourceIdOf(cluster.evidence.sourceBreakdown);
@@ -123,6 +129,7 @@ export class OpportunityEngine {
       competition,
       confidence: { band: cluster.confidence.band, score: cluster.confidence.score },
       scoreBreakdown,
+      fois,
       supportingEvidence: {
         evidenceCount: cluster.evidence.evidenceCount,
         sourceBreakdown: cluster.evidence.sourceBreakdown,
