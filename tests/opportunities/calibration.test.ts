@@ -10,6 +10,7 @@ import {
   defaultCalibration,
 } from "../../src/opportunities/calibration.js";
 import { defaultFounderIntelligence } from "../../src/opportunities/founder-intelligence.js";
+import { defaultAiDecisionValidation } from "../../src/opportunities/ai-decision-validation.js";
 import { ArtifactManager } from "../../src/runtime/artifacts/manager.js";
 import { MemoryEngine } from "../../src/runtime/memory/engine.js";
 import { InMemoryStore } from "../../src/runtime/memory/store.js";
@@ -507,5 +508,6 @@ function zeroSourceReportFixture() {
     semanticCluster: { canonicalTitle: "x", aliases: [], mentionCount: 1, supportingSources: [], mergedCount: 1 },
     calibration: defaultCalibration(),
     founderIntelligence: defaultFounderIntelligence(),
+    aiDecisionValidation: defaultAiDecisionValidation(),
   };
 }

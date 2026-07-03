@@ -13,6 +13,7 @@ import { buildFounderDecision } from "./decision.js";
 import { mergeSynonymOpportunities } from "./semantic.js";
 import { attachCalibration, computeAggregateCalibration, defaultCalibration } from "./calibration.js";
 import { attachFounderIntelligence, defaultFounderIntelligence } from "./founder-intelligence.js";
+import { attachAiDecisionValidation, defaultAiDecisionValidation } from "./ai-decision-validation.js";
 import type { OpportunityRepository } from "./repository.js";
 import type { ProblemCluster, ProblemIntelligenceReport } from "../problems/types.js";
 import type { ResearchSession } from "../research/types.js";
@@ -103,7 +104,14 @@ export class OpportunityEngine {
     // AFTER attachCalibration so every input it reads off each report
     // (decision, calibration, fois, ...) is the REAL, final value, never a
     // placeholder. Read-only: never re-sorts or re-scores the shipped list.
-    const opportunities = attachFounderIntelligence(calibrated, problemReport.clusters);
+    const withFounderIntelligence = attachFounderIntelligence(calibrated, problemReport.clusters);
+
+    // Loop 8 — AI Decision Validation layer (ai-decision-validation.ts), run
+    // LAST, AFTER attachFounderIntelligence, so every input it reads off
+    // each report (decision, founderIntelligence, fois, calibration) is the
+    // REAL, final value, never a placeholder. Read-only: never re-sorts or
+    // re-scores the shipped list, never mutates any prior field.
+    const opportunities = attachAiDecisionValidation(withFounderIntelligence, problemReport.clusters);
 
     const report: TopOpportunitiesReport = {
       id: generateId("opportunity-report"),
@@ -216,6 +224,12 @@ export class OpportunityEngine {
       // every surviving report in `analyze` below, run AFTER
       // attachCalibration. See defaultFounderIntelligence's doc.
       founderIntelligence: defaultFounderIntelligence(),
+      // Trivial, type-valid placeholder — always overwritten by
+      // `attachAiDecisionValidation` (ai-decision-validation.ts, Loop 8) for
+      // every surviving report in `analyze` below, run AFTER
+      // attachFounderIntelligence (the last step in the pipeline). See
+      // defaultAiDecisionValidation's doc.
+      aiDecisionValidation: defaultAiDecisionValidation(),
     };
 
     return report;

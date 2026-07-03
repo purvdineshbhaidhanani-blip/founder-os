@@ -7,6 +7,7 @@ import {
   estimateCompetitionPressure,
   estimateMarketMaturity,
 } from "../../src/opportunities/founder-intelligence.js";
+import { defaultAiDecisionValidation } from "../../src/opportunities/ai-decision-validation.js";
 import type {
   BuildDifficultyResult,
   BuyingIntentResult,
@@ -560,6 +561,7 @@ describe("defaultFounderIntelligence + attachFounderIntelligence", () => {
       semanticCluster: { canonicalTitle: "x", aliases: [], mentionCount: 5, supportingSources: [], mergedCount: 1 },
       calibration: makeCalibration(),
       founderIntelligence: defaultFounderIntelligence(),
+      aiDecisionValidation: defaultAiDecisionValidation(),
     };
 
     const [attached] = attachFounderIntelligence([report], [cluster]);
@@ -607,6 +609,7 @@ describe("defaultFounderIntelligence + attachFounderIntelligence", () => {
       semanticCluster: { canonicalTitle: "x", aliases: [], mentionCount: 5, supportingSources: [], mergedCount: 1 },
       calibration: makeCalibration(),
       founderIntelligence: defaultFounderIntelligence(),
+      aiDecisionValidation: defaultAiDecisionValidation(),
     };
 
     const [attached] = attachFounderIntelligence([report], [cluster]);

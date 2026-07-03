@@ -167,6 +167,16 @@ export interface FounderOpportunityReport {
    * `attachCalibration`).
    */
   founderIntelligence: FounderIntelligence;
+  /**
+   * Loop 8 AI Decision Validation bundle (see ai-decision-validation.ts) —
+   * a read-only adversarial-review/explainability layer over `decision`,
+   * `founderIntelligence`, `fois`, and `calibration`. Additive: every field
+   * above is left untouched for existing UI/export consumers. Always
+   * populated on every report in the shipped `opportunities` list (see
+   * engine.ts's `attachAiDecisionValidation` call, run after
+   * `attachFounderIntelligence`, the last step in the pipeline).
+   */
+  aiDecisionValidation: AiDecisionValidation;
 }
 
 export interface TopOpportunitiesReport {
@@ -645,6 +655,193 @@ export interface FounderIntelligence {
   competitionPressure: CompetitionPressureResult;
   differentiationStrategies: DifferentiationStrategy[];
   risks: FounderIntelligenceRisk[];
+}
+
+/* ---------------------------------------------------------------------- */
+/* Loop 8 — AI Decision Validation layer (ai-decision-validation.ts)      */
+/* ---------------------------------------------------------------------- */
+
+/**
+ * Module 1 — Decision Reasoning. A COMPOSITION of fields already computed on
+ * the source `ProblemCluster` (`normalizedStatement`, `rootCause`,
+ * `causeChain`, `frequency.growth`) plus `FounderIntelligence.marketGaps` —
+ * never a new scan, never an invented fact. See ai-decision-validation.ts
+ * Module 1 for the exact per-field derivation.
+ */
+export interface AiDecisionReasoning {
+  actualBusinessProblem: string;
+  whyExists: string;
+  whyCurrentSolutionsFailing: string;
+  /** Reused verbatim from `decision.reasoning`'s own field values — never regenerated. */
+  evidenceSupporting: string[];
+  /** Fired `decision.qualityGates` + `fois.weaknesses` + fired `calibration.diagnostics`, reused verbatim. */
+  evidenceWeakening: string[];
+  /** From `cluster.frequency.growth.label`: rising/stable -> "recurring", declining -> "temporary", insufficient-data -> "unknown". */
+  painTemporaryOrRecurring: "temporary" | "recurring" | "unknown";
+}
+
+/**
+ * Module 2 — Counter-Evidence Engine. Exactly 5 fixed, always-present claims
+ * (fired or not), each a deliberately adversarial reframing of an
+ * ALREADY-COMPUTED signal — never a new scan. This is the mission's explicit
+ * "never assume BUILD" mechanism.
+ */
+export interface AiCounterEvidenceClaim {
+  claim:
+    | "problem is exaggerated"
+    | "market already saturated"
+    | "users solved it manually"
+    | "competitors already dominate"
+    | "demand may be temporary";
+  fired: boolean;
+  reason: string;
+}
+
+/**
+ * Module 3 — BUILD/WATCH/IGNORE Validation. `validatedRecommendation`
+ * mirrors `decision.recommendation.verdict` by default; the ONLY override is
+ * an asymmetric, documented BUILD -> WATCH downgrade (see
+ * `COUNTER_EVIDENCE_DOWNGRADE_THRESHOLD` in ai-decision-validation.ts) — this
+ * engine never upgrades a verdict and never downgrades WATCH -> IGNORE.
+ */
+export interface AiValidationResult {
+  validatedRecommendation: FounderDecisionVerdict;
+  validationReason: string;
+  /** <= 0, see ai-decision-validation.ts's CONFIDENCE_ADJUSTMENT_PER_FIRED_CLAIM formula. Does not mutate `decision.confidence.score`. */
+  confidenceAdjustment: number;
+}
+
+/**
+ * Module 4 — Founder Risk Engine. Fixed 8-item taxonomy, ALWAYS all 8
+ * present. 5 of the 8 (Market/Competition/Execution/Technical/Platform Risk)
+ * are REUSED as-is from `founderIntelligence.risks` (converted to a 0-100
+ * score via a fixed severity->score table) rather than duplicated; the other
+ * 3 (Distribution/Monetization/Timing Risk) are genuinely new, freshly
+ * computed from already-attached fields. See ai-decision-validation.ts Module 4.
+ */
+export type AiFounderRiskName =
+  | "Market Risk"
+  | "Competition Risk"
+  | "Execution Risk"
+  | "Technical Risk"
+  | "Distribution Risk"
+  | "Monetization Risk"
+  | "Timing Risk"
+  | "Platform Risk";
+
+export interface AiFounderRisk {
+  risk: AiFounderRiskName;
+  score: number; // 0-100
+  reason: string;
+  supportingEvidence: string[];
+}
+
+/**
+ * Module 5 — Founder Opportunity Engine. A COMPOSITION/extension of
+ * `founderIntelligence.founderOpportunity` + `marketGaps` — never a new
+ * customer-research pass.
+ */
+export interface AiFounderOpportunityProfile {
+  idealCustomerProfile: string;
+  whoShouldNotBeTargeted: string;
+  earlyAdopterProfile: string;
+  /** = `cluster.normalizedStatement`, reused verbatim. */
+  corePain: string;
+  /** Top `founderIntelligence.marketGaps` by evidenceCount, capped — see TOP_MVP_FEATURE_CAP. */
+  topMvpFeatures: string[];
+  /** Empty array (with the reason documented in code, per the "never invent" quality gate) when no real high-complexity signal exists. */
+  featuresToAvoid: string[];
+  suggestedLaunchStrategy: string;
+}
+
+export type PricingConfidence = "high" | "medium" | "low" | "not-verified";
+/** "not-verified" is the honest default absent a real signal — see Module 10's quality-gate philosophy. */
+export type MonetizationSupportLabel = "supported" | "unsupported" | "not-verified";
+
+/**
+ * Module 6 — Monetization Reasoning. `possiblePricing` NEVER invents a
+ * dollar figure: when no comparable pricing evidence exists, it contains the
+ * literal string "NOT VERIFIED" instead of a fabricated number.
+ */
+export interface AiMonetizationReasoning {
+  possiblePricing: string;
+  pricingConfidence: PricingConfidence;
+  pricingAssumptions: string[];
+  subscriptionViability: MonetizationSupportLabel;
+  enterprisePotential: MonetizationSupportLabel;
+}
+
+/**
+ * Module 7 — AI Confidence Review. `originalScore` is a read-only COPY of
+ * `decision.confidence.score` (0-100 scale, unmodified). `adjustedScore` is
+ * a NEW, separately-scaled 0-1 normalized view (`originalScore/100 +
+ * confidenceAdjustment`, clamped 0-1) — this field never mutates
+ * `decision.confidence` itself. Never increases confidence, only reduces or
+ * leaves it as-is ("justified").
+ */
+export interface AiConfidenceReview {
+  originalScore: number;
+  adjustedScore: number;
+  adjustment: number;
+  verdict: "justified" | "reduced";
+  reason: string;
+}
+
+/**
+ * Module 8 — Decision Explainability. Every field is composed from real,
+ * already-cited strings/values produced by Modules 1-7 — never new free text
+ * generation.
+ */
+export interface AiDecisionExplainability {
+  whyBuild: string;
+  whyWait: string;
+  whyIgnore: string;
+  evidenceThatMattersMost: string;
+  evidenceMissing: string;
+  whatCouldChangeThis: string;
+}
+
+/**
+ * Module 9 — Final Founder Recommendation, the top-level return of the
+ * whole AI Decision Validation module. `executiveSummary` is a
+ * TEMPLATE-composed string (never free-text generation) citing real numbers
+ * already computed elsewhere on the report.
+ */
+export interface FinalFounderRecommendation {
+  executiveSummary: string;
+  recommendedAction: FounderDecisionVerdict;
+  evidenceSummary: string;
+  businessOpportunity: string;
+  risks: AiFounderRisk[];
+  recommendedMvp: string[];
+  suggestedPricingDirection: string;
+  goToMarketDirection: string;
+  /** Aggregate of every "NOT VERIFIED"/"unknown" signal surfaced across Modules 1-7. */
+  unknowns: string[];
+  nextValidationSteps: string[];
+}
+
+/**
+ * Loop 8 — AI Decision Validation bundle (ai-decision-validation.ts). A
+ * READ-ONLY composition/adversarial-review layer over `decision`,
+ * `founderIntelligence`, `fois`, and `calibration` — all already attached
+ * earlier in the same report-construction pipeline. No LLM call, no re-scan
+ * of raw evidence items, no re-derivation of clustering/FOIS/decision/
+ * calibration/founderIntelligence. Nothing here alters any of those fields
+ * or the report's rank. Attached to every report in the shipped
+ * `opportunities` list by `attachAiDecisionValidation`, run in engine.ts
+ * AFTER `attachFounderIntelligence` (the last step in the pipeline).
+ */
+export interface AiDecisionValidation {
+  decisionReasoning: AiDecisionReasoning;
+  counterEvidence: AiCounterEvidenceClaim[];
+  validation: AiValidationResult;
+  risks: AiFounderRisk[];
+  founderOpportunity: AiFounderOpportunityProfile;
+  monetization: AiMonetizationReasoning;
+  reviewedConfidence: AiConfidenceReview;
+  explainability: AiDecisionExplainability;
+  finalRecommendation: FinalFounderRecommendation;
 }
 
 /** Referenced for downstream typing convenience — re-exported for callers. */

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { dedupeOpportunities } from "../../src/opportunities/dedup.js";
 import { defaultCalibration } from "../../src/opportunities/calibration.js";
 import { defaultFounderIntelligence } from "../../src/opportunities/founder-intelligence.js";
+import { defaultAiDecisionValidation } from "../../src/opportunities/ai-decision-validation.js";
 import type {
   BuildDifficultyResult,
   BuyingIntentResult,
@@ -125,6 +126,7 @@ function makeReport(
     semanticCluster,
     calibration: defaultCalibration(),
     founderIntelligence: defaultFounderIntelligence(),
+    aiDecisionValidation: defaultAiDecisionValidation(),
     ...rest,
   };
 }
