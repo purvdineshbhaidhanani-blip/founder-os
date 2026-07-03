@@ -345,6 +345,48 @@ code {
   margin-bottom: 1.5rem;
 }
 
+.auth-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin: 1.25rem 0;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid var(--border);
+}
+
+.auth-divider::before {
+  margin-right: 0.75rem;
+}
+
+.auth-divider::after {
+  margin-left: 0.75rem;
+}
+
+.auth-google-button {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  padding: 0.6rem 1rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.auth-google-button:hover {
+  background: #eef1f8;
+}
+
 .run-research-action {
   margin-top: 0.75rem;
 }

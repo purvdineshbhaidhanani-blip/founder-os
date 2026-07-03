@@ -6,6 +6,13 @@ const logger = createLogger("server.session");
 export interface SessionPayload {
   email: string;
   issuedAt: number;
+  /**
+   * Which login method produced this session. Optional and additive: older
+   * sessions (or any code path that doesn't set it) simply omit it, and
+   * every existing consumer only ever reads `.email`/`.issuedAt`, so this
+   * cannot break anything already relying on `SessionPayload`.
+   */
+  provider?: "founder" | "google";
 }
 
 /**
@@ -99,4 +106,24 @@ export function buildSessionCookieHeader(cookieValue: string): string {
 
 export function buildClearSessionCookieHeader(): string {
   return `${SESSION_COOKIE_NAME}=; HttpOnly; Path=/; SameSite=Lax; Max-Age=0`;
+}
+
+/**
+ * Name of the short-lived cookie carrying the CSRF `state` token for the
+ * Google OAuth authorization-code dance. Separate from `founder_session` —
+ * it never carries identity, only a random token to be compared back on the
+ * callback request.
+ */
+export const OAUTH_STATE_COOKIE = "google_oauth_state";
+
+/** Builds the `Set-Cookie` header for the 5-minute-lived OAuth `state` cookie. */
+export function buildOAuthStateCookieHeader(stateValue: string): string {
+  const attrs = ["HttpOnly", "Path=/", "SameSite=Lax", `Max-Age=${60 * 5}`];
+  if (process.env.NODE_ENV === "production") attrs.push("Secure");
+  return `${OAUTH_STATE_COOKIE}=${encodeURIComponent(stateValue)}; ${attrs.join("; ")}`;
+}
+
+/** Builds the `Set-Cookie` header that immediately expires the OAuth `state` cookie. */
+export function buildClearOAuthStateCookieHeader(): string {
+  return `${OAUTH_STATE_COOKIE}=; HttpOnly; Path=/; SameSite=Lax; Max-Age=0`;
 }

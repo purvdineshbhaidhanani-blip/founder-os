@@ -1,7 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { login } from "../api/client";
 import { useAuth } from "../router";
+
+const OAUTH_ERROR_MESSAGES: Record<string, string> = {
+  oauth_state_mismatch: "Google sign-in failed (security check did not match). Please try again.",
+  oauth_failed: "Google sign-in failed. Please try again.",
+};
 
 export default function Login(): React.ReactElement {
   const [email, setEmail] = useState("");
@@ -13,6 +18,17 @@ export default function Login(): React.ReactElement {
   const { refresh } = useAuth();
 
   const from = (location.state as { from?: Location } | null)?.from ?? "/dashboard";
+
+  // The Google OAuth callback (server-side full-page redirect) reports
+  // failures back to this page via a `?error=` query param — surface it in
+  // the same error banner the founder-login form already uses.
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const errorCode = params.get("error");
+    if (errorCode && OAUTH_ERROR_MESSAGES[errorCode]) {
+      setError(OAUTH_ERROR_MESSAGES[errorCode]);
+    }
+  }, [location.search]);
 
   const handleSubmit = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
@@ -60,6 +76,20 @@ export default function Login(): React.ReactElement {
         <button type="submit" disabled={submitting}>
           {submitting ? "Signing in..." : "Sign in"}
         </button>
+
+        <div className="auth-divider">or</div>
+
+        {/*
+          Plain server-navigated link, not a fetch/JS call — the OAuth flow
+          is a full-page redirect dance (browser -> Google -> our server
+          callback -> browser), so this must be a real navigation that
+          carries the session cookie the same way `getPipelineExportUrl` in
+          web/src/api/client.ts documents for a similar server-redirect
+          pattern.
+        */}
+        <a href="/api/auth/google" className="auth-google-button">
+          Continue with Google
+        </a>
       </form>
     </div>
   );

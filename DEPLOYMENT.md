@@ -23,6 +23,21 @@ descriptions reflect the actual code, not assumptions.
 | `FOUNDER_EMAIL` | **Required** | Login is disabled. `POST /api/auth/login` logs `"FOUNDER_EMAIL / FOUNDER_PASSWORD not configured"` and returns **HTTP 500** (`"Login is not configured on this server."`). No one can authenticate, so the dashboard and research features are unreachable. (`src/server/routes/auth.ts`) |
 | `FOUNDER_PASSWORD` | **Required** | Same as above — login returns HTTP 500 until both `FOUNDER_EMAIL` and `FOUNDER_PASSWORD` are set. (`src/server/routes/auth.ts`) |
 
+### Optional — Google Sign-In (second, additional login method)
+
+Google Sign-In is a second, additive login method alongside founder
+email/password — it does not replace it, and founder login works identically
+whether or not these variables are set. There is still no database or user
+table: a successful Google sign-in issues the exact same stateless,
+HMAC-signed session cookie the founder login issues, just carrying the
+Google-verified email instead of the founder email.
+
+| Variable | Required | Behavior if missing |
+| --- | --- | --- |
+| `GOOGLE_CLIENT_ID` | Optional (required for Google Sign-In) | If unset, `GET /api/auth/google` logs `"GOOGLE_CLIENT_ID not configured"` and returns **HTTP 500** (`{"error": "Google Sign-In is not configured on this server."}`) instead of redirecting to a broken consent screen. Founder login is completely unaffected. (`src/server/routes/auth.ts`) |
+| `GOOGLE_CLIENT_SECRET` | Optional (required alongside `GOOGLE_CLIENT_ID`) | Required by `GET /api/auth/google/callback` to exchange the authorization code for a token. If unset, the callback redirects to `/login?error=oauth_failed` and logs the misconfiguration server-side. (`src/server/routes/auth.ts`) |
+| `GOOGLE_REDIRECT_URI` | Optional | Defaults to `http://localhost:{PORT}/api/auth/google/callback` (same "sensible default, explicit override" pattern `PORT` itself uses). **Must be set explicitly in production** to the real public callback URL, and must exactly match the redirect URI registered in the Google Cloud Console OAuth client, or Google will reject the exchange. (`src/server/routes/auth.ts`) |
+
 ### Strongly recommended for production
 
 | Variable | Required | Behavior if missing |

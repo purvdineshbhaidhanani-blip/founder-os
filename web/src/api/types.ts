@@ -12,6 +12,8 @@
 
 export interface AuthUser {
   email: string;
+  /** Which login method produced the current session ("founder" or "google"). Optional/additive — purely informational. */
+  provider?: "founder" | "google";
 }
 
 export interface LoginResponse {
