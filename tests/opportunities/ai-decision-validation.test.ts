@@ -816,6 +816,109 @@ describe("Module 10 — Quality Gates", () => {
 });
 
 /* -------------------------------------------------------------------- */
+/* Module 11 — Self Review                                               */
+/* -------------------------------------------------------------------- */
+
+describe("Module 11 — Self Review", () => {
+  it("a fully clean fixture (no not-verified signals, no high risks, no confidence reduction) reports all 4 checks consistent, internallyConsistent=true", () => {
+    const cluster = makeCluster({ category: "complaint" });
+    const founderIntelligence = makeFounderIntelligence({
+      competitorIntelligence: {
+        ...makeFounderIntelligence().competitorIntelligence,
+        pricingEvidence: makePricing([20, 40]),
+        competitorConfidence: "medium",
+        enterpriseVsSmb: "smb",
+      },
+    });
+    const result = compute({ cluster, founderIntelligence, buyingIntent: makeBuyingIntent(0.3) });
+
+    expect(result.finalRecommendation.unknowns).toEqual([]);
+    expect(result.reviewedConfidence.verdict).toBe("justified");
+    expect(result.validation.validatedRecommendation).toBe("BUILD");
+    expect(result.selfReview.checks).toHaveLength(4);
+    expect(result.selfReview.checks.every((c) => c.consistent)).toBe(true);
+    expect(result.selfReview.internallyConsistent).toBe(true);
+    for (const check of result.selfReview.checks) {
+      expect(check.detail.length).toBeGreaterThan(0);
+    }
+  });
+
+  it("fires 'BUILD verdict vs high-scoring risks' when validatedRecommendation=BUILD and >= 2 risks score >= 85, citing the exact risk names/scores", () => {
+    const cluster = makeCluster({ category: "complaint" });
+    const founderIntelligence = makeFounderIntelligence({
+      risks: DEFAULT_RISKS.map((r) => (r.risk === "Technical Risk" || r.risk === "Platform Risk" ? { ...r, severity: "high" as const } : r)),
+    });
+    const result = compute({ cluster, founderIntelligence });
+
+    expect(result.validation.validatedRecommendation).toBe("BUILD");
+    const highRiskCheck = result.selfReview.checks.find((c) => c.check === "BUILD verdict vs high-scoring risks")!;
+    expect(highRiskCheck.consistent).toBe(false);
+    expect(highRiskCheck.detail).toContain("Technical Risk=85");
+    expect(highRiskCheck.detail).toContain("Platform Risk=85");
+    expect(result.selfReview.internallyConsistent).toBe(false);
+  });
+
+  it("fires 'subscriptionViability vs pricingConfidence' when subscriptionViability=supported but pricingConfidence=not-verified", () => {
+    const cluster = makeCluster({ category: "complaint" });
+    const founderIntelligence = makeFounderIntelligence({
+      competitorIntelligence: { ...makeFounderIntelligence().competitorIntelligence, pricingEvidence: null },
+    });
+    const result = compute({ cluster, founderIntelligence, buyingIntent: makeBuyingIntent(0.8) });
+
+    expect(result.monetization.subscriptionViability).toBe("supported");
+    expect(result.monetization.pricingConfidence).toBe("not-verified");
+    const monetizationCheck = result.selfReview.checks.find((c) => c.check === "monetization.subscriptionViability vs monetization.pricingConfidence")!;
+    expect(monetizationCheck.consistent).toBe(false);
+    expect(monetizationCheck.detail).toContain('subscriptionViability="supported"');
+    expect(monetizationCheck.detail).toContain('pricingConfidence="not-verified"');
+  });
+
+  it("fires 'confidenceAdjustment vs recommendedAction' when confidence was reduced (1 fired claim, below the 2-claim downgrade threshold) but recommendedAction stays BUILD", () => {
+    const cluster = makeCluster({ category: "complaint", rootCause: "Missing Integration" });
+    const decision = makeDecision({ recommendation: { verdict: "BUILD", justification: "x", primaryRisk: "x", primaryOpportunity: "x" } });
+    const founderIntelligence = makeFounderIntelligence({
+      marketMaturity: { maturity: "saturated", reasons: ["x"] }, // fires exactly 1 counter-evidence claim
+      competitionPressure: { pressure: "low", explanation: "x" },
+    });
+    const result = compute({ cluster, decision, founderIntelligence, calibration: makeCalibration({ falsePositive: { likely: false, reasons: [] } }) });
+
+    expect(result.counterEvidence.filter((c) => c.fired)).toHaveLength(1);
+    expect(result.validation.confidenceAdjustment).toBeLessThan(0);
+    expect(result.validation.validatedRecommendation).toBe("BUILD");
+    expect(result.finalRecommendation.recommendedAction).toBe("BUILD");
+    const adjustmentCheck = result.selfReview.checks.find((c) => c.check === "validation.confidenceAdjustment vs finalRecommendation.recommendedAction")!;
+    expect(adjustmentCheck.consistent).toBe(false);
+    expect(adjustmentCheck.detail).toContain("confidenceAdjustment=-0.10");
+    expect(adjustmentCheck.detail).toContain('recommendedAction="BUILD"');
+  });
+
+  it("fires 'unknowns vs reviewedConfidence.verdict' when unknowns are non-empty but reviewedConfidence.verdict=justified (0 fired claims)", () => {
+    const cluster = makeCluster({
+      category: "complaint",
+      frequency: { mentions: 5, uniqueAuthors: 3, uniqueSources: 2, engagementTotal: 5, growth: { label: "insufficient-data", recentHalfCount: 0, earlierHalfCount: 0, ratio: null } },
+    });
+    const result = compute({ cluster }); // default founderIntelligence has pricingEvidence=null -> pricingConfidence unknown too
+
+    expect(result.finalRecommendation.unknowns.length).toBeGreaterThan(0);
+    expect(result.reviewedConfidence.verdict).toBe("justified");
+    const unknownsCheck = result.selfReview.checks.find((c) => c.check === "finalRecommendation.unknowns vs reviewedConfidence.verdict")!;
+    expect(unknownsCheck.consistent).toBe(false);
+    expect(unknownsCheck.detail).toContain(`finalRecommendation.unknowns has ${result.finalRecommendation.unknowns.length} item(s)`);
+    expect(unknownsCheck.detail).toContain('reviewedConfidence.verdict="justified"');
+  });
+
+  it("never mutates validation/risks/monetization/reviewedConfidence/finalRecommendation — purely reports on them", () => {
+    const cluster = makeCluster({ category: "complaint" });
+    const founderIntelligence = makeFounderIntelligence({
+      risks: DEFAULT_RISKS.map((r) => (r.risk === "Technical Risk" || r.risk === "Platform Risk" ? { ...r, severity: "high" as const } : r)),
+    });
+    const result = compute({ cluster, founderIntelligence });
+    expect(result.validation.validatedRecommendation).toBe("BUILD"); // unchanged despite self-review firing
+    expect(result.finalRecommendation.recommendedAction).toBe("BUILD");
+  });
+});
+
+/* -------------------------------------------------------------------- */
 /* defaultAiDecisionValidation + attachAiDecisionValidation wiring        */
 /* -------------------------------------------------------------------- */
 
@@ -827,6 +930,8 @@ describe("defaultAiDecisionValidation + attachAiDecisionValidation", () => {
     expect(placeholder.validation.validatedRecommendation).toBe("IGNORE");
     expect(placeholder.monetization.pricingConfidence).toBe("not-verified");
     expect(placeholder.reviewedConfidence.verdict).toBe("justified");
+    expect(placeholder.selfReview.checks).toEqual([]);
+    expect(placeholder.selfReview.internallyConsistent).toBe(true);
   });
 
   function makeMinimalReport(overrides: Partial<FounderOpportunityReport> & { id: string; clusterId: string }): FounderOpportunityReport {
@@ -884,6 +989,7 @@ describe("defaultAiDecisionValidation + attachAiDecisionValidation", () => {
     const [attached] = attachAiDecisionValidation([report], [cluster]);
     expect(attached!.aiDecisionValidation.risks).toHaveLength(8);
     expect(attached!.aiDecisionValidation).not.toEqual(defaultAiDecisionValidation());
+    expect(attached!.aiDecisionValidation.selfReview.checks).toHaveLength(4);
   });
 
   it("falls back to the existing (placeholder) report, not a crash, when clusterId has no matching cluster", () => {

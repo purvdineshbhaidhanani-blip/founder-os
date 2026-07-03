@@ -9,6 +9,8 @@ import type {
   AiFounderRisk,
   AiFounderRiskName,
   AiMonetizationReasoning,
+  AiSelfReview,
+  AiSelfReviewCheck,
   AiValidationResult,
   BuildDifficultyResult,
   BuyingIntentResult,
@@ -687,6 +689,94 @@ function buildFinalRecommendation(params: {
 }
 
 /* ======================================================================= */
+/* Module 11 — Self Review (self-consistency / internal-contradiction check) */
+/* ======================================================================= */
+
+/**
+ * Any risk score >= this counts as "high" for the self-review's
+ * contradiction checks — mirrors `RISK_SEVERITY_SCORE.high` (85) exactly,
+ * the same fixed severity->score table Module 4 already uses. Not a new
+ * threshold, a documented reuse of an existing one.
+ */
+const SELF_REVIEW_HIGH_RISK_SCORE_FLOOR = RISK_SEVERITY_SCORE.high;
+/** Named, documented threshold: >= this many high-scoring risks alongside a BUILD verdict is flagged as a contradiction. */
+const SELF_REVIEW_HIGH_RISK_COUNT_THRESHOLD = 2;
+
+/**
+ * Module 11 — a fixed, documented set of self-consistency checks over
+ * fields Modules 1-9 have ALREADY computed (no new data, no re-derivation).
+ * Every check's `detail` cites the exact field values compared. This is a
+ * READ-ONLY diagnostic: firing a check never mutates `validation`, `risks`,
+ * `monetization`, `reviewedConfidence`, or `finalRecommendation` — it only
+ * reports on them, mirroring calibration.ts's diagnostics/decision.ts's
+ * quality-gates philosophy of always-present, fired-or-not transparency.
+ */
+function buildSelfReview(params: {
+  validation: AiValidationResult;
+  risks: AiFounderRisk[];
+  monetization: AiMonetizationReasoning;
+  finalRecommendation: FinalFounderRecommendation;
+  reviewedConfidence: AiConfidenceReview;
+}): AiSelfReview {
+  const { validation, risks, monetization, finalRecommendation, reviewedConfidence } = params;
+  const checks: AiSelfReviewCheck[] = [];
+
+  // Check 1: validatedRecommendation="BUILD" while >= 2 risks score high.
+  const highRisks = risks.filter((r) => r.score >= SELF_REVIEW_HIGH_RISK_SCORE_FLOOR);
+  const buildWithHighRisks = validation.validatedRecommendation === "BUILD" && highRisks.length >= SELF_REVIEW_HIGH_RISK_COUNT_THRESHOLD;
+  checks.push({
+    check: "BUILD verdict vs high-scoring risks",
+    consistent: !buildWithHighRisks,
+    detail: `validation.validatedRecommendation="${validation.validatedRecommendation}" vs ${highRisks.length} risk(s) scoring >= ${SELF_REVIEW_HIGH_RISK_SCORE_FLOOR}/100 (${
+      highRisks.map((r) => `${r.risk}=${r.score}`).join(", ") || "none"
+    }) -> ${
+      buildWithHighRisks
+        ? `contradiction: a BUILD verdict alongside >= ${SELF_REVIEW_HIGH_RISK_COUNT_THRESHOLD} high-scoring risk(s) warrants a second look before committing.`
+        : "no contradiction."
+    }`,
+  });
+
+  // Check 2: monetization.subscriptionViability="supported" while monetization.pricingConfidence="not-verified".
+  const subscriptionPricingContradiction = monetization.subscriptionViability === "supported" && monetization.pricingConfidence === "not-verified";
+  checks.push({
+    check: "monetization.subscriptionViability vs monetization.pricingConfidence",
+    consistent: !subscriptionPricingContradiction,
+    detail: `monetization.subscriptionViability="${monetization.subscriptionViability}" vs monetization.pricingConfidence="${monetization.pricingConfidence}" -> ${
+      subscriptionPricingContradiction
+        ? 'contradiction: subscription viability is "supported" but no pricing evidence exists to back a confidence rating.'
+        : "no contradiction."
+    }`,
+  });
+
+  // Check 3: validation was downgraded (confidenceAdjustment < 0) while finalRecommendation.recommendedAction is still the fully optimistic BUILD verdict.
+  const reducedButStillBuild = validation.confidenceAdjustment < 0 && finalRecommendation.recommendedAction === "BUILD";
+  checks.push({
+    check: "validation.confidenceAdjustment vs finalRecommendation.recommendedAction",
+    consistent: !reducedButStillBuild,
+    detail: `validation.confidenceAdjustment=${validation.confidenceAdjustment.toFixed(2)} vs finalRecommendation.recommendedAction="${finalRecommendation.recommendedAction}" -> ${
+      reducedButStillBuild
+        ? "contradiction: confidence was reduced by fired counter-evidence, yet the recommended action remains the fully optimistic BUILD verdict."
+        : "no contradiction."
+    }`,
+  });
+
+  // Check 4: finalRecommendation.unknowns is non-empty while reviewedConfidence.verdict="justified" (no reduction applied).
+  const unknownsButJustified = finalRecommendation.unknowns.length > 0 && reviewedConfidence.verdict === "justified";
+  checks.push({
+    check: "finalRecommendation.unknowns vs reviewedConfidence.verdict",
+    consistent: !unknownsButJustified,
+    detail: `finalRecommendation.unknowns has ${finalRecommendation.unknowns.length} item(s) vs reviewedConfidence.verdict="${reviewedConfidence.verdict}" -> ${
+      unknownsButJustified
+        ? "contradiction: real unverified/unknown signal(s) were surfaced, yet confidence was judged justified with no reduction."
+        : "no contradiction."
+    }`,
+  });
+
+  const internallyConsistent = checks.every((c) => c.consistent);
+  return { checks, internallyConsistent };
+}
+
+/* ======================================================================= */
 /* Entry point                                                             */
 /* ======================================================================= */
 
@@ -745,6 +835,7 @@ export function computeAiDecisionValidation(input: ComputeAiDecisionValidationIn
     founderOpportunityProfile,
     monetization,
   });
+  const selfReview = buildSelfReview({ validation, risks, monetization, finalRecommendation, reviewedConfidence });
 
   return {
     decisionReasoning,
@@ -756,6 +847,7 @@ export function computeAiDecisionValidation(input: ComputeAiDecisionValidationIn
     reviewedConfidence,
     explainability,
     finalRecommendation,
+    selfReview,
   };
 }
 
@@ -825,6 +917,10 @@ export function defaultAiDecisionValidation(): AiDecisionValidation {
       goToMarketDirection: "Placeholder — overwritten by attachAiDecisionValidation.",
       unknowns: [],
       nextValidationSteps: [],
+    },
+    selfReview: {
+      checks: [],
+      internallyConsistent: true,
     },
   };
 }

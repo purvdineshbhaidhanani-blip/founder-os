@@ -822,6 +822,35 @@ export interface FinalFounderRecommendation {
 }
 
 /**
+ * Module 11 — Self Review. One named self-consistency check across fields
+ * ALREADY COMPUTED by Modules 1-9 above — no new data, no re-derivation.
+ * `detail` always cites the exact two (or more) field values compared, so a
+ * fired contradiction is loud and traceable, never a vague warning. See
+ * ai-decision-validation.ts's `buildSelfReview` for the fixed, documented
+ * checklist.
+ */
+export interface AiSelfReviewCheck {
+  /** Short, stable name for this check (e.g. "BUILD verdict vs high-scoring risks") — see buildSelfReview for the fixed set. */
+  check: string;
+  /** false = a contradiction was found (fired); true = the compared fields agree, or the contradiction condition simply didn't apply. */
+  consistent: boolean;
+  /** Cites the exact field paths/values compared (e.g. `validation.validatedRecommendation="BUILD" vs risks[...]`) — never a vague summary. */
+  detail: string;
+}
+
+/**
+ * Module 11 — Self Review bundle. `internallyConsistent` is `true` iff every
+ * entry in `checks` has `consistent === true`. This is a READ-ONLY
+ * diagnostic layer: it never mutates `validation`, `risks`, `monetization`,
+ * `reviewedConfidence`, or `finalRecommendation` — it only reports on them.
+ * See ai-decision-validation.ts's `buildSelfReview`.
+ */
+export interface AiSelfReview {
+  checks: AiSelfReviewCheck[];
+  internallyConsistent: boolean;
+}
+
+/**
  * Loop 8 — AI Decision Validation bundle (ai-decision-validation.ts). A
  * READ-ONLY composition/adversarial-review layer over `decision`,
  * `founderIntelligence`, `fois`, and `calibration` — all already attached
@@ -842,6 +871,13 @@ export interface AiDecisionValidation {
   reviewedConfidence: AiConfidenceReview;
   explainability: AiDecisionExplainability;
   finalRecommendation: FinalFounderRecommendation;
+  /**
+   * Module 11 — additive self-consistency / internal-contradiction check
+   * across the fields already computed above (Modules 1-9). Never removes,
+   * renames, or alters any existing field; see ai-decision-validation.ts's
+   * `buildSelfReview`.
+   */
+  selfReview: AiSelfReview;
 }
 
 /** Referenced for downstream typing convenience — re-exported for callers. */
