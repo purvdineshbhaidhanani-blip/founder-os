@@ -5,6 +5,20 @@ import type {
   ProblemIntelligenceReport,
 } from "../problems/types.js";
 import type { RawResearchItem, ResearchSession } from "../research/types.js";
+// Founder Business Intelligence wiring pass (see founder-business-intelligence.ts) —
+// `import type` only, so this is erased at compile time and introduces no
+// runtime circular dependency between types.ts and these 6 sibling modules
+// (each of which itself only imports *types* from this file).
+import type { BusinessIntelligenceResult } from "./business-intelligence.js";
+import type { MarketIntelligenceResult } from "./market-intelligence.js";
+import type { RevenueIntelligenceResult } from "./revenue-intelligence.js";
+import type { MvpScopeResult } from "./mvp-generator.js";
+import type { GoToMarketResult } from "./go-to-market.js";
+import type { TechnicalBlueprintResult } from "./technical-blueprint.js";
+// Phase 8 — Knowledge Links relationship layer (see knowledge-links.ts) —
+// `import type` only, same erased-at-compile-time reasoning as the 6
+// imports directly above.
+import type { KnowledgeLinksResult } from "./knowledge-links.js";
 
 /**
  * Founder Opportunity Reports engine surface. Turns the deterministic
@@ -177,6 +191,82 @@ export interface FounderOpportunityReport {
    * `attachFounderIntelligence`, the last step in the pipeline).
    */
   aiDecisionValidation: AiDecisionValidation;
+  /**
+   * Founder-facing Business Intelligence bundle (see business-intelligence.ts,
+   * Phase 1) — business/revenue/pricing model, B2B-vs-B2C, buyer/decision-maker,
+   * budget estimate, urgency, switching difficulty, and expansion potential.
+   * Additive and READ-ONLY: a pure composition over `founderIntelligence` and
+   * `aiDecisionValidation` above (never recomputes them, never mutates any
+   * field above). Always populated on every report in the shipped
+   * `opportunities` list (see engine.ts's `attachFounderBusinessIntelligence`
+   * call, run after `attachAiDecisionValidation`, the last step in the
+   * pipeline).
+   */
+  businessIntelligence: BusinessIntelligenceResult;
+  /**
+   * Founder-facing Market Intelligence bundle (see market-intelligence.ts,
+   * Phase 2) — growth stage, search/adoption confidence, saturation, and
+   * opportunity-window framing. Additive and READ-ONLY: a pure composition
+   * over `founderIntelligence`, `calibration`, and the source cluster's
+   * growth data. Always populated on every report in the shipped
+   * `opportunities` list (see engine.ts's `attachFounderBusinessIntelligence`
+   * call, run after `attachAiDecisionValidation`).
+   */
+  marketIntelligence: MarketIntelligenceResult;
+  /**
+   * Founder-facing Revenue Intelligence bundle (see revenue-intelligence.ts,
+   * Phase 3) — revenue potential, revenue-model description, upsell/cross-sell
+   * potential. Additive and READ-ONLY: a pure composition over
+   * `aiDecisionValidation.monetization`, `suggestedPricing`, and
+   * `founderIntelligence`. Always populated on every report in the shipped
+   * `opportunities` list (see engine.ts's `attachFounderBusinessIntelligence`
+   * call, run after `attachAiDecisionValidation`).
+   */
+  revenueIntelligence: RevenueIntelligenceResult;
+  /**
+   * Founder-facing MVP Scope bundle (see mvp-generator.ts, Phase 4) — a
+   * phased feature roadmap, launch-readiness criteria, and features
+   * deliberately deferred out of the MVP. Additive and READ-ONLY: a pure
+   * composition over `aiDecisionValidation.founderOpportunity`,
+   * `founderIntelligence.marketGaps`, and `buildDifficulty`. Always
+   * populated on every report in the shipped `opportunities` list (see
+   * engine.ts's `attachFounderBusinessIntelligence` call, run after
+   * `attachAiDecisionValidation`).
+   */
+  mvpPlan: MvpScopeResult;
+  /**
+   * Founder-facing Go-To-Market bundle (see go-to-market.ts, Phase 6) —
+   * recommended channels, positioning statement, and a launch sequence.
+   * Additive and READ-ONLY: a pure composition over
+   * `aiDecisionValidation.founderOpportunity`/`finalRecommendation`,
+   * `founderIntelligence`, and `supportingEvidence`. Always populated on
+   * every report in the shipped `opportunities` list (see engine.ts's
+   * `attachFounderBusinessIntelligence` call, run after
+   * `attachAiDecisionValidation`).
+   */
+  goToMarket: GoToMarketResult;
+  /**
+   * Founder-facing Technical Blueprint bundle (see technical-blueprint.ts,
+   * Phase 5) — ADVISORY architecture/database/API/auth/AI-layer/hosting/
+   * storage guidance for the opportunity's hypothetical future product
+   * (never a statement about this repository's own stack). Additive and
+   * READ-ONLY: a pure composition over `buildDifficulty` and
+   * `founderIntelligence`. Always populated on every report in the shipped
+   * `opportunities` list (see engine.ts's `attachFounderBusinessIntelligence`
+   * call, run after `attachAiDecisionValidation`).
+   */
+  technicalBlueprint: TechnicalBlueprintResult;
+  /**
+   * Phase 8 — Knowledge Links relationship layer (see knowledge-links.ts) —
+   * a typed, directed, ID-reference edge set between report sections
+   * already computed above (Problem -> Competitors -> Customer -> Market ->
+   * Revenue -> Execution -> Monitoring). NOT a graph database; a pure,
+   * read-only composition. Additive and READ-ONLY: never mutates any field
+   * above. Always populated on every report in the shipped `opportunities`
+   * list (see engine.ts's `attachKnowledgeLinks` call, run LAST, after
+   * `attachFounderBusinessIntelligence`).
+   */
+  knowledgeLinks: KnowledgeLinksResult;
 }
 
 export interface TopOpportunitiesReport {

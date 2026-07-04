@@ -11,6 +11,15 @@ import {
 } from "../../src/opportunities/calibration.js";
 import { defaultFounderIntelligence } from "../../src/opportunities/founder-intelligence.js";
 import { defaultAiDecisionValidation } from "../../src/opportunities/ai-decision-validation.js";
+import {
+  defaultBusinessIntelligence,
+  defaultMarketIntelligence,
+  defaultRevenueIntelligence,
+  defaultMvpPlan,
+  defaultGoToMarket,
+  defaultTechnicalBlueprint,
+} from "../../src/opportunities/founder-business-intelligence.js";
+import { defaultKnowledgeLinks } from "../../src/opportunities/knowledge-links.js";
 import { ArtifactManager } from "../../src/runtime/artifacts/manager.js";
 import { MemoryEngine } from "../../src/runtime/memory/engine.js";
 import { InMemoryStore } from "../../src/runtime/memory/store.js";
@@ -509,5 +518,12 @@ function zeroSourceReportFixture() {
     calibration: defaultCalibration(),
     founderIntelligence: defaultFounderIntelligence(),
     aiDecisionValidation: defaultAiDecisionValidation(),
+    businessIntelligence: defaultBusinessIntelligence(),
+    marketIntelligence: defaultMarketIntelligence(),
+    revenueIntelligence: defaultRevenueIntelligence(),
+    mvpPlan: defaultMvpPlan(),
+    goToMarket: defaultGoToMarket(),
+    technicalBlueprint: defaultTechnicalBlueprint(),
+    knowledgeLinks: defaultKnowledgeLinks(),
   };
 }

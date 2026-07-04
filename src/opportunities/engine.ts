@@ -14,6 +14,16 @@ import { mergeSynonymOpportunities } from "./semantic.js";
 import { attachCalibration, computeAggregateCalibration, defaultCalibration } from "./calibration.js";
 import { attachFounderIntelligence, defaultFounderIntelligence } from "./founder-intelligence.js";
 import { attachAiDecisionValidation, defaultAiDecisionValidation } from "./ai-decision-validation.js";
+import {
+  attachFounderBusinessIntelligence,
+  defaultBusinessIntelligence,
+  defaultGoToMarket,
+  defaultMarketIntelligence,
+  defaultMvpPlan,
+  defaultRevenueIntelligence,
+  defaultTechnicalBlueprint,
+} from "./founder-business-intelligence.js";
+import { attachKnowledgeLinks, defaultKnowledgeLinks } from "./knowledge-links.js";
 import type { OpportunityRepository } from "./repository.js";
 import type { ProblemCluster, ProblemIntelligenceReport } from "../problems/types.js";
 import type { ResearchSession } from "../research/types.js";
@@ -111,13 +121,36 @@ export class OpportunityEngine {
     // each report (decision, founderIntelligence, fois, calibration) is the
     // REAL, final value, never a placeholder. Read-only: never re-sorts or
     // re-scores the shipped list, never mutates any prior field.
-    const opportunities = attachAiDecisionValidation(withFounderIntelligence, problemReport.clusters);
+    const withAiDecisionValidation = attachAiDecisionValidation(withFounderIntelligence, problemReport.clusters);
+
+    // Founder Business Intelligence wiring pass (founder-business-intelligence.ts),
+    // run LAST, AFTER attachAiDecisionValidation, so every input the 6
+    // composed bundles read (report.founderIntelligence,
+    // report.aiDecisionValidation, report.fois, report.calibration, ...) is
+    // the REAL, final value, never a placeholder. Read-only: never re-sorts
+    // or re-scores the shipped list, never mutates any prior field. A
+    // single combined attach step (see founder-business-intelligence.ts's
+    // module doc for why one combined call is preferred over 6 separate
+    // ones) sets all 6 additive fields: businessIntelligence,
+    // marketIntelligence, revenueIntelligence, mvpPlan, goToMarket,
+    // technicalBlueprint.
+    const opportunities = attachFounderBusinessIntelligence(withAiDecisionValidation, problemReport.clusters);
+
+    // Phase 8 — Knowledge Links relationship layer (knowledge-links.ts), run
+    // LAST, AFTER attachFounderBusinessIntelligence, so every input
+    // computeKnowledgeLinks reads (report.competition,
+    // report.businessIntelligence, report.aiDecisionValidation,
+    // report.marketIntelligence, report.revenueIntelligence,
+    // report.mvpPlan, report.goToMarket, report.founderIntelligence) is the
+    // REAL, final value, never a placeholder. Read-only: never re-sorts or
+    // re-scores the shipped list, never mutates any prior field.
+    const withKnowledgeLinks = attachKnowledgeLinks(opportunities);
 
     const report: TopOpportunitiesReport = {
       id: generateId("opportunity-report"),
       sourceSessionId: session.id,
       sourceProblemReportId: problemReport.id,
-      opportunities,
+      opportunities: withKnowledgeLinks,
       totalClustersConsidered: problemReport.clusters.length,
       generatedAt: nowIso(),
       semanticMerge: { aliasGroupsApplied: aliasGroups.length, aliasGroups },
@@ -230,6 +263,24 @@ export class OpportunityEngine {
       // attachFounderIntelligence (the last step in the pipeline). See
       // defaultAiDecisionValidation's doc.
       aiDecisionValidation: defaultAiDecisionValidation(),
+      // Trivial, type-valid placeholders — always overwritten by
+      // `attachFounderBusinessIntelligence`
+      // (founder-business-intelligence.ts) for every surviving report in
+      // `analyze` below, run AFTER attachAiDecisionValidation (the last
+      // step in the pipeline). See each default*() function's doc in
+      // founder-business-intelligence.ts.
+      businessIntelligence: defaultBusinessIntelligence(),
+      marketIntelligence: defaultMarketIntelligence(),
+      revenueIntelligence: defaultRevenueIntelligence(),
+      mvpPlan: defaultMvpPlan(),
+      goToMarket: defaultGoToMarket(),
+      technicalBlueprint: defaultTechnicalBlueprint(),
+      // Trivial, type-valid placeholder — always overwritten by
+      // `attachKnowledgeLinks` (knowledge-links.ts, Phase 8) for every
+      // surviving report in `analyze` below, run AFTER
+      // attachFounderBusinessIntelligence (the last step in the pipeline).
+      // See defaultKnowledgeLinks's doc.
+      knowledgeLinks: defaultKnowledgeLinks(),
     };
 
     return report;

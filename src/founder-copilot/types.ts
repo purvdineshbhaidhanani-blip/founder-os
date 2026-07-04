@@ -18,9 +18,17 @@ export type { FounderOpportunityReport };
 
 /**
  * Fixed canonical topic vocabulary. `"unmatched"` is the honest fallback
- * used when a free-text question doesn't match any of the other 8 topics'
+ * used when a free-text question doesn't match any of the other topics'
  * keyword rules (see copilot.ts's `ROUTES`) — it is never silently coerced
  * into one of the real topics.
+ *
+ * The first 8 (`what-to-build` .. `launch`) are the original Loop-8-era
+ * canonical topics (see `CANONICAL_FOUNDER_QUESTIONS`). The next 8
+ * (`why-build` .. `market-weak`) are the Phase 9 additive expansion (see
+ * `ADDITIONAL_FOUNDER_QUESTIONS`) — two of the ten requested Phase 9
+ * questions ("What MVP?" and "What are the biggest risks?") are EXACT
+ * duplicates of the existing `mvp`/`risks` topics and therefore reuse them
+ * rather than getting their own topic.
  */
 export type FounderCopilotTopic =
   | "what-to-build"
@@ -31,6 +39,14 @@ export type FounderCopilotTopic =
   | "validation"
   | "mvp"
   | "launch"
+  | "why-build"
+  | "why-not-build"
+  | "who-pays"
+  | "how-price"
+  | "what-build-first"
+  | "differentiate"
+  | "get-customers"
+  | "market-weak"
   | "unmatched";
 
 /**

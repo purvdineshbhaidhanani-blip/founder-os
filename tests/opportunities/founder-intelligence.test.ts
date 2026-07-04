@@ -8,6 +8,15 @@ import {
   estimateMarketMaturity,
 } from "../../src/opportunities/founder-intelligence.js";
 import { defaultAiDecisionValidation } from "../../src/opportunities/ai-decision-validation.js";
+import {
+  defaultBusinessIntelligence,
+  defaultMarketIntelligence,
+  defaultRevenueIntelligence,
+  defaultMvpPlan,
+  defaultGoToMarket,
+  defaultTechnicalBlueprint,
+} from "../../src/opportunities/founder-business-intelligence.js";
+import { defaultKnowledgeLinks } from "../../src/opportunities/knowledge-links.js";
 import type {
   BuildDifficultyResult,
   BuyingIntentResult,
@@ -562,6 +571,13 @@ describe("defaultFounderIntelligence + attachFounderIntelligence", () => {
       calibration: makeCalibration(),
       founderIntelligence: defaultFounderIntelligence(),
       aiDecisionValidation: defaultAiDecisionValidation(),
+      businessIntelligence: defaultBusinessIntelligence(),
+      marketIntelligence: defaultMarketIntelligence(),
+      revenueIntelligence: defaultRevenueIntelligence(),
+      mvpPlan: defaultMvpPlan(),
+      goToMarket: defaultGoToMarket(),
+      technicalBlueprint: defaultTechnicalBlueprint(),
+      knowledgeLinks: defaultKnowledgeLinks(),
     };
 
     const [attached] = attachFounderIntelligence([report], [cluster]);
@@ -610,6 +626,13 @@ describe("defaultFounderIntelligence + attachFounderIntelligence", () => {
       calibration: makeCalibration(),
       founderIntelligence: defaultFounderIntelligence(),
       aiDecisionValidation: defaultAiDecisionValidation(),
+      businessIntelligence: defaultBusinessIntelligence(),
+      marketIntelligence: defaultMarketIntelligence(),
+      revenueIntelligence: defaultRevenueIntelligence(),
+      mvpPlan: defaultMvpPlan(),
+      goToMarket: defaultGoToMarket(),
+      technicalBlueprint: defaultTechnicalBlueprint(),
+      knowledgeLinks: defaultKnowledgeLinks(),
     };
 
     const [attached] = attachFounderIntelligence([report], [cluster]);

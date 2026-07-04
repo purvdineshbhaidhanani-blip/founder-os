@@ -19,6 +19,15 @@ import type {
 } from "../../src/opportunities/types.js";
 import type { CauseChain, ProblemCategory, ProblemCluster } from "../../src/problems/types.js";
 import type { RawResearchItem } from "../../src/research/types.js";
+import {
+  defaultBusinessIntelligence,
+  defaultMarketIntelligence,
+  defaultRevenueIntelligence,
+  defaultMvpPlan,
+  defaultGoToMarket,
+  defaultTechnicalBlueprint,
+} from "../../src/opportunities/founder-business-intelligence.js";
+import { defaultKnowledgeLinks } from "../../src/opportunities/knowledge-links.js";
 
 /* -------------------------------------------------------------------- */
 /* Shared, hand-built fixture helpers — mirrors founder-intelligence.   */
@@ -978,6 +987,13 @@ describe("defaultAiDecisionValidation + attachAiDecisionValidation", () => {
       calibration: makeCalibration(),
       founderIntelligence: makeFounderIntelligence(),
       aiDecisionValidation: defaultAiDecisionValidation(),
+      businessIntelligence: defaultBusinessIntelligence(),
+      marketIntelligence: defaultMarketIntelligence(),
+      revenueIntelligence: defaultRevenueIntelligence(),
+      mvpPlan: defaultMvpPlan(),
+      goToMarket: defaultGoToMarket(),
+      technicalBlueprint: defaultTechnicalBlueprint(),
+      knowledgeLinks: defaultKnowledgeLinks(),
       ...overrides,
     };
   }
