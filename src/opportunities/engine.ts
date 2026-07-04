@@ -24,6 +24,7 @@ import {
   defaultTechnicalBlueprint,
 } from "./founder-business-intelligence.js";
 import { attachKnowledgeLinks, defaultKnowledgeLinks } from "./knowledge-links.js";
+import { selectTopOpportunities } from "./opportunity-selection.js";
 import type { OpportunityRepository } from "./repository.js";
 import type { ProblemCluster, ProblemIntelligenceReport } from "../problems/types.js";
 import type { ResearchSession } from "../research/types.js";
@@ -146,6 +147,18 @@ export class OpportunityEngine {
     // re-scores the shipped list, never mutates any prior field.
     const withKnowledgeLinks = attachKnowledgeLinks(opportunities);
 
+    // Opportunity Selection / elimination layer (opportunity-selection.ts),
+    // run LAST, over the already-built, already-ranked, already-sliced
+    // shipped `opportunities` array above (read-only: never re-sorts,
+    // re-scores, or mutates that array or any report on it, and never
+    // changes `opportunities` itself). See
+    // TopOpportunitiesReport.opportunitySelection's doc (types.ts) and
+    // opportunity-selection.ts's module doc for why `problemReport.clusters`
+    // is passed alongside the report list (mirrors
+    // attachFounderIntelligence/attachAiDecisionValidation's own
+    // clusterId-lookup pattern).
+    const opportunitySelection = selectTopOpportunities(withKnowledgeLinks, problemReport.clusters);
+
     const report: TopOpportunitiesReport = {
       id: generateId("opportunity-report"),
       sourceSessionId: session.id,
@@ -155,6 +168,7 @@ export class OpportunityEngine {
       generatedAt: nowIso(),
       semanticMerge: { aliasGroupsApplied: aliasGroups.length, aliasGroups },
       calibration,
+      opportunitySelection,
     };
 
     return this.repository.persist(report);

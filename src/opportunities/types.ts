@@ -19,6 +19,12 @@ import type { TechnicalBlueprintResult } from "./technical-blueprint.js";
 // `import type` only, same erased-at-compile-time reasoning as the 6
 // imports directly above.
 import type { KnowledgeLinksResult } from "./knowledge-links.js";
+// Opportunity Selection / elimination layer wiring pass (see
+// opportunity-selection.ts) — `import type` only, same erased-at-compile-time
+// reasoning as the imports directly above. Reuses 3 small labeled unions
+// already computed by Phase 1/2's business/market intelligence modules
+// rather than redefining them.
+import type { RevenueModelLabel, UrgencyBand } from "./business-intelligence.js";
 
 /**
  * Founder Opportunity Reports engine surface. Turns the deterministic
@@ -296,6 +302,20 @@ export interface TopOpportunitiesReport {
    * run's health. Read-only diagnostics; never fed back into ranking.
    */
   calibration: CalibrationAggregate;
+  /**
+   * Opportunity Selection / elimination layer (see opportunity-selection.ts)
+   * — Founder OS's final, additive "eliminate weak opportunities until only
+   * the highest-conviction survive" reduction, computed as the LAST step in
+   * engine.ts's `analyze`, over the already-built, already-ranked shipped
+   * `opportunities` array above (read-only: never re-sorts, re-scores, or
+   * mutates that array or any report on it). Composes exclusively from
+   * fields already computed on each `FounderOpportunityReport` (plus the
+   * matching source `ProblemCluster`, looked up by `clusterId` exactly like
+   * `attachFounderIntelligence`/`attachAiDecisionValidation` already do) —
+   * no new raw-evidence scan, no recomputation of fois/decision/calibration/
+   * founderIntelligence/aiDecisionValidation/anything upstream.
+   */
+  opportunitySelection: OpportunitySelectionResult;
 }
 
 /* ---------------------------------------------------------------------- */
@@ -968,6 +988,170 @@ export interface AiDecisionValidation {
    * `buildSelfReview`.
    */
   selfReview: AiSelfReview;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Opportunity Selection / elimination layer (opportunity-selection.ts)   */
+/* ---------------------------------------------------------------------- */
+
+/**
+ * "Never guess": UNKNOWN is a first-class outcome distinct from FAIL,
+ * reserved for gates whose backing signal genuinely doesn't exist on this
+ * report/cluster (never inferred from absence). See opportunity-selection.ts
+ * Part A for the exact, documented per-gate derivation rule.
+ */
+export type QualificationGateStatus = "PASS" | "FAIL" | "UNKNOWN";
+
+/** One of the 10 always-evaluated qualification gates — see opportunity-selection.ts Part A. */
+export interface QualificationGate {
+  gate: string;
+  status: QualificationGateStatus;
+  evidence: string[];
+  reason: string;
+}
+
+/**
+ * Part B — Elimination verdict. `rejected=true` when ANY real, cited signal
+ * fires (see opportunity-selection.ts Part B's fixed rule list). Every
+ * string in `reasons` cites the exact real value that triggered it — never a
+ * generic message.
+ */
+export interface EliminationVerdict {
+  rejected: boolean;
+  reasons: string[];
+}
+
+/**
+ * Part C — Differentiation Engine. A cheap composition over
+ * `founderIntelligence.differentiationStrategies`, `founderIntelligence.marketGaps`,
+ * `competition.competitors`, and the source cluster's `symptoms`/`rootCause`
+ * — never a new detection pass. See opportunity-selection.ts Part C.
+ */
+export interface DifferentiationEngineResult {
+  currentSolution: string;
+  whyUsersStillUseIt: string;
+  biggestComplaints: string[];
+  missingFeatures: string[];
+  pricingComplaints: string[];
+  manualWorkarounds: string[];
+  aiOpportunities: string[];
+  automationOpportunities: string[];
+  uxOpportunities: string[];
+  workflowOpportunities: string[];
+  whyUsersWouldSwitch: string;
+}
+
+/** Fixed 4-tier friction/risk vocabulary shared by every Part D dimension — see opportunity-selection.ts Part D. */
+export type FrictionTier = "low" | "medium" | "high" | "unknown";
+
+/**
+ * Part D — Market Replacement Analysis. Every one of the 5 named tiers is
+ * derived from `businessIntelligence.switchingDifficulty` +
+ * `competition.competitors.length` + `report.technicalBlueprint` (all
+ * already computed, read-only here) — see opportunity-selection.ts Part D
+ * for the exact, documented per-field derivation and the `replacementFeasibility`
+ * composite formula.
+ */
+export interface MarketReplacementAnalysis {
+  switchFriction: FrictionTier;
+  switchFrictionReason: string;
+  migrationDifficulty: FrictionTier;
+  migrationDifficultyReason: string;
+  integrationDependency: FrictionTier;
+  integrationDependencyReason: string;
+  learningCurve: FrictionTier;
+  learningCurveReason: string;
+  lockInRisk: FrictionTier;
+  lockInRiskReason: string;
+  replacementFeasibility: "high" | "medium" | "low" | "unknown";
+  replacementFeasibilityReason: string;
+}
+
+/**
+ * Part E — Business Viability. A pure re-composition of
+ * `revenueIntelligence`/`businessIntelligence` fields already computed
+ * elsewhere — `retentionLikelihood` is ALWAYS `"unknown"` since no
+ * churn/retention signal has ever been measured anywhere upstream in this
+ * codebase (honestly reported, never invented). See
+ * opportunity-selection.ts Part E for the `viabilityTier` composite formula.
+ */
+export interface BusinessViabilityResult {
+  /** Reused verbatim from `businessIntelligence.revenueModel`. */
+  revenueModel: RevenueModelLabel;
+  /** Reused verbatim from `revenueIntelligence.pricingConfidence`. */
+  pricingConfidence: PricingConfidence;
+  /** Reused verbatim from `businessIntelligence.urgency`. */
+  customerUrgency: UrgencyBand;
+  businessFrequency: number;
+  businessFrequencyReason: string;
+  /** Always `"unknown"` — see this interface's doc. */
+  retentionLikelihood: "unknown";
+  retentionLikelihoodReason: string;
+  /** Reused verbatim from `businessIntelligence.expansionPotential` (== `revenueIntelligence.expansionPotential`). */
+  expansionPotential: MonetizationSupportLabel;
+  expansionPotentialReason: string;
+  viabilityTier: "high" | "medium" | "low" | "unknown";
+  viabilityTierReason: string;
+}
+
+/** One scored, weighted, named dimension of the High Conviction Score — see opportunity-selection.ts Part F. */
+export interface HighConvictionScoreDimension {
+  name: string;
+  raw: number; // 0-100
+  weight: number; // 0-1, all 8 dimension weights sum to 1.0 (asserted in tests)
+  weighted: number; // raw * weight, 0-100 scale
+  reason: string;
+}
+
+/**
+ * Part F — High Conviction Score. A NEW, separate, additive 0-100 score,
+ * distinct from `fois.overall` (fois.ts is never touched by this module) —
+ * see opportunity-selection.ts Part F for the exact 8-dimension formula and
+ * documented weight rationale.
+ */
+export interface HighConvictionScore {
+  overall: number; // 0-100
+  dimensions: HighConvictionScoreDimension[];
+}
+
+/**
+ * Part H — Self Critique, computed ONLY for survivors (see
+ * opportunity-selection.ts Part H). Every field reuses already-computed
+ * `aiDecisionValidation`/`decision`/`calibration` fields — never a new
+ * derivation.
+ */
+export interface SelfCritique {
+  reasonsToBuild: string[];
+  reasonsNotToBuild: string[];
+  strongestRisk: { risk: string; score: number; reason: string };
+  strongestUnknown: string;
+  evidenceStillMissing: string[];
+  customerInterviewsRequired: string[];
+}
+
+/** One opportunity that survived Part B elimination and made the top `MAX_SURVIVORS` cut — see opportunity-selection.ts Part G. */
+export interface OpportunitySelectionSurvivor {
+  report: FounderOpportunityReport;
+  highConvictionScore: HighConvictionScore;
+  whySurvived: string;
+  selfCritique: SelfCritique;
+}
+
+/** One opportunity that did NOT survive — either Part-B-eliminated or ranked below the `MAX_SURVIVORS` cap. See opportunity-selection.ts Part G. */
+export interface OpportunitySelectionRejected {
+  reportId: string;
+  whyRejected: string[];
+}
+
+/**
+ * Part G — Survivor Ranking, the top-level return of the whole Opportunity
+ * Selection module (see opportunity-selection.ts's `selectTopOpportunities`).
+ * Attached as `TopOpportunitiesReport.opportunitySelection` — see that
+ * field's doc.
+ */
+export interface OpportunitySelectionResult {
+  survivors: OpportunitySelectionSurvivor[];
+  rejected: OpportunitySelectionRejected[];
 }
 
 /** Referenced for downstream typing convenience — re-exported for callers. */
