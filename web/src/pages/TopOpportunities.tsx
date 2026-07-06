@@ -88,6 +88,83 @@ export default function TopOpportunities(): React.ReactElement {
           ))}
         </div>
       )}
+
+      {/*
+        Opportunity Selection — the backend's final elimination/survivor-ranking
+        layer (read-only rendering; no backend contract changed). Survivors carry
+        a High Conviction Score distinct from FOIS.
+      */}
+      <section className="card">
+        <h2>Opportunity Selection</h2>
+        <p className="page-subtitle">
+          {report.opportunitySelection.survivors.length} survivor(s) &middot;{" "}
+          {report.opportunitySelection.rejected.length} eliminated
+        </p>
+        {report.opportunitySelection.survivors.length === 0 ? (
+          <p className="muted">No opportunity survived the elimination gates.</p>
+        ) : (
+          report.opportunitySelection.survivors.map((survivor) => (
+            <div key={survivor.report.id} className="card">
+              <h3>{survivor.report.problem}</h3>
+              <p>
+                <span className="badge">High Conviction: {survivor.highConvictionScore.overall.toFixed(1)}</span>{" "}
+                <span className="badge">FOIS: {survivor.report.fois.overall.toFixed(1)}</span>
+              </p>
+              <p className="muted">{survivor.whySurvived}</p>
+              <details>
+                <summary>Score dimensions &amp; self-critique</summary>
+                <ul>
+                  {survivor.highConvictionScore.dimensions.map((dimension) => (
+                    <li key={dimension.name}>
+                      <strong>{dimension.name}:</strong> {dimension.weighted.toFixed(1)} (raw{" "}
+                      {dimension.raw.toFixed(0)} &times; {dimension.weight.toFixed(2)}) — {dimension.reason}
+                    </li>
+                  ))}
+                </ul>
+                <h4>Strongest risk</h4>
+                <p>
+                  {survivor.selfCritique.strongestRisk.risk} ({survivor.selfCritique.strongestRisk.score}) —{" "}
+                  {survivor.selfCritique.strongestRisk.reason}
+                </p>
+                <h4>Strongest unknown</h4>
+                <p>{survivor.selfCritique.strongestUnknown}</p>
+                {survivor.selfCritique.reasonsToBuild.length > 0 && (
+                  <>
+                    <h4>Reasons to build</h4>
+                    <ul>
+                      {survivor.selfCritique.reasonsToBuild.map((reason, index) => (
+                        <li key={index}>{reason}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+                {survivor.selfCritique.reasonsNotToBuild.length > 0 && (
+                  <>
+                    <h4>Reasons not to build</h4>
+                    <ul>
+                      {survivor.selfCritique.reasonsNotToBuild.map((reason, index) => (
+                        <li key={index}>{reason}</li>
+                      ))}
+                    </ul>
+                  </>
+                )}
+              </details>
+            </div>
+          ))
+        )}
+        {report.opportunitySelection.rejected.length > 0 && (
+          <details>
+            <summary>{report.opportunitySelection.rejected.length} eliminated opportunity(ies)</summary>
+            <ul>
+              {report.opportunitySelection.rejected.map((rejected) => (
+                <li key={rejected.reportId}>
+                  <code>{rejected.reportId}</code> — {rejected.whyRejected.join("; ")}
+                </li>
+              ))}
+            </ul>
+          </details>
+        )}
+      </section>
     </div>
   );
 }

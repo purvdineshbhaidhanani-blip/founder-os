@@ -46,7 +46,26 @@ export default function OpportunityDetail(): React.ReactElement {
   if (error) return <div className="banner banner-error">{error}</div>;
   if (!opportunity) return <div className="banner banner-error">Opportunity not found.</div>;
 
-  const { scoreBreakdown, fois, buyingIntent, competition, buildDifficulty, recommendation, supportingEvidence, decision } = opportunity;
+  const {
+    scoreBreakdown,
+    fois,
+    buyingIntent,
+    competition,
+    buildDifficulty,
+    recommendation,
+    supportingEvidence,
+    decision,
+    founderIntelligence,
+    aiDecisionValidation,
+    businessIntelligence,
+    marketIntelligence,
+    revenueIntelligence,
+    mvpPlan,
+    goToMarket,
+    technicalBlueprint,
+    knowledgeLinks,
+  } = opportunity;
+  const ai = aiDecisionValidation;
 
   return (
     <div className="page">
@@ -347,6 +366,536 @@ export default function OpportunityDetail(): React.ReactElement {
           {decision.qualityGates.map((gate) => (
             <li key={gate.name}>
               <strong>{gate.name}:</strong> {gate.fired ? "FIRED" : "ok"} — {gate.reason}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {/*
+        Founder Intelligence, AI Decision Validation, and the Business/Market/
+        Revenue/MVP/GTM/Technical/Knowledge bundles below are additive,
+        READ-ONLY renderings of fields the backend already computes on every
+        FounderOpportunityReport. No backend contract is changed; no field is
+        invented. Sections reuse the existing card/badge/list design.
+      */}
+      <section className="card">
+        <h2>Founder Intelligence</h2>
+        <h3>Competitor Intelligence</h3>
+        <p className="muted">{founderIntelligence.competitorIntelligence.explanation}</p>
+        <ul>
+          <li>
+            <strong>Primary competitors:</strong>{" "}
+            {founderIntelligence.competitorIntelligence.primaryCompetitors.join(", ") || "none detected"}
+          </li>
+          <li>
+            <strong>Category:</strong> {founderIntelligence.competitorIntelligence.competitorCategory} &middot;{" "}
+            <strong>Confidence:</strong> {founderIntelligence.competitorIntelligence.competitorConfidence}
+          </li>
+          <li>
+            <strong>Open-source vs SaaS:</strong> {founderIntelligence.competitorIntelligence.openSourceVsSaas} &middot;{" "}
+            <strong>Enterprise vs SMB:</strong> {founderIntelligence.competitorIntelligence.enterpriseVsSmb}
+          </li>
+          <li>
+            <strong>Market maturity:</strong> {founderIntelligence.marketMaturity.maturity}
+            {founderIntelligence.marketMaturity.reasons.length > 0 && (
+              <span className="muted"> — {founderIntelligence.marketMaturity.reasons.join("; ")}</span>
+            )}
+          </li>
+          <li>
+            <strong>Competition pressure:</strong> {founderIntelligence.competitionPressure.pressure}
+            <span className="muted"> — {founderIntelligence.competitionPressure.explanation}</span>
+          </li>
+        </ul>
+
+        <h3>Market Gaps</h3>
+        {founderIntelligence.marketGaps.length === 0 ? (
+          <p className="muted">No evidence-backed market gaps detected.</p>
+        ) : (
+          <ul>
+            {founderIntelligence.marketGaps.map((gap) => (
+              <li key={gap.gap}>
+                <strong>{gap.gap}</strong> — {gap.evidenceCount} evidence item(s), confidence {gap.confidence}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <h3>Founder Opportunity</h3>
+        <p>
+          <span className={`badge ${founderIntelligence.founderOpportunity.shouldBuild ? "badge-verdict-build" : "badge-verdict-ignore"}`}>
+            {founderIntelligence.founderOpportunity.shouldBuild ? "SHOULD BUILD" : "SHOULD NOT BUILD"}
+          </span>
+        </p>
+        <ul>
+          <li>
+            <strong>Best customer:</strong> {founderIntelligence.founderOpportunity.bestCustomer} —{" "}
+            {founderIntelligence.founderOpportunity.whyThisCustomer}
+          </li>
+          <li>
+            <strong>Best pricing model:</strong> {founderIntelligence.founderOpportunity.bestPricingModel} &middot;{" "}
+            <strong>MVP complexity:</strong> {founderIntelligence.founderOpportunity.expectedMvpComplexity} &middot;{" "}
+            <strong>Solo-founder suitability:</strong> {founderIntelligence.founderOpportunity.soloFounderSuitability}
+          </li>
+        </ul>
+        {founderIntelligence.founderOpportunity.why.length > 0 && (
+          <>
+            <h4>Why</h4>
+            <ul>
+              {founderIntelligence.founderOpportunity.why.map((reason, index) => (
+                <li key={index}>{reason}</li>
+              ))}
+            </ul>
+          </>
+        )}
+        {founderIntelligence.founderOpportunity.whyNot.length > 0 && (
+          <>
+            <h4>Why not</h4>
+            <ul>
+              {founderIntelligence.founderOpportunity.whyNot.map((reason, index) => (
+                <li key={index}>{reason}</li>
+              ))}
+            </ul>
+          </>
+        )}
+
+        <h3>Differentiation Strategies</h3>
+        {founderIntelligence.differentiationStrategies.length === 0 ? (
+          <p className="muted">No evidence-backed differentiation strategy surfaced.</p>
+        ) : (
+          <ul>
+            {founderIntelligence.differentiationStrategies.map((strategy) => (
+              <li key={strategy.strategy}>
+                <strong>{strategy.strategy}</strong> — {strategy.evidenceReason}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <h3>Risks (8-point taxonomy)</h3>
+        <ul>
+          {founderIntelligence.risks.map((risk) => (
+            <li key={risk.risk}>
+              <strong>{risk.risk}:</strong> {risk.severity} — {risk.explanation}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="card">
+        <h2>AI Decision Validation</h2>
+        <p>
+          <span className={`badge ${decisionVerdictClass(ai.validation.validatedRecommendation)}`}>
+            {ai.validation.validatedRecommendation}
+          </span>{" "}
+          <span className="badge">Confidence adjustment: {ai.validation.confidenceAdjustment}</span>
+        </p>
+        <p className="muted">{ai.validation.validationReason}</p>
+
+        <h3>Executive Summary</h3>
+        <p>{ai.finalRecommendation.executiveSummary}</p>
+        <ul>
+          <li>
+            <strong>Recommended action:</strong> {ai.finalRecommendation.recommendedAction}
+          </li>
+          <li>
+            <strong>Business opportunity:</strong> {ai.finalRecommendation.businessOpportunity}
+          </li>
+          <li>
+            <strong>Pricing direction:</strong> {ai.finalRecommendation.suggestedPricingDirection}
+          </li>
+          <li>
+            <strong>Go-to-market direction:</strong> {ai.finalRecommendation.goToMarketDirection}
+          </li>
+        </ul>
+
+        <h3>Counter-Evidence (adversarial)</h3>
+        <ul>
+          {ai.counterEvidence.map((claim) => (
+            <li key={claim.claim}>
+              <span className={`badge ${claim.fired ? "badge-verdict-ignore" : "badge-verdict-build"}`}>
+                {claim.fired ? "FIRED" : "clear"}
+              </span>{" "}
+              <strong>{claim.claim}</strong> — {claim.reason}
+            </li>
+          ))}
+        </ul>
+
+        <h3>Decision Reasoning</h3>
+        <ul>
+          <li>
+            <strong>Actual business problem:</strong> {ai.decisionReasoning.actualBusinessProblem}
+          </li>
+          <li>
+            <strong>Why it exists:</strong> {ai.decisionReasoning.whyExists}
+          </li>
+          <li>
+            <strong>Why current solutions fail:</strong> {ai.decisionReasoning.whyCurrentSolutionsFailing}
+          </li>
+          <li>
+            <strong>Pain is:</strong> {ai.decisionReasoning.painTemporaryOrRecurring}
+          </li>
+        </ul>
+
+        <h3>Founder Risk Engine (0-100)</h3>
+        <ul>
+          {ai.risks.map((risk) => (
+            <li key={risk.risk}>
+              <strong>{risk.risk}:</strong> {risk.score}/100 — {risk.reason}
+            </li>
+          ))}
+        </ul>
+
+        <h3>Monetization Reasoning</h3>
+        <ul>
+          <li>
+            <strong>Possible pricing:</strong> {ai.monetization.possiblePricing} (confidence:{" "}
+            {ai.monetization.pricingConfidence})
+          </li>
+          <li>
+            <strong>Subscription viability:</strong> {ai.monetization.subscriptionViability} &middot;{" "}
+            <strong>Enterprise potential:</strong> {ai.monetization.enterprisePotential}
+          </li>
+        </ul>
+
+        <h3>Confidence Review</h3>
+        <p>
+          <span className="badge">{ai.reviewedConfidence.verdict}</span> original{" "}
+          {ai.reviewedConfidence.originalScore}/100 &rarr; adjusted {ai.reviewedConfidence.adjustedScore.toFixed(2)}{" "}
+          (Δ {ai.reviewedConfidence.adjustment})
+        </p>
+        <p className="muted">{ai.reviewedConfidence.reason}</p>
+
+        <h3>Explainability</h3>
+        <ul>
+          <li>
+            <strong>Why build:</strong> {ai.explainability.whyBuild}
+          </li>
+          <li>
+            <strong>Why wait:</strong> {ai.explainability.whyWait}
+          </li>
+          <li>
+            <strong>Why ignore:</strong> {ai.explainability.whyIgnore}
+          </li>
+          <li>
+            <strong>Evidence that matters most:</strong> {ai.explainability.evidenceThatMattersMost}
+          </li>
+          <li>
+            <strong>Evidence missing:</strong> {ai.explainability.evidenceMissing}
+          </li>
+          <li>
+            <strong>What could change this:</strong> {ai.explainability.whatCouldChangeThis}
+          </li>
+        </ul>
+
+        {ai.finalRecommendation.unknowns.length > 0 && (
+          <>
+            <h3>Unknowns</h3>
+            <ul>
+              {ai.finalRecommendation.unknowns.map((unknown, index) => (
+                <li key={index}>{unknown}</li>
+              ))}
+            </ul>
+          </>
+        )}
+        {ai.finalRecommendation.nextValidationSteps.length > 0 && (
+          <>
+            <h3>Next Validation Steps</h3>
+            <ul>
+              {ai.finalRecommendation.nextValidationSteps.map((step, index) => (
+                <li key={index}>{step}</li>
+              ))}
+            </ul>
+          </>
+        )}
+
+        <h3>Self Review</h3>
+        <p>
+          <span className={`badge ${ai.selfReview.internallyConsistent ? "badge-verdict-build" : "badge-verdict-ignore"}`}>
+            {ai.selfReview.internallyConsistent ? "internally consistent" : "contradiction found"}
+          </span>
+        </p>
+        <ul>
+          {ai.selfReview.checks.map((check) => (
+            <li key={check.check}>
+              <strong>{check.check}:</strong> {check.consistent ? "ok" : "FIRED"} — {check.detail}
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      <section className="card">
+        <h2>Business Intelligence</h2>
+        <ul>
+          <li>
+            <strong>Business model:</strong> {businessIntelligence.businessModel}
+            <span className="muted"> — {businessIntelligence.businessModelReason}</span>
+          </li>
+          <li>
+            <strong>Revenue model:</strong> {businessIntelligence.revenueModel} &middot;{" "}
+            <strong>Pricing model:</strong> {businessIntelligence.pricingModel}
+          </li>
+          <li>
+            <strong>B2B vs B2C:</strong> {businessIntelligence.b2bVsB2c}
+            <span className="muted"> — {businessIntelligence.b2bVsB2cReason}</span>
+          </li>
+          <li>
+            <strong>Ideal customer:</strong> {businessIntelligence.idealCustomerProfile}
+          </li>
+          <li>
+            <strong>Company size:</strong> {businessIntelligence.companySize}
+            <span className="muted"> — {businessIntelligence.companySizeReason}</span>
+          </li>
+          <li>
+            <strong>Primary buyer:</strong> {businessIntelligence.primaryBuyer}
+            <span className="muted"> — {businessIntelligence.primaryBuyerReason}</span>
+          </li>
+          <li>
+            <strong>Decision maker:</strong> {businessIntelligence.decisionMaker}
+            <span className="muted"> — {businessIntelligence.decisionMakerReason}</span>
+          </li>
+          <li>
+            <strong>Budget estimate:</strong> {businessIntelligence.budgetEstimate} (confidence:{" "}
+            {businessIntelligence.budgetConfidence})
+            <span className="muted"> — {businessIntelligence.budgetReason}</span>
+          </li>
+          <li>
+            <strong>Urgency:</strong> {businessIntelligence.urgency}
+            <span className="muted"> — {businessIntelligence.urgencyReason}</span>
+          </li>
+          <li>
+            <strong>Switching difficulty:</strong> {businessIntelligence.switchingDifficulty}
+            <span className="muted"> — {businessIntelligence.switchingDifficultyReason}</span>
+          </li>
+          <li>
+            <strong>Expansion potential:</strong> {businessIntelligence.expansionPotential}
+            <span className="muted"> — {businessIntelligence.expansionPotentialReason}</span>
+          </li>
+        </ul>
+      </section>
+
+      <section className="card">
+        <h2>Market Intelligence</h2>
+        <ul>
+          <li>
+            <strong>Market maturity:</strong> {marketIntelligence.marketMaturity}
+            {marketIntelligence.marketMaturityReasons.length > 0 && (
+              <span className="muted"> — {marketIntelligence.marketMaturityReasons.join("; ")}</span>
+            )}
+          </li>
+          <li>
+            <strong>Growth stage:</strong> {marketIntelligence.growthStage}
+            <span className="muted"> — {marketIntelligence.growthStageReason}</span>
+          </li>
+          <li>
+            <strong>Saturation:</strong> {marketIntelligence.saturation}
+            <span className="muted"> — {marketIntelligence.saturationReason}</span>
+          </li>
+          <li>
+            <strong>Search confidence:</strong> {marketIntelligence.searchConfidence} &middot;{" "}
+            <strong>Adoption confidence:</strong> {marketIntelligence.adoptionConfidence}
+          </li>
+          <li>
+            <strong>Competition pressure:</strong> {marketIntelligence.competitionPressure}
+          </li>
+          <li>
+            <strong>Opportunity window:</strong> {marketIntelligence.opportunityWindow}
+            <span className="muted"> — {marketIntelligence.opportunityWindowReason}</span>
+          </li>
+          <li>
+            <strong>Geo concentration:</strong> {marketIntelligence.geoConcentration} &middot;{" "}
+            <strong>Industry concentration:</strong> {marketIntelligence.industryConcentration}
+          </li>
+        </ul>
+      </section>
+
+      <section className="card">
+        <h2>Revenue Analysis</h2>
+        <ul>
+          <li>
+            <strong>Revenue potential:</strong> {revenueIntelligence.revenuePotential}
+            <span className="muted"> — {revenueIntelligence.revenuePotentialReason}</span>
+          </li>
+          <li>
+            <strong>Possible pricing:</strong> {revenueIntelligence.possiblePricing} (confidence:{" "}
+            {revenueIntelligence.pricingConfidence})
+          </li>
+          <li>
+            <strong>Revenue model:</strong> {revenueIntelligence.revenueModel} —{" "}
+            {revenueIntelligence.revenueModelDescription}
+          </li>
+          <li>
+            <strong>Subscription viability:</strong> {revenueIntelligence.subscriptionViability} &middot;{" "}
+            <strong>Expansion potential:</strong> {revenueIntelligence.expansionPotential}
+          </li>
+          <li>
+            <strong>Upsell potential:</strong> {revenueIntelligence.upsellPotential}
+            <span className="muted"> — {revenueIntelligence.upsellPotentialReason}</span>
+          </li>
+          <li>
+            <strong>Cross-sell potential:</strong> {revenueIntelligence.crossSellPotential}
+            <span className="muted"> — {revenueIntelligence.crossSellPotentialReason}</span>
+          </li>
+        </ul>
+      </section>
+
+      <section className="card">
+        <h2>MVP Recommendations</h2>
+        <p>{mvpPlan.scopeSummary}</p>
+        <ul>
+          <li>
+            <strong>Recommended MVP:</strong> {mvpPlan.recommendedMvp}
+          </li>
+          <li>
+            <strong>Estimated time to MVP:</strong> {mvpPlan.estimatedTimeToMvp} &middot;{" "}
+            <strong>Build difficulty:</strong> {mvpPlan.buildDifficulty} — {mvpPlan.buildDifficultyExplanation}
+          </li>
+        </ul>
+        {mvpPlan.coreFeatures.length > 0 && (
+          <>
+            <h3>Core Features</h3>
+            <ul>
+              {mvpPlan.coreFeatures.map((feature, index) => (
+                <li key={index}>{feature}</li>
+              ))}
+            </ul>
+          </>
+        )}
+        <h3>Phased Roadmap</h3>
+        {mvpPlan.phasedRoadmap.map((phase, index) => (
+          <div key={index}>
+            <h4>{phase.phase}</h4>
+            <p className="muted">{phase.reason}</p>
+            <ul>
+              {phase.features.map((feature, featureIndex) => (
+                <li key={featureIndex}>{feature}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
+        {mvpPlan.featuresToAvoidAtLaunch.length > 0 && (
+          <>
+            <h3>Deferred / Avoid at Launch</h3>
+            <p className="muted">{mvpPlan.featuresToAvoidReason}</p>
+            <ul>
+              {mvpPlan.featuresToAvoidAtLaunch.map((feature, index) => (
+                <li key={index}>{feature}</li>
+              ))}
+            </ul>
+          </>
+        )}
+        {mvpPlan.launchReadinessCriteria.length > 0 && (
+          <>
+            <h3>Launch Readiness Criteria</h3>
+            <ul>
+              {mvpPlan.launchReadinessCriteria.map((criterion, index) => (
+                <li key={index}>{criterion}</li>
+              ))}
+            </ul>
+          </>
+        )}
+      </section>
+
+      <section className="card">
+        <h2>Technical Recommendations</h2>
+        <p className="muted">{technicalBlueprint.advisoryDisclaimer}</p>
+        <ul>
+          <li>
+            <strong>Build difficulty:</strong> {technicalBlueprint.buildDifficulty} &middot;{" "}
+            <strong>Expected MVP complexity:</strong> {technicalBlueprint.expectedMvpComplexity}
+          </li>
+          <li>
+            <strong>Architecture:</strong> {technicalBlueprint.architectureAdvice}
+            <span className="muted"> — {technicalBlueprint.architectureAdviceReason}</span>
+          </li>
+          <li>
+            <strong>Database:</strong> {technicalBlueprint.databaseAdvice}
+            <span className="muted"> — {technicalBlueprint.databaseAdviceReason}</span>
+          </li>
+          <li>
+            <strong>API:</strong> {technicalBlueprint.apiAdvice}
+            <span className="muted"> — {technicalBlueprint.apiAdviceReason}</span>
+          </li>
+          <li>
+            <strong>Auth:</strong> {technicalBlueprint.authAdvice}
+            <span className="muted"> — {technicalBlueprint.authAdviceReason}</span>
+          </li>
+          <li>
+            <strong>AI layer:</strong> {technicalBlueprint.aiLayerAdvice}
+            <span className="muted"> — {technicalBlueprint.aiLayerAdviceReason}</span>
+          </li>
+          <li>
+            <strong>Hosting:</strong> {technicalBlueprint.hostingAdvice}
+            <span className="muted"> — {technicalBlueprint.hostingAdviceReason}</span>
+          </li>
+          <li>
+            <strong>Storage:</strong> {technicalBlueprint.storageAdvice}
+            <span className="muted"> — {technicalBlueprint.storageAdviceReason}</span>
+          </li>
+        </ul>
+      </section>
+
+      <section className="card">
+        <h2>Go-To-Market Recommendations</h2>
+        <ul>
+          <li>
+            <strong>Launch strategy:</strong> {goToMarket.launchStrategy}
+          </li>
+          <li>
+            <strong>Best customer:</strong> {goToMarket.bestCustomer} — {goToMarket.whyThisCustomer}
+          </li>
+          <li>
+            <strong>Early adopter profile:</strong> {goToMarket.earlyAdopterProfile}
+          </li>
+          <li>
+            <strong>Positioning:</strong> {goToMarket.positioningStatement}
+          </li>
+          <li>
+            <strong>Positioning basis:</strong>{" "}
+            {goToMarket.positioningBasis === "NOT VERIFIED"
+              ? "NOT VERIFIED"
+              : goToMarket.positioningBasis.join(", ")}
+          </li>
+        </ul>
+        <h3>Recommended Channels</h3>
+        <ul>
+          {goToMarket.recommendedChannels.map((channel, index) => (
+            <li key={index}>
+              <strong>{channel.channel}</strong> — {channel.reason}
+            </li>
+          ))}
+        </ul>
+        <h3>Launch Sequence</h3>
+        <ol>
+          {goToMarket.launchSequence.map((step) => (
+            <li key={step.step}>
+              {step.action}
+              <span className="muted"> — {step.reason}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="card">
+        <h2>Knowledge Links</h2>
+        <p className="muted">
+          {knowledgeLinks.nodes.length} node(s), {knowledgeLinks.edges.length} edge(s) — typed references across
+          this report&apos;s sections.
+        </p>
+        <h3>Nodes</h3>
+        <ul>
+          {knowledgeLinks.nodes.map((node) => (
+            <li key={node.id}>
+              <strong>[{node.type}]</strong> {node.label}
+              <span className="muted"> — {node.reason}</span>
+            </li>
+          ))}
+        </ul>
+        <h3>Edges</h3>
+        <ul>
+          {knowledgeLinks.edges.map((edge, index) => (
+            <li key={index}>
+              <code>{edge.from}</code> <strong>{edge.relation}</strong> <code>{edge.to}</code>
+              <span className="muted"> — {edge.reason}</span>
             </li>
           ))}
         </ul>

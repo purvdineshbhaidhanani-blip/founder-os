@@ -444,6 +444,416 @@ export interface FoisBreakdown {
   penalties: FoisPenalty[];
 }
 
+/* ---------------------------------------------------------------------- */
+/* Founder Intelligence (src/opportunities/founder-intelligence.ts)       */
+/* ---------------------------------------------------------------------- */
+
+export type MarketMaturityLabel = "emerging" | "growing" | "crowded" | "saturated" | "declining";
+export interface MarketMaturityResult {
+  maturity: MarketMaturityLabel;
+  reasons: string[];
+}
+
+export type OpenSourceVsSaas = "open-source" | "saas" | "mixed" | "unknown";
+export type EnterpriseVsSmb = "enterprise" | "smb" | "mixed" | "unknown";
+export type CompetitorConfidence = "high" | "medium" | "low" | "unknown";
+export interface CompetitorIntelligence {
+  primaryCompetitors: string[];
+  competitorCategory: string;
+  marketMaturity: MarketMaturityLabel;
+  openSourceVsSaas: OpenSourceVsSaas;
+  enterpriseVsSmb: EnterpriseVsSmb;
+  soloFounderFriendlyCompetitors: string[];
+  pricingEvidence: PricingSignal | null;
+  competitorConfidence: CompetitorConfidence;
+  competitorEvidence: string[];
+  explanation: string;
+}
+
+export type MarketGapName =
+  | "Missing Features"
+  | "Expensive Pricing"
+  | "Complex UX"
+  | "Missing AI"
+  | "Poor Automation"
+  | "Poor Mobile Experience"
+  | "Slow Support"
+  | "Weak Integrations"
+  | "Missing API"
+  | "Poor Onboarding"
+  | "Weak Documentation"
+  | "Manual Workflow";
+export interface MarketGap {
+  gap: MarketGapName;
+  evidenceCount: number;
+  exampleConceptIds: string[];
+  confidence: "high" | "medium" | "low";
+}
+
+export type CompetitionPressureLabel = "very-low" | "low" | "medium" | "high" | "very-high";
+export interface CompetitionPressureResult {
+  pressure: CompetitionPressureLabel;
+  explanation: string;
+}
+
+export type FounderPricingModel = "subscription" | "one-time" | "usage" | "freemium" | "enterprise";
+export type FounderMvpComplexity = "low" | "medium" | "high";
+export type SoloFounderSuitability = "high" | "medium" | "low";
+export interface FounderOpportunitySynthesis {
+  shouldBuild: boolean;
+  why: string[];
+  whyNot: string[];
+  bestCustomer: string;
+  whyThisCustomer: string;
+  bestPricingModel: FounderPricingModel;
+  expectedBuildDifficulty: BuildDifficultyTier;
+  expectedMvpComplexity: FounderMvpComplexity;
+  soloFounderSuitability: SoloFounderSuitability;
+}
+
+export type DifferentiationStrategyName =
+  | "AI-first"
+  | "Automation-first"
+  | "Vertical SaaS"
+  | "Lower Pricing"
+  | "Faster UX"
+  | "Developer-first"
+  | "No-code"
+  | "Privacy-first"
+  | "Offline-first";
+export interface DifferentiationStrategy {
+  strategy: DifferentiationStrategyName;
+  evidenceReason: string;
+}
+
+export type FounderRiskName =
+  | "Market Risk"
+  | "Execution Risk"
+  | "Technical Risk"
+  | "Pricing Risk"
+  | "Competition Risk"
+  | "Customer Risk"
+  | "Platform Risk"
+  | "Regulation Risk";
+export interface FounderIntelligenceRisk {
+  risk: FounderRiskName;
+  severity: "low" | "medium" | "high";
+  explanation: string;
+}
+
+export interface FounderIntelligence {
+  competitorIntelligence: CompetitorIntelligence;
+  marketGaps: MarketGap[];
+  marketMaturity: MarketMaturityResult;
+  founderOpportunity: FounderOpportunitySynthesis;
+  competitionPressure: CompetitionPressureResult;
+  differentiationStrategies: DifferentiationStrategy[];
+  risks: FounderIntelligenceRisk[];
+}
+
+/* ---------------------------------------------------------------------- */
+/* AI Decision Validation (src/opportunities/ai-decision-validation.ts)   */
+/* ---------------------------------------------------------------------- */
+
+export interface AiDecisionReasoning {
+  actualBusinessProblem: string;
+  whyExists: string;
+  whyCurrentSolutionsFailing: string;
+  evidenceSupporting: string[];
+  evidenceWeakening: string[];
+  painTemporaryOrRecurring: "temporary" | "recurring" | "unknown";
+}
+export interface AiCounterEvidenceClaim {
+  claim:
+    | "problem is exaggerated"
+    | "market already saturated"
+    | "users solved it manually"
+    | "competitors already dominate"
+    | "demand may be temporary";
+  fired: boolean;
+  reason: string;
+}
+export interface AiValidationResult {
+  validatedRecommendation: FounderDecisionVerdict;
+  validationReason: string;
+  confidenceAdjustment: number;
+}
+export type AiFounderRiskName =
+  | "Market Risk"
+  | "Competition Risk"
+  | "Execution Risk"
+  | "Technical Risk"
+  | "Distribution Risk"
+  | "Monetization Risk"
+  | "Timing Risk"
+  | "Platform Risk";
+export interface AiFounderRisk {
+  risk: AiFounderRiskName;
+  score: number;
+  reason: string;
+  supportingEvidence: string[];
+}
+export interface AiFounderOpportunityProfile {
+  idealCustomerProfile: string;
+  whoShouldNotBeTargeted: string;
+  earlyAdopterProfile: string;
+  corePain: string;
+  topMvpFeatures: string[];
+  featuresToAvoid: string[];
+  suggestedLaunchStrategy: string;
+}
+export type PricingConfidence = "high" | "medium" | "low" | "not-verified";
+export type MonetizationSupportLabel = "supported" | "unsupported" | "not-verified";
+export interface AiMonetizationReasoning {
+  possiblePricing: string;
+  pricingConfidence: PricingConfidence;
+  pricingAssumptions: string[];
+  subscriptionViability: MonetizationSupportLabel;
+  enterprisePotential: MonetizationSupportLabel;
+}
+export interface AiConfidenceReview {
+  originalScore: number;
+  adjustedScore: number;
+  adjustment: number;
+  verdict: "justified" | "reduced";
+  reason: string;
+}
+export interface AiDecisionExplainability {
+  whyBuild: string;
+  whyWait: string;
+  whyIgnore: string;
+  evidenceThatMattersMost: string;
+  evidenceMissing: string;
+  whatCouldChangeThis: string;
+}
+export interface FinalFounderRecommendation {
+  executiveSummary: string;
+  recommendedAction: FounderDecisionVerdict;
+  evidenceSummary: string;
+  businessOpportunity: string;
+  risks: AiFounderRisk[];
+  recommendedMvp: string[];
+  suggestedPricingDirection: string;
+  goToMarketDirection: string;
+  unknowns: string[];
+  nextValidationSteps: string[];
+}
+export interface AiSelfReviewCheck {
+  check: string;
+  consistent: boolean;
+  detail: string;
+}
+export interface AiSelfReview {
+  checks: AiSelfReviewCheck[];
+  internallyConsistent: boolean;
+}
+export interface AiDecisionValidation {
+  decisionReasoning: AiDecisionReasoning;
+  counterEvidence: AiCounterEvidenceClaim[];
+  validation: AiValidationResult;
+  risks: AiFounderRisk[];
+  founderOpportunity: AiFounderOpportunityProfile;
+  monetization: AiMonetizationReasoning;
+  reviewedConfidence: AiConfidenceReview;
+  explainability: AiDecisionExplainability;
+  finalRecommendation: FinalFounderRecommendation;
+  selfReview: AiSelfReview;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Business Intelligence (src/opportunities/business-intelligence.ts)     */
+/* ---------------------------------------------------------------------- */
+
+export type RevenueModelLabel = "recurring" | "usage-based" | "one-time";
+export type B2bVsB2c = "B2B" | "B2C" | "unknown";
+export type CompanySizeBand = "smb" | "enterprise" | "mixed" | "unknown";
+export type BudgetConfidence = "high" | "medium" | "low" | "not-verified";
+export type UrgencyBand = "high" | "medium" | "low";
+export type SwitchingDifficulty = "high" | "medium" | "low" | "unknown";
+export interface BusinessIntelligenceResult {
+  businessModel: string;
+  businessModelReason: string;
+  pricingModel: FounderPricingModel;
+  revenueModel: RevenueModelLabel;
+  revenueModelReason: string;
+  b2bVsB2c: B2bVsB2c;
+  b2bVsB2cReason: string;
+  idealCustomerProfile: string;
+  companySize: CompanySizeBand;
+  companySizeReason: string;
+  primaryBuyer: string;
+  primaryBuyerReason: string;
+  decisionMaker: string;
+  decisionMakerReason: string;
+  budgetEstimate: string;
+  budgetConfidence: BudgetConfidence;
+  budgetReason: string;
+  urgency: UrgencyBand;
+  urgencyReason: string;
+  switchingDifficulty: SwitchingDifficulty;
+  switchingDifficultyReason: string;
+  expansionPotential: MonetizationSupportLabel;
+  expansionPotentialReason: string;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Market Intelligence (src/opportunities/market-intelligence.ts)         */
+/* ---------------------------------------------------------------------- */
+
+export type GrowthStageLabel = "early" | "growing" | "plateauing" | "declining" | "insufficient-data";
+export type ConfidenceBand = "high" | "medium" | "low";
+export type SaturationLabel = "low" | "medium" | "high";
+export type OpportunityWindowLabel = "opening" | "steady" | "narrow" | "closing" | "unclear";
+export interface MarketIntelligenceResult {
+  marketMaturity: MarketMaturityLabel;
+  marketMaturityReasons: string[];
+  growthStage: GrowthStageLabel;
+  growthStageReason: string;
+  geoConcentration: "UNKNOWN";
+  geoConcentrationReason: string;
+  industryConcentration: "UNKNOWN";
+  industryConcentrationReason: string;
+  searchConfidence: ConfidenceBand;
+  searchConfidenceReason: string;
+  adoptionConfidence: ConfidenceBand;
+  adoptionConfidenceReason: string;
+  saturation: SaturationLabel;
+  saturationReason: string;
+  competitionPressure: CompetitionPressureLabel;
+  opportunityWindow: OpportunityWindowLabel;
+  opportunityWindowReason: string;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Revenue Intelligence (src/opportunities/revenue-intelligence.ts)       */
+/* ---------------------------------------------------------------------- */
+
+export type RevenueBand = "high" | "medium" | "low" | "NOT VERIFIED";
+export type ExpansionBand = "high" | "medium" | "low" | "not-verified";
+export interface RevenueIntelligenceResult {
+  revenuePotential: RevenueBand;
+  revenuePotentialReason: string;
+  pricingConfidence: PricingConfidence;
+  possiblePricing: string;
+  revenueModel: FounderPricingModel;
+  revenueModelDescription: string;
+  subscriptionViability: MonetizationSupportLabel;
+  expansionPotential: MonetizationSupportLabel;
+  upsellPotential: ExpansionBand;
+  upsellPotentialReason: string;
+  crossSellPotential: ExpansionBand;
+  crossSellPotentialReason: string;
+}
+
+/* ---------------------------------------------------------------------- */
+/* MVP Scope (src/opportunities/mvp-generator.ts)                         */
+/* ---------------------------------------------------------------------- */
+
+export interface MvpPhase {
+  phase: string;
+  features: string[];
+  reason: string;
+}
+export interface MvpScopeResult {
+  recommendedMvp: string;
+  estimatedTimeToMvp: string;
+  buildDifficulty: BuildDifficultyTier;
+  buildDifficultyExplanation: string;
+  coreFeatures: string[];
+  featuresToAvoidAtLaunch: string[];
+  featuresToAvoidReason: string;
+  phasedRoadmap: MvpPhase[];
+  launchReadinessCriteria: string[];
+  scopeSummary: string;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Go-To-Market (src/opportunities/go-to-market.ts)                       */
+/* ---------------------------------------------------------------------- */
+
+export interface GtmChannel {
+  channel: string;
+  reason: string;
+}
+export interface GtmLaunchStep {
+  step: number;
+  action: string;
+  reason: string;
+}
+export interface GoToMarketResult {
+  launchStrategy: string;
+  goToMarketDirection: string;
+  bestCustomer: string;
+  whyThisCustomer: string;
+  earlyAdopterProfile: string;
+  recommendedChannels: GtmChannel[];
+  positioningStatement: string;
+  positioningBasis: DifferentiationStrategyName[] | "NOT VERIFIED";
+  launchSequence: GtmLaunchStep[];
+}
+
+/* ---------------------------------------------------------------------- */
+/* Technical Blueprint (src/opportunities/technical-blueprint.ts)         */
+/* ---------------------------------------------------------------------- */
+
+export interface TechnicalBlueprintResult {
+  buildDifficulty: BuildDifficultyTier;
+  expectedMvpComplexity: FounderMvpComplexity;
+  architectureAdvice: string;
+  architectureAdviceReason: string;
+  databaseAdvice: string;
+  databaseAdviceReason: string;
+  apiAdvice: string;
+  apiAdviceReason: string;
+  authAdvice: string;
+  authAdviceReason: string;
+  aiLayerAdvice: string;
+  aiLayerAdviceReason: string;
+  hostingAdvice: string;
+  hostingAdviceReason: string;
+  storageAdvice: string;
+  storageAdviceReason: string;
+  advisoryDisclaimer: string;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Knowledge Links (src/opportunities/knowledge-links.ts)                 */
+/* ---------------------------------------------------------------------- */
+
+export type KnowledgeNodeType =
+  | "problem"
+  | "competitor"
+  | "customer"
+  | "market"
+  | "revenue"
+  | "execution"
+  | "monitoring-capability";
+export interface KnowledgeNode {
+  id: string;
+  type: KnowledgeNodeType;
+  label: string;
+  reason: string;
+}
+export type KnowledgeRelation =
+  | "threatens"
+  | "affects"
+  | "competes-for-attention-of"
+  | "operates-in"
+  | "shapes-monetization-of"
+  | "funds-scope-of"
+  | "sequenced-before"
+  | "could-be-watched-by";
+export interface KnowledgeEdge {
+  from: string;
+  to: string;
+  relation: KnowledgeRelation;
+  reason: string;
+}
+export interface KnowledgeLinksResult {
+  nodes: KnowledgeNode[];
+  edges: KnowledgeEdge[];
+}
+
 /** src/opportunities/types.ts FounderOpportunityReport */
 export interface FounderOpportunityReport {
   id: string;
@@ -475,6 +885,101 @@ export interface FounderOpportunityReport {
   sourceProblemReportId: string;
   /** Loop 3 Founder Decision layer — see FounderDecision above. */
   decision: FounderDecision;
+  /** Loop 7 Founder Intelligence bundle — competitor intel, market gaps, differentiation, risks. */
+  founderIntelligence: FounderIntelligence;
+  /** Loop 8 AI Decision Validation bundle — adversarial review, counter-evidence, final recommendation. */
+  aiDecisionValidation: AiDecisionValidation;
+  /** Business Intelligence bundle — business/revenue model, buyer, budget, urgency, switching. */
+  businessIntelligence: BusinessIntelligenceResult;
+  /** Market Intelligence bundle — growth stage, saturation, opportunity window. */
+  marketIntelligence: MarketIntelligenceResult;
+  /** Revenue Intelligence bundle — revenue potential, model, upsell/cross-sell. */
+  revenueIntelligence: RevenueIntelligenceResult;
+  /** MVP Scope bundle — phased roadmap, launch-readiness, deferred features. */
+  mvpPlan: MvpScopeResult;
+  /** Go-To-Market bundle — channels, positioning, launch sequence. */
+  goToMarket: GoToMarketResult;
+  /** Technical Blueprint bundle — advisory architecture/DB/API/auth/hosting guidance. */
+  technicalBlueprint: TechnicalBlueprintResult;
+  /** Knowledge Links bundle — typed node/edge reference set across report sections. */
+  knowledgeLinks: KnowledgeLinksResult;
+}
+
+/* ---------------------------------------------------------------------- */
+/* Opportunity Selection (src/opportunities/opportunity-selection.ts)      */
+/* ---------------------------------------------------------------------- */
+
+export type QualificationGateStatus = "PASS" | "FAIL" | "UNKNOWN";
+export interface QualificationGate {
+  gate: string;
+  status: QualificationGateStatus;
+  evidence: string[];
+  reason: string;
+}
+export interface EliminationVerdict {
+  rejected: boolean;
+  reasons: string[];
+}
+export interface DifferentiationEngineResult {
+  currentSolution: string;
+  whyUsersStillUseIt: string;
+  biggestComplaints: string[];
+  missingFeatures: string[];
+  pricingComplaints: string[];
+  manualWorkarounds: string[];
+  aiOpportunities: string[];
+  automationOpportunities: string[];
+  uxOpportunities: string[];
+  workflowOpportunities: string[];
+  whyUsersWouldSwitch: string;
+}
+export type FrictionTier = "low" | "medium" | "high" | "unknown";
+export interface MarketReplacementAnalysis {
+  switchFriction: FrictionTier;
+  switchFrictionReason: string;
+  migrationDifficulty: FrictionTier;
+  migrationDifficultyReason: string;
+  integrationDependency: FrictionTier;
+  integrationDependencyReason: string;
+  learningCurve: FrictionTier;
+  learningCurveReason: string;
+  lockInRisk: FrictionTier;
+  lockInRiskReason: string;
+  replacementFeasibility: "high" | "medium" | "low" | "unknown";
+  replacementFeasibilityReason: string;
+}
+export interface HighConvictionScoreDimension {
+  name: string;
+  raw: number;
+  weight: number;
+  weighted: number;
+  reason: string;
+}
+export interface HighConvictionScore {
+  overall: number;
+  dimensions: HighConvictionScoreDimension[];
+}
+export interface SelfCritique {
+  reasonsToBuild: string[];
+  reasonsNotToBuild: string[];
+  strongestRisk: { risk: string; score: number; reason: string };
+  strongestUnknown: string;
+  evidenceStillMissing: string[];
+  customerInterviewsRequired: string[];
+}
+export interface OpportunitySelectionSurvivor {
+  report: FounderOpportunityReport;
+  highConvictionScore: HighConvictionScore;
+  whySurvived: string;
+  selfCritique: SelfCritique;
+}
+export interface OpportunitySelectionRejected {
+  reportId: string;
+  whyRejected: string[];
+}
+export interface OpportunitySelectionResult {
+  survivors: OpportunitySelectionSurvivor[];
+  rejected: OpportunitySelectionRejected[];
 }
 
 /** src/opportunities/types.ts TopOpportunitiesReport — GET /api/pipeline/:id/opportunities response */
@@ -486,4 +991,6 @@ export interface TopOpportunitiesReport {
   totalClustersConsidered: number;
   generatedAt: string;
   artifactId?: string;
+  /** Final elimination/survivor-ranking layer — see OpportunitySelectionResult. */
+  opportunitySelection: OpportunitySelectionResult;
 }
