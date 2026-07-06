@@ -9,7 +9,7 @@ import { MissingKeysError } from "../../research/engine.js";
 import { exportAsJson, exportAsMarkdown } from "../../opportunities/export.js";
 import type { ResearchProgressEvent, ResearchSession } from "../../research/types.js";
 import type { ProblemIntelligenceReport } from "../../problems/types.js";
-import type { TopOpportunitiesReport } from "../../opportunities/types.js";
+import type { FounderOpportunityReport, TopOpportunitiesReport } from "../../opportunities/types.js";
 
 const RunBody = z.object({
   windowDays: z.number().int().positive().max(365).optional(),
@@ -295,6 +295,25 @@ export function registerOpportunityPipelineRoutes(router: Router, ctx: AppContex
     });
     reqCtx.res.end(body);
   });
+}
+
+/**
+ * Shared, read-only accessor for the pipeline's completed opportunity report,
+ * keyed by the same `pipelineId` this route mints. Exported so sibling routes
+ * (e.g. the Founder Copilot) can resolve an opportunity WITHOUT duplicating
+ * the `pipelineStates` lookup or re-running the pipeline. Returns `undefined`
+ * when the pipeline is unknown or has not yet produced opportunities.
+ */
+export function getPipelineOpportunityReport(pipelineId: string): TopOpportunitiesReport | undefined {
+  return pipelineStates.get(pipelineId)?.opportunityReport;
+}
+
+/** Resolves a single opportunity within a pipeline's report — same lookup the `/opportunities/:opportunityId` route uses. */
+export function getPipelineOpportunity(
+  pipelineId: string,
+  opportunityId: string,
+): FounderOpportunityReport | undefined {
+  return getPipelineOpportunityReport(pipelineId)?.opportunities.find((entry) => entry.id === opportunityId);
 }
 
 /** Test-only hook to reset in-memory pipeline state between test cases. */

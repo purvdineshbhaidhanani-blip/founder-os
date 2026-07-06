@@ -21,6 +21,7 @@ import { MultiProjectScheduler } from "../scheduling/index.js";
 import { SettingsManager } from "../settings/index.js";
 import { ResearchEngine } from "../research/index.js";
 import { MonitorEngine } from "../monitoring/index.js";
+import { createFounderCopilotService, type FounderCopilotService } from "../founder-copilot/index.js";
 import { ClusterRepository, ProblemIntelligenceEngine } from "../problems/index.js";
 import { OpportunityEngine, OpportunityRepository } from "../opportunities/index.js";
 
@@ -52,6 +53,7 @@ export interface AppContext {
   connectors: ConnectorRegistry;
   research: ResearchEngine;
   monitoring: MonitorEngine;
+  copilot: FounderCopilotService;
   clusterRepository: ClusterRepository;
   problems: ProblemIntelligenceEngine;
   opportunityRepository: OpportunityRepository;
@@ -87,6 +89,7 @@ export function composeAppContext(): AppContext {
   const connectors = new ConnectorRegistry();
   const research = new ResearchEngine({ connectors, artifacts, memory, bus });
   const monitoring = new MonitorEngine({ memory, artifacts, bus });
+  const copilot = createFounderCopilotService();
   const clusterRepository = new ClusterRepository({ artifacts, memory });
   const problems = new ProblemIntelligenceEngine({ repository: clusterRepository });
   const opportunityRepository = new OpportunityRepository({ artifacts, memory });
@@ -130,6 +133,7 @@ export function composeAppContext(): AppContext {
     connectors,
     research,
     monitoring,
+    copilot,
     clusterRepository,
     problems,
     opportunityRepository,

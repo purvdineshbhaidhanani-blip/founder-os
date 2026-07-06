@@ -268,6 +268,88 @@ describe("pipeline routes: end-to-end success", () => {
     expect(res.status).toBe(404);
   });
 
+  it("requires authentication for the Founder Copilot routes", async () => {
+    const questions = await fetch(`${baseUrl}/api/copilot/questions`);
+    expect(questions.status).toBe(401);
+    const answers = await fetch(
+      `${baseUrl}/api/pipeline/${encodeURIComponent(pipelineId)}/opportunities/whatever/copilot/answers`,
+    );
+    expect(answers.status).toBe(401);
+    const ask = await fetch(
+      `${baseUrl}/api/pipeline/${encodeURIComponent(pipelineId)}/opportunities/whatever/copilot/ask`,
+      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: "why?" }) },
+    );
+    expect(ask.status).toBe(401);
+  });
+
+  it("lists the supported Founder Copilot questions via GET /api/copilot/questions", async () => {
+    const res = await fetch(`${baseUrl}/api/copilot/questions`, { headers: { Cookie: sessionCookie } });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(Array.isArray(body.canonical)).toBe(true);
+    expect(Array.isArray(body.additional)).toBe(true);
+    expect(body.canonical.length).toBe(8);
+    expect(body.additional.length).toBe(8);
+  });
+
+  it("answers the full Copilot battery for a real opportunity via GET .../copilot/answers", async () => {
+    const opportunityId = opportunityReport.opportunities[0].id;
+    const res = await fetch(
+      `${baseUrl}/api/pipeline/${encodeURIComponent(pipelineId)}/opportunities/${encodeURIComponent(opportunityId)}/copilot/answers`,
+      { headers: { Cookie: sessionCookie } },
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.opportunityId).toBe(opportunityId);
+    // 8 canonical + 8 additional.
+    expect(body.answers.length).toBe(16);
+    const first = body.answers[0];
+    expect(typeof first.question).toBe("string");
+    expect(typeof first.topic).toBe("string");
+    expect(typeof first.answer).toBe("string");
+    expect(Array.isArray(first.citations)).toBe(true);
+    expect(typeof first.notVerified).toBe("boolean");
+  });
+
+  it("answers a single free-text Copilot question via POST .../copilot/ask", async () => {
+    const opportunityId = opportunityReport.opportunities[0].id;
+    const res = await fetch(
+      `${baseUrl}/api/pipeline/${encodeURIComponent(pipelineId)}/opportunities/${encodeURIComponent(opportunityId)}/copilot/ask`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Cookie: sessionCookie },
+        body: JSON.stringify({ question: "What should I build?" }),
+      },
+    );
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.opportunityId).toBe(opportunityId);
+    expect(body.answer.question).toBe("What should I build?");
+    expect(typeof body.answer.answer).toBe("string");
+    expect(body.answer.answer.length).toBeGreaterThan(0);
+  });
+
+  it("rejects an empty Copilot question body with 400", async () => {
+    const opportunityId = opportunityReport.opportunities[0].id;
+    const res = await fetch(
+      `${baseUrl}/api/pipeline/${encodeURIComponent(pipelineId)}/opportunities/${encodeURIComponent(opportunityId)}/copilot/ask`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Cookie: sessionCookie },
+        body: JSON.stringify({ question: "" }),
+      },
+    );
+    expect(res.status).toBe(400);
+  });
+
+  it("returns 404 for the Copilot on an unknown opportunityId", async () => {
+    const res = await fetch(
+      `${baseUrl}/api/pipeline/${encodeURIComponent(pipelineId)}/opportunities/does-not-exist/copilot/answers`,
+      { headers: { Cookie: sessionCookie } },
+    );
+    expect(res.status).toBe(404);
+  });
+
   it("exports Markdown with the right content-type and a non-empty body", async () => {
     const res = await fetch(`${baseUrl}/api/pipeline/${encodeURIComponent(pipelineId)}/export?format=markdown`, {
       headers: { Cookie: sessionCookie },

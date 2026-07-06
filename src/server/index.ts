@@ -11,6 +11,7 @@ import { registerConnectorRoutes } from "./routes/connectors.js";
 import { registerResearchRoutes } from "./routes/research.js";
 import { registerOpportunityPipelineRoutes } from "./routes/opportunities.js";
 import { registerMonitoringRoutes } from "./routes/monitoring.js";
+import { registerCopilotRoutes } from "./routes/copilot.js";
 import { createLogger } from "../utils/logger.js";
 
 const logger = createLogger("server");
@@ -91,6 +92,7 @@ export function createServer(ctx: AppContext): http.Server {
   registerResearchRoutes(router, ctx);
   registerOpportunityPipelineRoutes(router, ctx);
   registerMonitoringRoutes(router, ctx);
+  registerCopilotRoutes(router, ctx);
 
   return http.createServer((req, res) => {
     const url = new URL(req.url ?? "/", "http://localhost");
