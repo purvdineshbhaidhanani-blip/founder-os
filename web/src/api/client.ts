@@ -1,10 +1,18 @@
 import type {
   ApiErrorBody,
   ConnectorStatusView,
+  CopilotAnswersResponse,
+  CopilotAskResponse,
+  CopilotQuestionsResponse,
   FounderDashboardView,
   FounderOpportunityReport,
   LoginResponse,
   MeResponse,
+  MonitorProvidersResponse,
+  MonitorRunInput,
+  MonitorRunResult,
+  MonitorRunsResponse,
+  MonitorSnapshot,
   PipelineProgressEvent,
   ResearchProgressEvent,
   ResearchSession,
@@ -173,6 +181,56 @@ export function getOpportunityDetail(pipelineId: string, opportunityId: string):
 /** Builds the download URL for a pipeline's exported report — a plain same-origin link so the browser sends the session cookie on navigation. */
 export function getPipelineExportUrl(pipelineId: string, format: "markdown" | "json"): string {
   return `${API_BASE}/pipeline/${encodeURIComponent(pipelineId)}/export?format=${format}`;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Founder Copilot — read-only Q&A over one opportunity (src/founder-copilot). */
+/* -------------------------------------------------------------------------- */
+
+/** The fixed supported-question vocabulary (canonical + additional). */
+export function getCopilotQuestions(): Promise<CopilotQuestionsResponse> {
+  return request<CopilotQuestionsResponse>("/copilot/questions");
+}
+
+/** Answers one free-text question against a single opportunity. */
+export function askCopilot(
+  pipelineId: string,
+  opportunityId: string,
+  question: string,
+): Promise<CopilotAskResponse> {
+  return request<CopilotAskResponse>(
+    `/pipeline/${encodeURIComponent(pipelineId)}/opportunities/${encodeURIComponent(opportunityId)}/copilot/ask`,
+    { method: "POST", body: JSON.stringify({ question }) },
+  );
+}
+
+/** The full pre-answered battery (canonical + additional) for one opportunity. */
+export function getCopilotAnswers(pipelineId: string, opportunityId: string): Promise<CopilotAnswersResponse> {
+  return request<CopilotAnswersResponse>(
+    `/pipeline/${encodeURIComponent(pipelineId)}/opportunities/${encodeURIComponent(opportunityId)}/copilot/answers`,
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/* Monitoring — change detection over external providers (src/monitoring).     */
+/* -------------------------------------------------------------------------- */
+
+export function getMonitoringProviders(): Promise<MonitorProvidersResponse> {
+  return request<MonitorProvidersResponse>("/monitoring/providers");
+}
+
+export function runMonitoring(input: MonitorRunInput): Promise<MonitorRunResult> {
+  return request<MonitorRunResult>("/monitoring/run", { method: "POST", body: JSON.stringify(input) });
+}
+
+export function getMonitoringSnapshot(providerId: string, query: string): Promise<MonitorSnapshot> {
+  const params = new URLSearchParams({ providerId, query });
+  return request<MonitorSnapshot>(`/monitoring/snapshot?${params.toString()}`);
+}
+
+export function getMonitoringRuns(limit?: number): Promise<MonitorRunsResponse> {
+  const suffix = limit ? `?limit=${limit}` : "";
+  return request<MonitorRunsResponse>(`/monitoring/runs${suffix}`);
 }
 
 /**

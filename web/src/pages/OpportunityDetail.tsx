@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { getOpportunityDetail } from "../api/client";
 import type { FounderOpportunityReport } from "../api/types";
 import ConfidenceBadge from "../components/ConfidenceBadge";
+import CopilotPanel from "../components/CopilotPanel";
 
 function verdictClass(verdict: string): string {
   if (verdict === "BUILD") return "badge-verdict-build";
@@ -72,6 +73,8 @@ export default function OpportunityDetail(): React.ReactElement {
       <h1>{opportunity.problem}</h1>
       <p className="page-subtitle">Category: {opportunity.category}</p>
       <p>{opportunity.summary}</p>
+
+      {pipelineId && opportunityId && <CopilotPanel pipelineId={pipelineId} opportunityId={opportunityId} />}
 
       <section className="card">
         <h2>Recommendation</h2>

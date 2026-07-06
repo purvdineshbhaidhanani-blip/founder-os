@@ -26,6 +26,9 @@ export default function Nav(): React.ReactElement {
         <NavLink to="/research" className={({ isActive }) => (isActive ? "active" : "")}>
           Advanced: Research
         </NavLink>
+        <NavLink to="/monitoring" className={({ isActive }) => (isActive ? "active" : "")}>
+          Advanced: Monitoring
+        </NavLink>
         <NavLink to="/history" className={({ isActive }) => (isActive ? "active" : "")}>
           Advanced: History
         </NavLink>

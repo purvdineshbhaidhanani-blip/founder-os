@@ -994,3 +994,154 @@ export interface TopOpportunitiesReport {
   /** Final elimination/survivor-ranking layer — see OpportunitySelectionResult. */
   opportunitySelection: OpportunitySelectionResult;
 }
+
+/* ---------------------------------------------------------------------- */
+/* Founder Copilot (src/founder-copilot/* + src/server/routes/copilot.ts)  */
+/* ---------------------------------------------------------------------- */
+
+export type FounderCopilotTopic =
+  | "what-to-build"
+  | "why"
+  | "customer"
+  | "why-pay"
+  | "risks"
+  | "validation"
+  | "mvp"
+  | "launch"
+  | "why-build"
+  | "why-not-build"
+  | "who-pays"
+  | "how-price"
+  | "what-build-first"
+  | "differentiate"
+  | "get-customers"
+  | "market-weak"
+  | "unmatched";
+
+export interface FounderCopilotCitation {
+  fieldPath: string;
+  value: string;
+}
+
+export interface FounderCopilotAnswer {
+  question: string;
+  topic: FounderCopilotTopic;
+  answer: string;
+  citations: FounderCopilotCitation[];
+  notVerified: boolean;
+}
+
+/** GET /api/copilot/questions */
+export interface CopilotQuestionsResponse {
+  canonical: string[];
+  additional: string[];
+}
+
+/** POST .../copilot/ask */
+export interface CopilotAskResponse {
+  pipelineId: string;
+  opportunityId: string;
+  answer: FounderCopilotAnswer;
+}
+
+/** GET .../copilot/answers */
+export interface CopilotAnswersResponse {
+  pipelineId: string;
+  opportunityId: string;
+  answers: FounderCopilotAnswer[];
+}
+
+/* ---------------------------------------------------------------------- */
+/* Monitoring (src/monitoring/* + src/server/routes/monitoring.ts)         */
+/* ---------------------------------------------------------------------- */
+
+export type MonitorCategory =
+  | "competitor-launch"
+  | "pricing"
+  | "feature-release"
+  | "funding"
+  | "product-hunt"
+  | "trending-github"
+  | "complaint"
+  | "market";
+
+export type ChangeEventType = "added" | "removed" | "changed";
+
+export interface ChangeEvent {
+  type: ChangeEventType;
+  itemId: string;
+  title: string;
+  url: string;
+  sourceId: string;
+  field?: string;
+  previousValue?: string | number | boolean;
+  currentValue?: string | number | boolean;
+}
+
+export interface MonitorSnapshotItem {
+  id: string;
+  title: string;
+  url: string;
+  fields?: Record<string, string | number | boolean | undefined>;
+  capturedAt: string;
+  sourceId: string;
+  metadata?: Record<string, unknown>;
+}
+
+export interface MonitorSnapshot {
+  providerId: string;
+  category: MonitorCategory;
+  query: string;
+  capturedAt: string;
+  items: MonitorSnapshotItem[];
+}
+
+export interface MonitorProviderInfo {
+  id: string;
+  category: MonitorCategory;
+  keyless: boolean;
+}
+
+export interface MonitorProviderRunResult {
+  providerId: string;
+  category: MonitorCategory;
+  ok: boolean;
+  firstRun: boolean;
+  itemCount: number;
+  changes: ChangeEvent[];
+  partialFailure?: { reason: SourceFailureReason; detail: string };
+  error?: string;
+  reason?: SourceFailureReason;
+}
+
+export interface MonitorRunResult {
+  runId: string;
+  query: string;
+  windowDays: number;
+  startedAt: string;
+  completedAt: string;
+  durationMs: number;
+  providersRun: string[];
+  providersFailed: string[];
+  totalChanges: number;
+  results: MonitorProviderRunResult[];
+  artifactId?: string;
+}
+
+/** POST /api/monitoring/run body */
+export interface MonitorRunInput {
+  query: string;
+  windowDays?: number;
+  providerIds?: string[];
+  category?: MonitorCategory;
+}
+
+/** GET /api/monitoring/providers */
+export interface MonitorProvidersResponse {
+  providers: MonitorProviderInfo[];
+}
+
+/** GET /api/monitoring/runs */
+export interface MonitorRunsResponse {
+  runs: MonitorRunResult[];
+}

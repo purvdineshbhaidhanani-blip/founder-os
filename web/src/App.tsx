@@ -13,6 +13,7 @@ import Settings from "./pages/Settings";
 import PipelineProgress from "./pages/PipelineProgress";
 import TopOpportunities from "./pages/TopOpportunities";
 import OpportunityDetail from "./pages/OpportunityDetail";
+import Monitoring from "./pages/Monitoring";
 
 function AuthedLayout({ children }: { children: React.ReactElement }): React.ReactElement {
   const { user } = useAuth();
@@ -91,6 +92,14 @@ function AppRoutes(): React.ReactElement {
           element={
             <RequireAuth>
               <Report />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="/monitoring"
+          element={
+            <RequireAuth>
+              <Monitoring />
             </RequireAuth>
           }
         />
