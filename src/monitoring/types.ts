@@ -104,6 +104,60 @@ export interface MonitorProvider {
   fetch(query: string, windowDays?: number): Promise<MonitorProviderResult>;
 }
 
+/* ---------------------------------------------------------------------- */
+/* Monitoring run orchestration (engine.ts) — the server-facing surface.  */
+/* ---------------------------------------------------------------------- */
+
+/** Input to `MonitorEngine.run` — scopes which providers run and for what query. */
+export interface MonitorRunInput {
+  /** What to monitor: a competitor name / product keyword, or a target URL for the web-snapshot provider. */
+  query: string;
+  /** Recency window in days for providers that support it; ignored by providers that don't. */
+  windowDays?: number;
+  /** Restrict the run to these provider ids; when omitted, all (category-filtered, else every) providers run. */
+  providerIds?: string[];
+  /** Restrict the run to providers whose primary `category` matches; ignored when `providerIds` is given. */
+  category?: MonitorCategory;
+}
+
+/** Provider descriptor returned by `MonitorEngine.listProviders` (no fetch, safe to serialize). */
+export interface MonitorProviderInfo {
+  id: string;
+  category: MonitorCategory;
+  keyless: boolean;
+}
+
+/** Per-provider outcome of a single monitoring run. */
+export interface MonitorProviderRunResult {
+  providerId: string;
+  category: MonitorCategory;
+  ok: boolean;
+  /** True when no previous snapshot existed for this provider/query — changes are intentionally empty (nothing to diff against). */
+  firstRun: boolean;
+  itemCount: number;
+  changes: ChangeEvent[];
+  /** Present only when this provider fanned out and some (not all) endpoints failed. */
+  partialFailure?: { reason: SourceFailureReason; detail: string };
+  /** Present only when `ok === false`. */
+  error?: string;
+  reason?: SourceFailureReason;
+}
+
+/** Full, typed result of one `MonitorEngine.run` invocation. */
+export interface MonitorRunResult {
+  runId: string;
+  query: string;
+  windowDays: number;
+  startedAt: Timestamp;
+  completedAt: Timestamp;
+  durationMs: number;
+  providersRun: string[];
+  providersFailed: string[];
+  totalChanges: number;
+  results: MonitorProviderRunResult[];
+  artifactId?: string;
+}
+
 export type ChangeEventType = "added" | "removed" | "changed";
 
 /**
