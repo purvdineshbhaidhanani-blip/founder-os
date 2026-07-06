@@ -25,8 +25,12 @@ architecture — no rewrites.
 7. **Ranking/calibration algorithm iteration** — a dedicated, test-updating
    change to improve prioritization math (kept out of UI work to preserve
    deterministic backward compatibility).
-8. **Persistence backend** — swap the in-memory stores for a durable store
-   behind the existing `MemoryStore` interface (already abstracted).
+8. **Persistence backend** — _shipped_: `SupabaseMemoryStore` implements the
+   existing `MemoryStore` interface and is selected automatically when
+   `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` are set (falls back to
+   in-memory otherwise). Remaining: apply `supabase/migrations/0001_*.sql`
+   once per project (DDL cannot run over PostgREST), and additional durable
+   stores (Postgres direct, etc.) behind the same interface if needed.
 9. **Multi-opportunity copilot** — cross-opportunity comparison questions.
 
 ## Explicitly out of scope for the current phase

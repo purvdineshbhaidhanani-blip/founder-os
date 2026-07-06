@@ -5,6 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { Router, sendJson } from "./router.js";
 import { composeAppContext, type AppContext } from "./wiring.js";
+import { SupabaseMemoryStore } from "../runtime/memory/supabase-store.js";
 import { registerAuthRoutes } from "./routes/auth.js";
 import { registerDashboardRoutes } from "./routes/dashboard.js";
 import { registerConnectorRoutes } from "./routes/connectors.js";
@@ -110,6 +111,13 @@ export function startServer(port = Number(process.env.PORT) || 4173): { server: 
   server.listen(port, () => {
     logger.info(`Founder OS server listening on port ${port}`);
   });
+  // Verify a durable memory backend at boot (non-blocking): logs whether the
+  // Supabase table is reachable / needs its one-time migration. Never crashes
+  // the server and never logs the key.
+  const store = ctx.memory.store;
+  if (store instanceof SupabaseMemoryStore) {
+    void store.verifyConnection();
+  }
   return { server, ctx };
 }
 

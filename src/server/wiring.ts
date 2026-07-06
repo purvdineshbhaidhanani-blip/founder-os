@@ -5,6 +5,7 @@ import {
   DashboardBackend,
   EventBus,
   MemoryEngine,
+  createMemoryStoreFromEnv,
   TaskQueue,
   WorkflowEngine,
 } from "../runtime/index.js";
@@ -72,7 +73,10 @@ export function composeAppContext(): AppContext {
   const runtime = new AgentRuntime({ bus });
   const queue = new TaskQueue();
   const workflow = new WorkflowEngine();
-  const memory = new MemoryEngine();
+  // Durable Supabase-backed memory when SUPABASE_URL + SUPABASE_SERVICE_ROLE_KEY
+  // are set in the server environment; otherwise the volatile in-memory store
+  // (unchanged default). See src/runtime/memory/store-factory.ts.
+  const memory = new MemoryEngine(createMemoryStoreFromEnv());
   const artifacts = new ArtifactManager({ bus });
   const approvals = new ApprovalSystem({ bus, workflowEngine: workflow });
   const analytics = new AgentAnalytics();

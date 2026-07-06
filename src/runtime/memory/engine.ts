@@ -25,7 +25,12 @@ export interface MemoryIndex {
  * (`remember/recall/forget/cleanup`).
  */
 export class MemoryEngine {
-  constructor(private readonly store: MemoryStore = new InMemoryStore()) {}
+  constructor(private readonly backingStore: MemoryStore = new InMemoryStore()) {}
+
+  /** The underlying store — exposed read-only for startup diagnostics (e.g. connection verification). */
+  get store(): MemoryStore {
+    return this.backingStore;
+  }
 
   async remember<T>(
     namespace: MemoryNamespace,
