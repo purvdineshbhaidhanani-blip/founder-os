@@ -46,7 +46,7 @@ export default function OpportunityDetail(): React.ReactElement {
   if (error) return <div className="banner banner-error">{error}</div>;
   if (!opportunity) return <div className="banner banner-error">Opportunity not found.</div>;
 
-  const { scoreBreakdown, buyingIntent, competition, buildDifficulty, recommendation, supportingEvidence, decision } = opportunity;
+  const { scoreBreakdown, fois, buyingIntent, competition, buildDifficulty, recommendation, supportingEvidence, decision } = opportunity;
 
   return (
     <div className="page">
@@ -90,8 +90,55 @@ export default function OpportunityDetail(): React.ReactElement {
         )}
       </section>
 
+      {/*
+        FOIS (Founder Opportunity Intelligence Score) — the report's real
+        ranking key. Opportunities are sorted by fois.overall descending
+        (src/opportunities/engine.ts), so it is surfaced as the primary score
+        here, above the legacy scoreBreakdown composite below. Additive,
+        read-only rendering — alters no section.
+      */}
       <section className="card">
-        <h2>Score Breakdown</h2>
+        <h2>FOIS — Opportunity Intelligence Score</h2>
+        <p>
+          <strong>{fois.overall.toFixed(1)}</strong> / 100 &middot; ranking key
+        </p>
+        <ul>
+          {fois.dimensions.map((dimension) => (
+            <li key={dimension.name}>
+              <strong>{dimension.name}:</strong> {dimension.weighted.toFixed(1)} (raw {dimension.raw.toFixed(0)} &times; weight{" "}
+              {dimension.weight.toFixed(2)}) — {dimension.reason}
+            </li>
+          ))}
+        </ul>
+        {fois.penalties.length > 0 && (
+          <>
+            <h3>Penalties</h3>
+            <ul>
+              {fois.penalties.map((penalty, index) => (
+                <li key={index}>
+                  &minus;{penalty.points}: {penalty.reason}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+        {fois.weaknesses.length > 0 && (
+          <>
+            <h3>Weaknesses</h3>
+            <ul>
+              {fois.weaknesses.map((weakness, index) => (
+                <li key={index}>{weakness}</li>
+              ))}
+            </ul>
+          </>
+        )}
+      </section>
+
+      <section className="card">
+        <h2>Legacy Score Breakdown</h2>
+        <p className="muted">
+          Diagnostic composite retained for transparency. Not the ranking key — ranking uses FOIS above.
+        </p>
         <p>
           <strong>Weighted total:</strong> {scoreBreakdown.weightedTotal.toFixed(3)} &middot;{" "}
           <strong>Pain score:</strong> {opportunity.painScore.toFixed(2)} &middot;{" "}

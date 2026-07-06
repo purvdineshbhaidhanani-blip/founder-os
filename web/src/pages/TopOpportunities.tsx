@@ -79,7 +79,7 @@ export default function TopOpportunities(): React.ReactElement {
                   <span className={`badge ${verdictClass(opportunity.recommendation.verdict)}`}>
                     {opportunity.recommendation.verdict}
                   </span>
-                  <span className="badge">Score: {opportunity.scoreBreakdown.weightedTotal.toFixed(3)}</span>
+                  <span className="badge">FOIS: {opportunity.fois.overall.toFixed(1)}</span>
                   <span className="badge">Pain: {opportunity.painScore.toFixed(2)}</span>
                   <ConfidenceBadge score={{ band: opportunity.confidence.band as "low" | "medium" | "high", numericScore: opportunity.confidence.score }} />
                 </div>

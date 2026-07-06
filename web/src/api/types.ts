@@ -414,6 +414,36 @@ export interface FounderDecision {
   qualityGates: DecisionQualityGate[];
 }
 
+/** src/opportunities/types.ts FoisDimension */
+export interface FoisDimension {
+  name: string;
+  raw: number;
+  weight: number;
+  weighted: number;
+  reason: string;
+  evidence: string[];
+}
+
+/** src/opportunities/types.ts FoisPenalty */
+export interface FoisPenalty {
+  reason: string;
+  points: number;
+}
+
+/**
+ * src/opportunities/types.ts FoisBreakdown — the Founder Opportunity
+ * Intelligence Score. `fois.overall` is the report's real ranking key
+ * (opportunities are sorted by it descending), replacing
+ * scoreBreakdown.weightedTotal as the headline score.
+ */
+export interface FoisBreakdown {
+  overall: number;
+  dimensions: FoisDimension[];
+  reasons: string[];
+  weaknesses: string[];
+  penalties: FoisPenalty[];
+}
+
 /** src/opportunities/types.ts FounderOpportunityReport */
 export interface FounderOpportunityReport {
   id: string;
@@ -426,6 +456,12 @@ export interface FounderOpportunityReport {
   competition: CompetitionResult;
   confidence: { band: string; score: number };
   scoreBreakdown: OpportunityScoreBreakdown;
+  /**
+   * Founder Opportunity Intelligence Score. Backend ranks every report by
+   * `fois.overall` descending (see src/opportunities/engine.ts), so this — not
+   * scoreBreakdown.weightedTotal — is the number the UI shows as "Score".
+   */
+  fois: FoisBreakdown;
   supportingEvidence: { evidenceCount: number; sourceBreakdown: Record<string, number>; urls: string[] };
   representativeQuotes: Array<{ text: string; url: string; source: string }>;
   recommendedMvp: string;
