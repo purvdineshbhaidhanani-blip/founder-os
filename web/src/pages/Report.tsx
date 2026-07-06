@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { getReport } from "../api/client";
 import type { FounderReport } from "../api/types";
 import ConfidenceBadge from "../components/ConfidenceBadge";
+import { errorMessage } from "../lib/errors";
 
 export default function Report(): React.ReactElement {
   const { sessionId } = useParams<{ sessionId: string }>();
@@ -19,7 +20,7 @@ export default function Report(): React.ReactElement {
         if (!cancelled) setReport(data);
       })
       .catch((err) => {
-        if (!cancelled) setError(err instanceof Error ? err.message : "Failed to load report.");
+        if (!cancelled) setError(errorMessage(err, "Failed to load report."));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);

@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { getPipelineExportUrl, getPipelineOpportunities } from "../api/client";
 import type { TopOpportunitiesReport } from "../api/types";
 import ConfidenceBadge from "../components/ConfidenceBadge";
+import { errorMessage } from "../lib/errors";
 
 function verdictClass(verdict: string): string {
   if (verdict === "BUILD") return "badge-verdict-build";
@@ -25,7 +26,7 @@ export default function TopOpportunities(): React.ReactElement {
         if (!cancelled) setReport(data);
       })
       .catch((err) => {
-        if (!cancelled) setError(err instanceof Error ? err.message : "Failed to load top opportunities.");
+        if (!cancelled) setError(errorMessage(err, "Failed to load top opportunities."));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);

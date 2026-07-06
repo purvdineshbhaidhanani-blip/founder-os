@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { login } from "../api/client";
 import { useAuth } from "../router";
+import { errorMessage } from "../lib/errors";
 
 const OAUTH_ERROR_MESSAGES: Record<string, string> = {
   oauth_state_mismatch: "Google sign-in failed (security check did not match). Please try again.",
@@ -39,7 +40,7 @@ export default function Login(): React.ReactElement {
       await refresh();
       navigate(typeof from === "string" ? from : "/dashboard", { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed.");
+      setError(errorMessage(err, "Login failed."));
     } finally {
       setSubmitting(false);
     }

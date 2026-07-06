@@ -66,7 +66,18 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   }
 
   const contentType = res.headers.get("content-type") ?? "";
-  const payload = contentType.includes("application/json") ? await res.json() : undefined;
+  let payload: unknown = undefined;
+  if (contentType.includes("application/json")) {
+    try {
+      payload = await res.json();
+    } catch {
+      // A truncated/garbled JSON body must not surface as a raw SyntaxError.
+      if (!res.ok) {
+        throw new ApiError(res.status, { error: res.statusText || "The server returned an unreadable response." });
+      }
+      throw new ApiError(502, { error: "The server returned a malformed response. Please try again." });
+    }
+  }
 
   if (!res.ok) {
     throw new ApiError(res.status, (payload as ApiErrorBody) ?? { error: res.statusText });

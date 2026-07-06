@@ -3,6 +3,7 @@ import { getConnectorStatus } from "../api/client";
 import type { ConnectorStatusView } from "../api/types";
 import SourceStatusBadge from "../components/SourceStatusBadge";
 import RunResearchButton from "../components/RunResearchButton";
+import { errorMessage } from "../lib/errors";
 
 export default function Research(): React.ReactElement {
   const [connectors, setConnectors] = useState<ConnectorStatusView[]>([]);
@@ -17,7 +18,7 @@ export default function Research(): React.ReactElement {
         if (!cancelled) setConnectors(list);
       })
       .catch((err) => {
-        if (!cancelled) setError(err instanceof Error ? err.message : "Failed to load connector status.");
+        if (!cancelled) setError(errorMessage(err, "Failed to load connector status."));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);

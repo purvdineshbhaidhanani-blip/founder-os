@@ -1,13 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { askCopilot, getCopilotAnswers, getCopilotQuestions, ApiError } from "../api/client";
+import { askCopilot, getCopilotAnswers, getCopilotQuestions } from "../api/client";
 import type { FounderCopilotAnswer } from "../api/types";
 import { type ConversationEntry } from "../lib/copilot-format";
+import { errorMessage } from "../lib/errors";
 import CopilotAnswerCard from "./CopilotAnswerCard";
-
-function errorMessage(err: unknown): string {
-  if (err instanceof ApiError) return err.body.error || err.message;
-  return err instanceof Error ? err.message : "Request failed.";
-}
 
 /**
  * Founder Copilot panel — a read-only conversational surface over ONE

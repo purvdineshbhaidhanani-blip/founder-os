@@ -4,6 +4,7 @@ import { getOpportunityDetail } from "../api/client";
 import type { FounderOpportunityReport } from "../api/types";
 import ConfidenceBadge from "../components/ConfidenceBadge";
 import CopilotPanel from "../components/CopilotPanel";
+import { errorMessage } from "../lib/errors";
 
 function verdictClass(verdict: string): string {
   if (verdict === "BUILD") return "badge-verdict-build";
@@ -33,7 +34,7 @@ export default function OpportunityDetail(): React.ReactElement {
         if (!cancelled) setOpportunity(data);
       })
       .catch((err) => {
-        if (!cancelled) setError(err instanceof Error ? err.message : "Failed to load opportunity.");
+        if (!cancelled) setError(errorMessage(err, "Failed to load opportunity."));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getDashboard } from "../api/client";
 import type { FounderDashboardView } from "../api/types";
 import RunResearchButton from "../components/RunResearchButton";
+import { errorMessage } from "../lib/errors";
 
 export default function Dashboard(): React.ReactElement {
   const [data, setData] = useState<FounderDashboardView | null>(null);
@@ -16,7 +17,7 @@ export default function Dashboard(): React.ReactElement {
         if (!cancelled) setData(view);
       })
       .catch((err) => {
-        if (!cancelled) setError(err instanceof Error ? err.message : "Failed to load dashboard.");
+        if (!cancelled) setError(errorMessage(err, "Failed to load dashboard."));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);

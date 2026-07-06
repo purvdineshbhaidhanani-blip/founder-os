@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  ApiError,
   getMonitoringProviders,
   getMonitoringRuns,
   getMonitoringSnapshot,
@@ -8,6 +7,7 @@ import {
 } from "../api/client";
 import type { MonitorCategory, MonitorProviderInfo, MonitorRunResult, MonitorSnapshot } from "../api/types";
 import MonitorRunResultView from "../components/MonitorRunResultView";
+import { errorMessage } from "../lib/errors";
 
 const CATEGORIES: MonitorCategory[] = [
   "competitor-launch",
@@ -19,11 +19,6 @@ const CATEGORIES: MonitorCategory[] = [
   "complaint",
   "market",
 ];
-
-function errorMessage(err: unknown): string {
-  if (err instanceof ApiError) return err.body.error || err.message;
-  return err instanceof Error ? err.message : "Request failed.";
-}
 
 export default function Monitoring(): React.ReactElement {
   const [providers, setProviders] = useState<MonitorProviderInfo[]>([]);
