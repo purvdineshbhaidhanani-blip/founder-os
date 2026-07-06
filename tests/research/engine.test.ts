@@ -90,7 +90,10 @@ describe("ResearchEngine", () => {
     expect(session.artifactId).toBeTruthy();
   });
 
-  it("threads an optional topic through to every adapter's fetch call and records it on the session", async () => {
+  it("falls back to the raw user topic for every adapter when Query Intelligence returns LOW confidence (unclassifiable query)", async () => {
+    // "handmade artisan candles" matches no INDUSTRY_PATTERNS keyword ->
+    // industryConfidence "low" -> Task 5 fallback: adapters receive the raw
+    // topic unchanged, exactly like the pre-wiring behavior.
     const seenTopics: Array<string | undefined> = [];
     const adapter: SourceAdapter = {
       id: "hackernews",
@@ -102,10 +105,42 @@ describe("ResearchEngine", () => {
     };
     const { engine } = harness({}, [adapter]);
 
-    const session = await engine.run(30, () => undefined, "accounting software");
+    const session = await engine.run(30, () => undefined, "handmade artisan candles");
 
-    expect(seenTopics).toEqual(["accounting software"]);
-    expect(session.topic).toBe("accounting software");
+    expect(seenTopics).toEqual(["handmade artisan candles"]);
+    // session.topic always records the ORIGINAL user query, never an expansion.
+    expect(session.topic).toBe("handmade artisan candles");
+  });
+
+  it("dispatches the Query-Intelligence-expanded per-source query to a mapped adapter, but the raw topic to an unmapped one, while recording the original topic", async () => {
+    // "AI SaaS" -> AI Software (high confidence). hackernews is a mapped
+    // source, so it receives the top generated hackernews query
+    // (entity "LLM" + suffix "Show HN" = "LLM Show HN"). stackexchange has no
+    // dedicated per-source query list, so it falls back to the raw topic.
+    const seen: Record<string, string | undefined> = {};
+    const mapped: SourceAdapter = {
+      id: "hackernews",
+      keyless: true,
+      fetch: async (_windowDays, topic) => {
+        seen.hackernews = topic;
+        return { ok: true, items: [] };
+      },
+    };
+    const unmapped: SourceAdapter = {
+      id: "stackexchange",
+      keyless: true,
+      fetch: async (_windowDays, topic) => {
+        seen.stackexchange = topic;
+        return { ok: true, items: [] };
+      },
+    };
+    const { engine } = harness({}, [mapped, unmapped]);
+
+    const session = await engine.run(30, () => undefined, "AI SaaS");
+
+    expect(seen.hackernews).toBe("LLM Show HN");
+    expect(seen.stackexchange).toBe("AI SaaS");
+    expect(session.topic).toBe("AI SaaS");
   });
 
   it("records sourcesPartial (and surfaces it in the report) when an adapter succeeds with a partialFailure", async () => {

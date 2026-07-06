@@ -11,6 +11,7 @@ import { classifyException } from "./sources/classify.js";
 import { buildFounderReport } from "./report.js";
 import { dedupeItems } from "./dedup.js";
 import { filterOpportunitiesByRelevance, resolveRelevanceThreshold } from "./relevance.js";
+import { generateAndLogQueries, type SourceSpecificQueries } from "./query-intelligence.js";
 import type {
   Opportunity,
   RawResearchItem,
@@ -47,6 +48,22 @@ export interface ResearchEngineOptions {
 }
 
 const KEYED_SOURCE_IDS = new Set(["github", "youtube", "stackexchange"]);
+
+/**
+ * Maps a live source adapter's `id` to the matching key in
+ * `SourceSpecificQueries` (produced by `query-intelligence.ts`). Adapters
+ * whose `id` is absent here — currently only `stackexchange`, which Query
+ * Intelligence has no dedicated per-source query list for — fall back to the
+ * raw user topic (see `resolveAdapterQuery`). This is a lookup only; it does
+ * NOT change any adapter's `fetch(windowDays, topic?)` signature.
+ */
+const ADAPTER_QUERY_SOURCE: Record<string, keyof SourceSpecificQueries> = {
+  github: "github",
+  reddit: "reddit",
+  youtube: "youtube",
+  hackernews: "hackernews",
+  rss: "rss",
+};
 
 function keywordsOf(title: string): string[] {
   return title
@@ -182,13 +199,64 @@ export class ResearchEngine {
     const sourcesPartial: Array<{ id: string; reason: SourceFailureReason; detail: string }> = [];
     const allItems: RawResearchItem[] = [];
 
+    // ---- Query Intelligence wiring -----------------------------------------
+    // Pass the raw user topic through query-intelligence.ts BEFORE collection,
+    // expanding it into per-source search queries. Then each adapter is
+    // dispatched with a single query string drawn from its own source-specific
+    // list — preserving the existing `fetch(windowDays, topic?)` signature
+    // (adapters treat `topic` as one search term, so we send the top-priority
+    // generated query per source and log the full candidate list). Never
+    // redesigns query generation and never touches an adapter.
+    //
+    // Fallbacks (Task 5): a LOW-confidence intent, OR a source with no
+    // dedicated query list (e.g. stackexchange), OR an empty generated list,
+    // all fall back to the raw user topic — the exact pre-wiring behavior.
+    const rawTopic = topic?.trim() && topic.trim().length > 0 ? topic.trim() : undefined;
+    let sourceQueries: SourceSpecificQueries | undefined;
+    if (rawTopic) {
+      const { intent, queries } = generateAndLogQueries(rawTopic);
+      if (intent.industryConfidence === "low") {
+        logger.info("query intelligence LOW confidence — falling back to original user query", {
+          originalQuery: rawTopic,
+          industry: intent.industry,
+        });
+      } else {
+        sourceQueries = queries;
+        logger.info("query intelligence expanded original user query", {
+          originalQuery: rawTopic,
+          industry: intent.industry,
+          industryConfidence: intent.industryConfidence,
+        });
+      }
+    }
+
+    /**
+     * Resolves the single query string an adapter is dispatched with. When no
+     * expansion applies (no topic, LOW confidence, unmapped source, or empty
+     * list) this returns the raw user topic (or `undefined` when there was no
+     * topic at all) — identical to the pre-Query-Intelligence behavior.
+     */
+    const resolveAdapterQuery = (adapter: SourceAdapter): string | undefined => {
+      if (!rawTopic) return topic;
+      if (!sourceQueries) return rawTopic;
+      const key = ADAPTER_QUERY_SOURCE[adapter.id];
+      const candidates = key ? sourceQueries[key] : undefined;
+      return candidates && candidates.length > 0 ? candidates[0] : rawTopic;
+    };
+
     let completedCount = 0;
     const total = eligible.length;
 
     const settlements = await Promise.allSettled(
       eligible.map(async (adapter) => {
         onProgress({ type: "source.start", sourceId: adapter.id });
-        const result = await adapter.fetch(windowDays, topic);
+        const adapterQuery = resolveAdapterQuery(adapter);
+        logger.info("dispatching source query", {
+          sourceId: adapter.id,
+          query: adapterQuery ?? null,
+          expanded: Boolean(rawTopic) && sourceQueries !== undefined && adapterQuery !== rawTopic,
+        });
+        const result = await adapter.fetch(windowDays, adapterQuery);
         completedCount += 1;
         const percent = Math.round((completedCount / total) * 100);
 
