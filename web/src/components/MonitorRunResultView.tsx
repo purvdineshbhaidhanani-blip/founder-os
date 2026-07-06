@@ -20,7 +20,7 @@ function statusBadgeClass(status: "ok" | "first-run" | "failed"): string {
  * first-run vs incremental, changes, and failure reasons. Display only —
  * consumes exactly what the monitoring API returned.
  */
-export default function MonitorRunResultView({ run }: { run: MonitorRunResult }): React.ReactElement {
+function MonitorRunResultView({ run }: { run: MonitorRunResult }): React.ReactElement {
   const summary = summarizeRun(run);
   const newItems = newlyDetected(run);
 
@@ -102,3 +102,5 @@ export default function MonitorRunResultView({ run }: { run: MonitorRunResult })
     </div>
   );
 }
+
+export default React.memo(MonitorRunResultView);

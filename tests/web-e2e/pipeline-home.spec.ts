@@ -83,13 +83,33 @@ test.describe("Pipeline home (one-button flow)", () => {
       expect(page.url().startsWith(pipelineUrl.replace(/\/opportunities$/, "/opportunities/"))).toBe(true);
 
       // Detail page renders without crashing: key section headings present.
-      await expect(page.getByRole("heading", { name: "Recommendation" })).toBeVisible();
-      await expect(page.getByRole("heading", { name: "Score Breakdown" })).toBeVisible();
+      // `exact` avoids matching the newer "… Recommendations" sections
+      // (Technical / Go-To-Market / MVP) that also contain the word.
+      await expect(page.getByRole("heading", { name: "Recommendation", exact: true })).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Legacy Score Breakdown" })).toBeVisible();
       await expect(page.getByRole("heading", { name: "Buying Intent" })).toBeVisible();
       await expect(page.getByRole("heading", { name: "Competition" })).toBeVisible();
       await expect(page.getByRole("heading", { name: /Supporting Evidence/ })).toBeVisible();
       await expect(page.getByRole("heading", { name: "Representative Quotes" })).toBeVisible();
       await expect(page.getByRole("heading", { name: "Build Guidance" })).toBeVisible();
+
+      // Founder Copilot panel: suggested questions load, asking one returns a
+      // cited answer, and citations expand. The copilot is deterministic and
+      // makes no external network call, so this is stable offline.
+      await expect(page.getByRole("heading", { name: "Founder Copilot" })).toBeVisible();
+      const firstChip = page.locator(".copilot-chip").first();
+      await expect(firstChip).toBeVisible();
+      await firstChip.click();
+      const answer = page.locator(".copilot-answer").first();
+      await expect(answer).toBeVisible({ timeout: 15_000 });
+      // Citation disclosure is present and expandable.
+      const citations = page.locator(".copilot-citations summary").first();
+      if (await citations.count()) {
+        await citations.click();
+      }
+      // "Show all insights" lazy-loads the full battery.
+      await page.getByRole("button", { name: /Show all insights/i }).click();
+      await expect(page.locator(".copilot-battery-list")).toBeVisible({ timeout: 15_000 });
 
       // If at least one representative quote link exists, it must open in a
       // new tab with a real href (not a dead "#" link).

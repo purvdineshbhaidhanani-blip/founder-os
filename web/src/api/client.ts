@@ -38,15 +38,28 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(
-  path: string,
-  init?: RequestInit,
-): Promise<T> {
-  const res = await fetch(`${API_BASE}${path}`, {
-    credentials: "include",
-    headers: init?.body ? { "Content-Type": "application/json" } : undefined,
-    ...init,
-  });
+/** Per-request timeout (ms). Aborts a hung request so callers can show a friendly error + retry. */
+const REQUEST_TIMEOUT_MS = 15000;
+
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  let res: Response;
+  try {
+    res = await fetch(`${API_BASE}${path}`, {
+      credentials: "include",
+      headers: init?.body ? { "Content-Type": "application/json" } : undefined,
+      signal: controller.signal,
+      ...init,
+    });
+  } catch (err) {
+    if (err instanceof DOMException && err.name === "AbortError") {
+      throw new ApiError(408, { error: "The request timed out. Check your connection and try again." });
+    }
+    throw new ApiError(0, { error: err instanceof Error ? err.message : "Network error — please try again." });
+  } finally {
+    clearTimeout(timer);
+  }
 
   if (res.status === 204) {
     return undefined as T;

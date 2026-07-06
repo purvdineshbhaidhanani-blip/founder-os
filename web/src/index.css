@@ -634,3 +634,44 @@ code {
     flex: 1;
   }
 }
+
+.copilot-secondary {
+  background: transparent;
+  border: 1px solid var(--border, #d0d0d8);
+}
+.copilot-battery {
+  margin: 0.25rem 0 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.copilot-battery-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.copilot-battery-list summary {
+  cursor: pointer;
+  padding: 0.35rem 0;
+}
+
+/* Mobile-first hardening: let the nav wrap instead of overflowing on narrow
+   screens, and prevent long unbroken tokens (URLs, code, field paths) from
+   forcing horizontal page scroll. */
+.nav {
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
+}
+.nav-links {
+  flex-wrap: wrap;
+  row-gap: 0.4rem;
+}
+.card code,
+.copilot-answer,
+.monitor-change,
+.monitor-snapshot-items li {
+  overflow-wrap: anywhere;
+}

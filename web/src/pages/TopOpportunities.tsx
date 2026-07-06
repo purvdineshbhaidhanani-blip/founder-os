@@ -165,6 +165,70 @@ export default function TopOpportunities(): React.ReactElement {
           </details>
         )}
       </section>
+
+      <section className="card">
+        <h2>Run Calibration</h2>
+        <p className="page-subtitle">
+          Aggregate diagnostics over the whole run (read-only; never affects ranking).
+        </p>
+        <div className="badge-grid">
+          <span className="badge">Items collected: {report.calibration.itemsCollected}</span>
+          <span className="badge">Clustered: {report.calibration.itemsClustered}</span>
+          <span className="badge">Rejected by gates: {report.calibration.opportunitiesRejectedByGates}</span>
+          <span className="badge badge-verdict-build">BUILD {report.calibration.verdictBreakdown.build}</span>
+          <span className="badge badge-verdict-wait">WATCH {report.calibration.verdictBreakdown.watch}</span>
+          <span className="badge badge-verdict-ignore">IGNORE {report.calibration.verdictBreakdown.ignore}</span>
+        </div>
+        <ul>
+          <li>Average FOIS: {report.calibration.averageFois.toFixed(1)}</li>
+          <li>Average evidence: {report.calibration.averageEvidence.toFixed(2)}</li>
+          <li>Average source diversity: {report.calibration.averageSourceDiversity.toFixed(2)}</li>
+          <li>
+            Items removed by relevance:{" "}
+            {report.calibration.itemsRemovedByRelevance === null
+              ? "unknown (no relevance filter recorded)"
+              : report.calibration.itemsRemovedByRelevance}
+          </li>
+          <li>Likely false positives: {report.calibration.falsePositiveCount}</li>
+        </ul>
+        <h3>FOIS threshold diagnostic (advisory)</h3>
+        <p className="muted">
+          BUILD threshold {report.calibration.thresholdDiagnostic.foisBuildThreshold} ·{" "}
+          {report.calibration.thresholdDiagnostic.acceptedPct.toFixed(0)}% accepted ·{" "}
+          {report.calibration.thresholdDiagnostic.rejectedPct.toFixed(0)}% rejected
+        </p>
+        <p className="muted">{report.calibration.thresholdDiagnostic.suggestion}</p>
+        {report.calibration.notes.length > 0 && (
+          <ul>
+            {report.calibration.notes.map((note, index) => (
+              <li key={index} className="muted">
+                {note}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="card">
+        <h2>Semantic Merge</h2>
+        {report.semanticMerge.aliasGroupsApplied === 0 ? (
+          <p className="muted">
+            No synonym opportunities were merged this run — category clustering already de-duplicated them upstream.
+          </p>
+        ) : (
+          <>
+            <p className="page-subtitle">{report.semanticMerge.aliasGroupsApplied} alias group(s) merged.</p>
+            <ul>
+              {report.semanticMerge.aliasGroups.map((group, index) => (
+                <li key={index}>
+                  <strong>{group.canonical}</strong> (matched &ldquo;{group.matchedAlias}&rdquo;) —{" "}
+                  {group.memberProblems.join("; ")}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </section>
     </div>
   );
 }

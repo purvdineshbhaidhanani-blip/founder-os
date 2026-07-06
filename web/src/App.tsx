@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { AuthProvider, RequireAuth, useAuth } from "./router";
 import Nav from "./components/Nav";
@@ -12,8 +12,10 @@ import History from "./pages/History";
 import Settings from "./pages/Settings";
 import PipelineProgress from "./pages/PipelineProgress";
 import TopOpportunities from "./pages/TopOpportunities";
-import OpportunityDetail from "./pages/OpportunityDetail";
-import Monitoring from "./pages/Monitoring";
+
+// Lazy-load the heaviest routes so they don't inflate the initial bundle.
+const OpportunityDetail = React.lazy(() => import("./pages/OpportunityDetail"));
+const Monitoring = React.lazy(() => import("./pages/Monitoring"));
 
 function AuthedLayout({ children }: { children: React.ReactElement }): React.ReactElement {
   const { user } = useAuth();
@@ -29,6 +31,7 @@ function AppRoutes(): React.ReactElement {
   const location = useLocation();
   return (
     <AuthedLayout>
+      <Suspense fallback={<div className="page-loading">Loading…</div>}>
       <Routes location={location}>
         <Route path="/login" element={<Login />} />
         <Route
@@ -121,6 +124,7 @@ function AppRoutes(): React.ReactElement {
         />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      </Suspense>
     </AuthedLayout>
   );
 }

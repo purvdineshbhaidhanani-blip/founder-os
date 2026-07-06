@@ -65,6 +65,8 @@ export default function OpportunityDetail(): React.ReactElement {
     goToMarket,
     technicalBlueprint,
     knowledgeLinks,
+    semanticCluster,
+    calibration,
   } = opportunity;
   const ai = aiDecisionValidation;
 
@@ -902,6 +904,86 @@ export default function OpportunityDetail(): React.ReactElement {
             </li>
           ))}
         </ul>
+      </section>
+
+      <section className="card">
+        <h2>Cluster &amp; Aliases</h2>
+        <ul>
+          <li>
+            <strong>Canonical title:</strong> {semanticCluster.canonicalTitle}
+          </li>
+          <li>
+            <strong>Mentions:</strong> {semanticCluster.mentionCount} &middot;{" "}
+            <strong>Merged reports:</strong> {semanticCluster.mergedCount}
+          </li>
+          <li>
+            <strong>Supporting sources:</strong>{" "}
+            {semanticCluster.supportingSources.join(", ") || "none"}
+          </li>
+        </ul>
+        {semanticCluster.aliases.length > 0 ? (
+          <>
+            <h3>Merged aliases</h3>
+            <ul>
+              {semanticCluster.aliases.map((alias, index) => (
+                <li key={index}>{alias}</li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <p className="muted">No synonym problems were merged into this opportunity.</p>
+        )}
+      </section>
+
+      <section className="card">
+        <h2>Calibration &amp; Diagnostics</h2>
+        <p className="muted">Read-only quality signals. None of these affect the ranking above.</p>
+        {calibration.falsePositive.likely && (
+          <p>
+            <span className="badge badge-warn">Possible false positive</span>{" "}
+            <span className="muted">{calibration.falsePositive.reasons.join("; ")}</span>
+          </p>
+        )}
+        <ul>
+          <li>Ranking stability: {calibration.metrics.rankingStability.toFixed(2)}</li>
+          <li>Signal density: {calibration.metrics.signalDensity.toFixed(2)}</li>
+          <li>Evidence density: {calibration.metrics.evidenceDensity.toFixed(2)}</li>
+          <li>Cross-source consistency: {calibration.metrics.crossSourceConsistency.toFixed(2)}</li>
+          <li>Intent consistency: {calibration.metrics.intentConsistency.toFixed(2)}</li>
+          <li>Noise ratio: {calibration.metrics.noiseRatio.toFixed(2)}</li>
+          <li>Duplicate compression: {calibration.metrics.duplicateCompressionRatio.toFixed(2)}</li>
+        </ul>
+        <p>
+          <strong>Rank:</strong> #{calibration.ranking.rankBefore} (noise-adjusted #{calibration.ranking.rankAfter},
+          movement {calibration.ranking.movement >= 0 ? "+" : ""}
+          {calibration.ranking.movement})
+          <span className="muted"> — {calibration.ranking.reason}</span>
+        </p>
+        <h3>Diagnostic flags</h3>
+        <ul>
+          {calibration.diagnostics.map((flag) => (
+            <li key={flag.flag}>
+              <strong>{flag.flag}:</strong> {flag.fired ? "FIRED" : "ok"} — {flag.reason}
+            </li>
+          ))}
+        </ul>
+        {calibration.explainability && (
+          <>
+            <h3>Why ranked here</h3>
+            <p>{calibration.explainability.whyRankedHere}</p>
+            <p>
+              <strong>Above the next:</strong> {calibration.explainability.whyAboveNext}
+            </p>
+            {calibration.explainability.topContributingSignals.length > 0 && (
+              <ul>
+                {calibration.explainability.topContributingSignals.map((signal, index) => (
+                  <li key={index}>{signal}</li>
+                ))}
+              </ul>
+            )}
+            <p className="muted">Largest uncertainty: {calibration.explainability.largestUncertainty}</p>
+          </>
+        )}
       </section>
     </div>
   );

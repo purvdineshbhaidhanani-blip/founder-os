@@ -414,6 +414,102 @@ export interface FounderDecision {
   qualityGates: DecisionQualityGate[];
 }
 
+/* ---------------------------------------------------------------------- */
+/* Semantic clustering + calibration (src/opportunities/semantic.ts,      */
+/* calibration.ts)                                                         */
+/* ---------------------------------------------------------------------- */
+
+export interface SemanticClusterInfo {
+  canonicalTitle: string;
+  aliases: string[];
+  mentionCount: number;
+  supportingSources: string[];
+  mergedCount: number;
+}
+
+export interface AliasGroupSummary {
+  canonical: string;
+  matchedAlias: string;
+  memberProblems: string[];
+  survivorId: string;
+  mergedReportIds: string[];
+}
+
+export interface CalibrationMetrics {
+  rankingStability: number;
+  signalDensity: number;
+  evidenceDensity: number;
+  crossSourceConsistency: number;
+  intentConsistency: number;
+  noiseRatio: number;
+  duplicateCompressionRatio: number;
+}
+
+export interface CalibrationDiagnosticFlag {
+  flag: string;
+  fired: boolean;
+  reason: string;
+}
+
+export interface CalibrationRanking {
+  rankBefore: number;
+  rankAfter: number;
+  movement: number;
+  reason: string;
+}
+
+export interface CalibrationExplainability {
+  whyRankedHere: string;
+  whyAboveNext: string;
+  topContributingSignals: string[];
+  penaltiesApplied: string[];
+  largestUncertainty: string;
+}
+
+export interface CalibrationFalsePositive {
+  likely: boolean;
+  reasons: string[];
+}
+
+export interface OpportunityCalibration {
+  metrics: CalibrationMetrics;
+  diagnostics: CalibrationDiagnosticFlag[];
+  ranking: CalibrationRanking;
+  explainability: CalibrationExplainability | null;
+  falsePositive: CalibrationFalsePositive;
+}
+
+export interface CalibrationFoisBucket {
+  range: string;
+  count: number;
+}
+
+export interface ThresholdDiagnostic {
+  foisBuildThreshold: number;
+  observedFoisDistribution: CalibrationFoisBucket[];
+  rejectedPct: number;
+  acceptedPct: number;
+  uncertainPct: number;
+  suggestion: string;
+}
+
+export interface CalibrationAggregate {
+  itemsCollected: number;
+  itemsRemovedByRelevance: number | null;
+  itemsClustered: number;
+  opportunitiesRejectedByGates: number;
+  averageConfidence: number;
+  averageFois: number;
+  averageEvidence: number;
+  averageIntentConcentration: number;
+  averageSourceDiversity: number;
+  averageRecommendationConfidence: number;
+  verdictBreakdown: { build: number; watch: number; ignore: number };
+  falsePositiveCount: number;
+  thresholdDiagnostic: ThresholdDiagnostic;
+  notes: string[];
+}
+
 /** src/opportunities/types.ts FoisDimension */
 export interface FoisDimension {
   name: string;
@@ -903,6 +999,10 @@ export interface FounderOpportunityReport {
   technicalBlueprint: TechnicalBlueprintResult;
   /** Knowledge Links bundle — typed node/edge reference set across report sections. */
   knowledgeLinks: KnowledgeLinksResult;
+  /** Semantic-alias merge metadata for this survivor (mergedCount === 1 means no merge). */
+  semanticCluster: SemanticClusterInfo;
+  /** Read-only calibration/diagnostics for this report (never affects ranking). */
+  calibration: OpportunityCalibration;
 }
 
 /* ---------------------------------------------------------------------- */
@@ -993,6 +1093,10 @@ export interface TopOpportunitiesReport {
   artifactId?: string;
   /** Final elimination/survivor-ranking layer — see OpportunitySelectionResult. */
   opportunitySelection: OpportunitySelectionResult;
+  /** Diagnostic summary of the semantic-alias merge pass (aliasGroupsApplied === 0 in the common case). */
+  semanticMerge: { aliasGroupsApplied: number; aliasGroups: AliasGroupSummary[] };
+  /** Aggregate calibration/regression dashboard for the whole run. */
+  calibration: CalibrationAggregate;
 }
 
 /* ---------------------------------------------------------------------- */

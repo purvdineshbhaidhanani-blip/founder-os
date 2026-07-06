@@ -138,8 +138,15 @@ export default function Monitoring(): React.ReactElement {
                 />
                 <span>
                   <strong>{provider.id}</strong> <span className="muted">({provider.category})</span>{" "}
-                  <span className={provider.keyless ? "badge badge-ok" : "badge badge-detail"}>
-                    {provider.keyless ? "keyless" : "needs key"}
+                  <span
+                    className={provider.keyless ? "badge badge-ok" : "badge badge-warn"}
+                    title={
+                      provider.keyless
+                        ? "No credentials required — ready to run."
+                        : "May require API credentials on the server; runs but can fail with an authentication error if unconfigured."
+                    }
+                  >
+                    {provider.keyless ? "Ready" : "Needs credentials"}
                   </span>
                 </span>
                 <button type="button" className="monitor-snapshot-link" onClick={() => void viewSnapshot(provider.id)}>
