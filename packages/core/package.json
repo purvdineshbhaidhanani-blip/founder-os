@@ -1,0 +1,17 @@
+{
+  "name": "@platform/core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Foundational, dependency-free primitives (structured logging) every other platform package can build on.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src"
+  ]
+}

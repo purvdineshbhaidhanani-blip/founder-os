@@ -1,6 +1,6 @@
 # Production Identity Foundation
 
-`src/identity/` is the multi-tenant identity system: users, organizations,
+`packages/identity/src/` is the multi-tenant identity system: users, organizations,
 teams, RBAC (roles/permissions), profiles, database-backed sessions, and a
 database-backed audit log. It sits alongside — and does not replace — the
 existing single-founder auth in `src/server/routes/auth.ts`; both are wired
@@ -43,9 +43,9 @@ expires no matter what.
 
 **New:**
 - `supabase/migrations/0002_identity.sql` — schema + seed data
-- `src/identity/types.ts`, `permissions-catalog.ts`, `password.ts`, `slug.ts`
-- `src/identity/store.ts` (interface), `in-memory-store.ts`, `postgrest-client.ts`, `postgrest-store.ts`, `store-factory.ts`
-- `src/identity/session-service.ts`, `organization-service.ts`, `auth-service.ts`, `audit-service.ts`, `rbac.ts`, `index.ts`
+- `packages/identity/src/types.ts`, `permissions-catalog.ts`, `password.ts`, `slug.ts`
+- `packages/identity/src/store.ts` (interface), `in-memory-store.ts`, `postgrest-client.ts`, `postgrest-store.ts`, `store-factory.ts`
+- `packages/identity/src/session-service.ts`, `organization-service.ts`, `auth-service.ts`, `audit-service.ts`, `rbac.ts`, `index.ts`
 - `src/server/routes/identity.ts`
 - `tests/identity/*.test.ts` (39 tests), `tests/server/identity-routes.test.ts` (10 tests)
 - `docs/IDENTITY.md` (this file)
@@ -123,7 +123,7 @@ router change.
 
 ### RBAC enforcement
 
-`src/identity/rbac.ts` exports the guards every protected route calls:
+`packages/identity/src/rbac.ts` exports the guards every protected route calls:
 
 - `requireIdentityUser(ctx, deps)` — verifies the session cookie against the
   database (not just a signature) and loads the user. 401 on failure.

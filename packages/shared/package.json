@@ -1,0 +1,17 @@
+{
+  "name": "@platform/shared",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cross-cutting primitives shared by the platform packages: cron/scheduling, retry, template interpolation, dependency-graph validation, confidence scoring, priority ranking.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src"
+  ]
+}

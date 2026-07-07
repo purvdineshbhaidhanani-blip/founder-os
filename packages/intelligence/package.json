@@ -1,0 +1,31 @@
+{
+  "name": "@platform/intelligence",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Universal Platform Intelligence — recommendation, insights, decision, feature/product intelligence, AI recommendation layer, diagnostics, optimization, and the intelligence module registry/API.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@platform/shared": "*",
+    "@platform/engines": "*"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./recommendation": "./src/recommendation/index.ts",
+    "./insights": "./src/insights/index.ts",
+    "./decision": "./src/decision/index.ts",
+    "./registry": "./src/registry/index.ts",
+    "./feature-intelligence": "./src/feature-intelligence/index.ts",
+    "./product-intelligence": "./src/product-intelligence/index.ts",
+    "./ai-layer": "./src/ai-layer/index.ts",
+    "./diagnostics": "./src/diagnostics/index.ts",
+    "./optimization": "./src/optimization/index.ts",
+    "./api": "./src/api/index.ts"
+  },
+  "files": [
+    "src"
+  ]
+}

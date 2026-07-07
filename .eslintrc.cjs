@@ -43,5 +43,16 @@ module.exports = {
         node: false,
       },
     },
+    {
+      files: ["packages/ui/**/*.ts", "packages/ui/**/*.tsx"],
+      parserOptions: {
+        ecmaFeatures: { jsx: true },
+        project: "./packages/ui/tsconfig.json",
+      },
+      env: {
+        browser: true,
+        node: false,
+      },
+    },
   ],
 };

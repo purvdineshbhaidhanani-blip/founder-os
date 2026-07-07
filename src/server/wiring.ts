@@ -25,7 +25,7 @@ import { MonitorEngine } from "../monitoring/index.js";
 import { createFounderCopilotService, type FounderCopilotService } from "../founder-copilot/index.js";
 import { ClusterRepository, ProblemIntelligenceEngine } from "../problems/index.js";
 import { OpportunityEngine, OpportunityRepository } from "../opportunities/index.js";
-import { createIdentityStoreFromEnv } from "../identity/index.js";
+import { createIdentityStoreFromEnv } from "@platform/identity";
 import { createIdentityContext, type IdentityContext } from "./routes/identity.js";
 
 /**

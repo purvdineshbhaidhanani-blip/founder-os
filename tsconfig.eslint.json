@@ -8,7 +8,19 @@
     "src/**/*.ts",
     "tests/**/*.ts",
     "scripts/**/*.ts",
-    "*.ts"
+    "*.ts",
+    "packages/core/src/**/*.ts",
+    "packages/core/tests/**/*.ts",
+    "packages/shared/src/**/*.ts",
+    "packages/shared/tests/**/*.ts",
+    "packages/engines/src/**/*.ts",
+    "packages/engines/tests/**/*.ts",
+    "packages/factory/src/**/*.ts",
+    "packages/factory/tests/**/*.ts",
+    "packages/intelligence/src/**/*.ts",
+    "packages/intelligence/tests/**/*.ts",
+    "packages/identity/src/**/*.ts",
+    "packages/identity/tests/**/*.ts"
   ],
-  "exclude": ["node_modules", "dist", "web", ".runtime"]
+  "exclude": ["node_modules", "dist", "web", "packages/ui", ".runtime"]
 }

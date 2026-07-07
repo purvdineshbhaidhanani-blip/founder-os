@@ -1,6 +1,6 @@
 # Universal Platform Intelligence
 
-`src/platform-intelligence/` is the decision-support layer on top of the
+`packages/intelligence/src/` is the decision-support layer on top of the
 Loop 2 engines and Loop 3 factory: it helps products make better decisions,
 not just get built faster. Every module is provider-independent and
 product-agnostic — nothing here contains Founder OS logic, a hardcoded
@@ -11,24 +11,28 @@ or structural interfaces supplied by the caller.
 
 | Module | Path | Purpose |
 |---|---|---|
-| Recommendation Engine | `recommendation/` | Rule-based (`RuleBasedRecommendationSource`) and AI-powered (`AIRecommendationSource`) recommendation sources, confidence scoring, explanation generation, priority ranking. |
-| Insights Engine | `insights/` | Usage/growth/adoption/retention/error insight collectors, all built on one generic `ThresholdSeriesInsightCollector` over a `MetricSeriesSource` interface. |
-| Decision Engine | `decision/` | Weighted multi-factor scoring, rule evaluation, configurable thresholds, confidence levels, decision history. |
-| Intelligence Registry | `registry/` | Registration, on-disk discovery, enable/disable, and semver-based versioning for intelligence modules — reuses the Loop 3 `validateDependencyGraph`. |
-| Feature Intelligence | `feature-intelligence/` | Feature adoption, usage summaries, success scoring, lifecycle staging, and retirement-candidate detection from raw usage events. |
-| Product Intelligence | `product-intelligence/` | Product/module/dependency health and configuration validation, aggregated from structural `ModuleRegistryLike`/`ConfigValidationResultLike` inputs. |
-| AI Recommendation Layer | `ai-layer/` | The narrow `AITextGenerator` interface, a zero-dependency `TemplateAITextGenerator` default, an optional bridge from a Loop 2 `AIProvider`, and `AIRecommendationAssistant` (explain / summarize / action items). |
-| Health & Diagnostics | `diagnostics/` | Pluggable checks for missing configuration, broken dependencies, invalid/undocumented modules, and performance warnings. |
-| Optimization Engine | `optimization/` | Analyzers for module selection, performance, cost, and simplification, ranked by confidence × impact. |
-| Intelligence API | `api/` | `IntelligenceAPI` — one facade exposing every module above through simple, dependency-injected methods. |
-| Shared | `shared/` | `classifyConfidence`/`combineConfidence` (confidence scoring + levels) and `rankByPriority`, used across Recommendation, Decision, and Optimization. |
+| Recommendation Engine | `packages/intelligence/src/recommendation` | Rule-based (`RuleBasedRecommendationSource`) and AI-powered (`AIRecommendationSource`) recommendation sources, confidence scoring, explanation generation, priority ranking. |
+| Insights Engine | `packages/intelligence/src/insights` | Usage/growth/adoption/retention/error insight collectors, all built on one generic `ThresholdSeriesInsightCollector` over a `MetricSeriesSource` interface. |
+| Decision Engine | `packages/intelligence/src/decision` | Weighted multi-factor scoring, rule evaluation, configurable thresholds, confidence levels, decision history. |
+| Intelligence Registry | `packages/intelligence/src/registry` | Registration, on-disk discovery, enable/disable, and semver-based versioning for intelligence modules — reuses `@platform/shared`'s `validateDependencyGraph`. |
+| Feature Intelligence | `packages/intelligence/src/feature-intelligence` | Feature adoption, usage summaries, success scoring, lifecycle staging, and retirement-candidate detection from raw usage events. |
+| Product Intelligence | `packages/intelligence/src/product-intelligence` | Product/module/dependency health and configuration validation, aggregated from structural `ModuleRegistryLike`/`ConfigValidationResultLike` inputs. |
+| AI Recommendation Layer | `packages/intelligence/src/ai-layer` | The narrow `AITextGenerator` interface, a zero-dependency `TemplateAITextGenerator` default, an optional bridge from a Loop 2 `AIProvider`, and `AIRecommendationAssistant` (explain / summarize / action items). |
+| Health & Diagnostics | `packages/intelligence/src/diagnostics` | Pluggable checks for missing configuration, broken dependencies, invalid/undocumented modules, and performance warnings. |
+| Optimization Engine | `packages/intelligence/src/optimization` | Analyzers for module selection, performance, cost, and simplification, ranked by confidence × impact. |
+| Intelligence API | `packages/intelligence/src/api` | `IntelligenceAPI` — one facade exposing every module above through simple, dependency-injected methods. |
+
+`classifyConfidence`/`combineConfidence` (confidence scoring + levels) and
+`rankByPriority`, used across Recommendation, Decision, and Optimization,
+live in the sibling `@platform/shared` package.
 
 ## Example
 
+This module is published as the `@platform/intelligence` workspace package:
+
 ```ts
-import { IntelligenceAPI } from "./platform-intelligence/api/index.js";
-import { RuleBasedRecommendationSource } from "./platform-intelligence/recommendation/index.js";
-import { RecommendationEngine } from "./platform-intelligence/recommendation/index.js";
+import { IntelligenceAPI } from "@platform/intelligence/api";
+import { RuleBasedRecommendationSource, RecommendationEngine } from "@platform/intelligence/recommendation";
 
 const api = new IntelligenceAPI({
   recommendationEngine: new RecommendationEngine([
@@ -64,9 +68,10 @@ const explanation = await api.explainRecommendation(recommendations[0]!);
   without importing either — so this layer works with any registry/config
   implementation, present or future.
 - **No duplicated algorithms.** Dependency-graph validation is imported
-  from `factory/shared` (Loop 3), not reimplemented. Confidence scoring
-  (`shared/confidence.ts`) and priority ranking (`shared/ranking.ts`) are
-  each written once and shared by every module that needs them.
+  from `@platform/shared` (also used by the SaaS Factory), not
+  reimplemented. Confidence scoring (`@platform/shared`'s `confidence.ts`)
+  and priority ranking (`ranking.ts`) are each written once and shared by
+  every module that needs them.
 - **Reuse across loops where it's genuinely the same utility.** The AI
   Recommendation Layer's prompt templating reuses the Loop 2
   `interpolate()` helper instead of reimplementing `{{placeholder}}`
@@ -77,7 +82,7 @@ const explanation = await api.explainRecommendation(recommendations[0]!);
 
 ## Tests
 
-`tests/platform-intelligence/*.test.ts` (51 tests) covers every module,
+`packages/intelligence/tests/*.test.ts` (51 tests) covers every module,
 including registry discovery via a temp directory, decision scoring/rules/
 thresholds, insight collectors' severity thresholds, and the API facade's
 dependency injection.

@@ -7,13 +7,13 @@ import {
   buildClearIdentitySessionCookieHeader,
   buildIdentitySessionCookieHeader,
   OrganizationService,
+  PERMISSIONS,
   requireIdentityUser,
   requireOrgPermission,
   requireOrganizationMembership,
   SessionService,
   type IdentityStore,
-} from "../../identity/index.js";
-import { PERMISSIONS } from "../../identity/permissions-catalog.js";
+} from "@platform/identity";
 
 export interface IdentityContext {
   store: IdentityStore;

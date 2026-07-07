@@ -1,0 +1,23 @@
+{
+  "name": "@platform/ui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Universal SaaS Factory UI Component Library and Design System — product-agnostic, token-driven React components.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./ui-kit": "./src/ui-kit/index.ts",
+    "./design-system": "./src/design-system/index.ts"
+  },
+  "files": [
+    "src"
+  ]
+}

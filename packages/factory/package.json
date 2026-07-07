@@ -1,0 +1,28 @@
+{
+  "name": "@platform/factory",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Universal SaaS Factory — configuration-driven product definitions, module registry, bootstrap system, templates, configuration engine, extensions, and documentation generator.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@platform/shared": "*",
+    "zod": "^3.23.8"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./product": "./src/product/index.ts",
+    "./modules": "./src/modules/index.ts",
+    "./bootstrap": "./src/bootstrap/index.ts",
+    "./templates": "./src/templates/index.ts",
+    "./config": "./src/config/index.ts",
+    "./extensions": "./src/extensions/index.ts",
+    "./docs": "./src/docs/index.ts"
+  },
+  "files": [
+    "src"
+  ]
+}

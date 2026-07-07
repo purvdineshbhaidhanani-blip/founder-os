@@ -1,0 +1,30 @@
+{
+  "name": "@platform/engines",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Universal Platform Engines — provider-agnostic AI, workflow, automation, search, knowledge, notification, analytics, logging/monitoring, integration, and storage engines.",
+  "type": "module",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@platform/shared": "*"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "exports": {
+    ".": "./src/index.ts",
+    "./ai": "./src/ai/index.ts",
+    "./workflow": "./src/workflow/index.ts",
+    "./automation": "./src/automation/index.ts",
+    "./search": "./src/search/index.ts",
+    "./knowledge": "./src/knowledge/index.ts",
+    "./notification": "./src/notification/index.ts",
+    "./analytics": "./src/analytics/index.ts",
+    "./logging-monitoring": "./src/logging-monitoring/index.ts",
+    "./integration": "./src/integration/index.ts",
+    "./storage": "./src/storage/index.ts"
+  },
+  "files": [
+    "src"
+  ]
+}

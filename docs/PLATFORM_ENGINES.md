@@ -1,6 +1,6 @@
 # Universal Platform Engines
 
-`src/engines/` is a standalone, reusable layer of platform building blocks. It
+`packages/engines/src/` is a standalone, reusable layer of platform building blocks. It
 has no dependency on Founder OS business logic (agents, departments,
 opportunities, brain, etc.) — anything in this workspace building a new SaaS,
 AI application, mobile app, web application, or API can import from it
@@ -16,42 +16,46 @@ calling code — that's the no-vendor-lock-in guarantee.
 
 | Engine | Path | Purpose |
 |---|---|---|
-| AI | `src/engines/ai` | Provider-agnostic chat completions: routing, prompts, context window management, memory, tool calling, streaming, token accounting. Adapters: `MockProvider`, `OpenAIProvider`, `AnthropicProvider`. |
-| Workflow | `src/engines/workflow` | DAG step execution with conditions, retry, background (fire-and-poll) execution, and cron/interval/one-off scheduling. |
-| Automation | `src/engines/automation` | Event bus, trigger/action registries wired through a queue, and a cron abstraction that publishes synthetic events. |
-| Search | `src/engines/search` | Named collections behind `SearchIndexProvider`; filtering, sorting, full-text scoring, and a global fan-out search across collections. |
-| Knowledge | `src/engines/knowledge` | Document chunking, pluggable embeddings, a vector store abstraction, and citation-producing retrieval. |
-| Notification | `src/engines/notification` | Channel-agnostic dispatch (email, in-app, push, webhook) plus versioned templates. |
-| Analytics | `src/engines/analytics` | Event tracking, usage metrics (count/sum/average/time-series), dashboards, reports, and an audit trail. |
-| Logging & Monitoring | `src/engines/logging-monitoring` | Structured JSON logging, health checks, metrics collection, error reporting, and a tracing interface. |
-| Integration Framework | `src/engines/integration` | Connector base class composing auth (OAuth2 or API key), rate limiting, and retry; plus webhook signature verification, polling, and sync jobs. |
-| Storage | `src/engines/storage` | Object storage abstraction (local filesystem or HTTP/S3-compatible), upload/download managers, and a media processing hook pipeline. |
-| Shared | `src/engines/shared` | Cross-engine primitives used by more than one engine: cron parsing, the `Scheduler` interface, `{{template}}` interpolation, and retry/backoff — kept in one place so no two engines reinvent the same logic. |
+| AI | `packages/engines/src/ai` | Provider-agnostic chat completions: routing, prompts, context window management, memory, tool calling, streaming, token accounting. Adapters: `MockProvider`, `OpenAIProvider`, `AnthropicProvider`. |
+| Workflow | `packages/engines/src/workflow` | DAG step execution with conditions, retry, background (fire-and-poll) execution, and cron/interval/one-off scheduling. |
+| Automation | `packages/engines/src/automation` | Event bus, trigger/action registries wired through a queue, and a cron abstraction that publishes synthetic events. |
+| Search | `packages/engines/src/search` | Named collections behind `SearchIndexProvider`; filtering, sorting, full-text scoring, and a global fan-out search across collections. |
+| Knowledge | `packages/engines/src/knowledge` | Document chunking, pluggable embeddings, a vector store abstraction, and citation-producing retrieval. |
+| Notification | `packages/engines/src/notification` | Channel-agnostic dispatch (email, in-app, push, webhook) plus versioned templates. |
+| Analytics | `packages/engines/src/analytics` | Event tracking, usage metrics (count/sum/average/time-series), dashboards, reports, and an audit trail. |
+| Logging & Monitoring | `packages/engines/src/logging-monitoring` | Structured JSON logging, health checks, metrics collection, error reporting, and a tracing interface. |
+| Integration Framework | `packages/engines/src/integration` | Connector base class composing auth (OAuth2 or API key), rate limiting, and retry; plus webhook signature verification, polling, and sync jobs. |
+| Storage | `packages/engines/src/storage` | Object storage abstraction (local filesystem or HTTP/S3-compatible), upload/download managers, and a media processing hook pipeline. |
+
+Cross-engine primitives (cron parsing, the `Scheduler` interface,
+`{{template}}` interpolation, retry/backoff, and more) live in the sibling
+`@platform/shared` package, not inside this one — see `PACKAGES.md`.
 
 ## Usage
 
-Import a specific engine's namespace to avoid symbol collisions across
+This engine is published as the `@platform/engines` workspace package.
+Import a specific engine's subpath to avoid symbol collisions across
 engines:
 
 ```ts
-import { ModelRouter, MockProvider } from "./engines/ai/index.js";
-import { WorkflowEngine } from "./engines/workflow/index.js";
+import { ModelRouter, MockProvider } from "@platform/engines/ai";
+import { WorkflowEngine } from "@platform/engines/workflow";
 ```
 
-Or import the aggregated namespace export from `src/engines/index.ts`:
+Or import the aggregated namespace export from the package root:
 
 ```ts
-import { ai, workflow, storage } from "./engines/index.js";
+import { ai, workflow, storage } from "@platform/engines";
 
 const router = new ai.ModelRouter({ routes: [{ model: "*", provider: new ai.MockProvider() }] });
 ```
 
 ## Design rules this layer follows
 
-- **No Founder OS imports.** Nothing under `src/engines` imports from
-  `src/agents`, `src/departments`, `src/brain`, `src/opportunities`, or any
-  other business-specific module. The only shared code it pulls from
-  elsewhere is generic filesystem/id/logging utilities in `src/utils`.
+- **No Founder OS imports.** Nothing under `packages/engines/src` imports
+  from `src/agents`, `src/departments`, `src/brain`, `src/opportunities`, or
+  any other business-specific module — the package's only dependency,
+  declared in its `package.json`, is `@platform/shared`.
 - **Every engine ships a working default.** `MockProvider`,
   `InMemoryQueue`, `InMemoryVectorStore`, `LocalFsStorage`, and friends mean
   every engine runs out of the box with zero external services or API keys —
@@ -59,9 +63,9 @@ const router = new ai.ModelRouter({ routes: [{ model: "*", provider: new ai.Mock
   until a real backend is wired in.
 - **Vendor-specific code is isolated to `providers/` and `adapters/`
   subdirectories.** Anthropic- and OpenAI-specific request/response shaping
-  lives in `src/engines/ai/providers/*`; nowhere else in the AI engine knows
+  lives in `packages/engines/src/ai/providers/*`; nowhere else in the AI engine knows
   those shapes exist.
-- **Cross-engine duplication is refactored into `src/engines/shared`.** Cron
+- **Cross-engine duplication is refactored into `@platform/shared`.** Cron
   parsing, scheduling, template interpolation, and retry/backoff are each
   implemented once and consumed by every engine that needs them (e.g. the
   Workflow Engine's scheduling interface and the Automation Engine's cron
@@ -69,5 +73,6 @@ const router = new ai.ModelRouter({ routes: [{ model: "*", provider: new ai.Mock
 
 ## Tests
 
-Each engine has a corresponding test file under `tests/engines/` (e.g.
-`tests/engines/ai.test.ts`), run with the existing `npm test` (vitest) suite.
+Each engine has a corresponding test file under `packages/engines/tests/`
+(e.g. `packages/engines/tests/ai.test.ts`), run with the existing `npm test`
+(vitest) suite.
