@@ -41,6 +41,8 @@ export class InMemoryQueue<TPayload = unknown> implements Queue<TPayload> {
   constructor(options: InMemoryQueueOptions = {}) {
     this.concurrency = options.concurrency ?? 1;
     this.maxAttempts = options.maxAttempts ?? 1;
+    if (this.concurrency < 1) throw new Error("InMemoryQueue: concurrency must be at least 1 (0 would never drain the queue).");
+    if (this.maxAttempts < 1) throw new Error("InMemoryQueue: maxAttempts must be at least 1.");
     this.onError = options.onError;
   }
 
@@ -82,7 +84,13 @@ export class InMemoryQueue<TPayload = unknown> implements Queue<TPayload> {
       if (job.attempts < this.maxAttempts) {
         this.pending.push(job);
       } else {
-        this.onError?.(error, job as QueueJob<unknown>);
+        // Guard against a caller-supplied onError itself throwing — this queue must
+        // never reject runJob's promise, since drain() invokes it as `void this.runJob(job)`.
+        try {
+          this.onError?.(error, job as QueueJob<unknown>);
+        } catch {
+          // intentionally swallowed — see comment above
+        }
       }
     } finally {
       this.active -= 1;

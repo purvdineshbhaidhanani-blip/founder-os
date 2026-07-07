@@ -1,4 +1,4 @@
-import { withRetry, type RetryPolicy } from "../../shared/retry.js";
+import { NO_RETRY_POLICY, withRetry, type RetryPolicy } from "../../shared/retry.js";
 import type { NotificationMessage } from "../types.js";
 import type { NotificationChannel } from "./channel.js";
 
@@ -6,6 +6,7 @@ export interface WebhookChannelOptions {
   /** Resolves the destination URL for a given recipient (e.g. a per-tenant webhook URL). */
   resolveUrl: (recipient: string) => string;
   headers?: Record<string, string>;
+  /** Defaults to a single attempt (no retry) — pass a policy explicitly if the receiving endpoint tolerates duplicate deliveries. */
   retry?: RetryPolicy;
   fetchImpl?: typeof fetch;
 }
@@ -34,6 +35,6 @@ export class WebhookChannel implements NotificationChannel {
       if (!response.ok) {
         throw new Error(`Webhook delivery failed (${response.status}): ${await response.text()}`);
       }
-    }, this.options.retry);
+    }, this.options.retry ?? NO_RETRY_POLICY);
   }
 }

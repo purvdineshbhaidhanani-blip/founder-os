@@ -27,8 +27,24 @@ export class HttpObjectStorage implements ObjectStorageProvider {
     this.fetchImpl = options.fetchImpl ?? fetch;
   }
 
+  /**
+   * Builds the object URL by concatenating percent-encoded path segments
+   * onto `baseUrl` — deliberately not `new URL(key, baseUrl)`. A `key`
+   * containing a scheme (`"https://evil.example/x"`) or a protocol-relative
+   * prefix (`"//evil.example/x"`) would otherwise be resolved by the WHATWG
+   * URL parser as its own absolute URL, silently discarding `baseUrl` and
+   * sending the request (with auth headers) to an attacker-controlled host.
+   * `.`/`..`/empty segments are dropped too, closing the matching
+   * path-traversal case.
+   */
   private urlFor(key: string): string {
-    return new URL(key, this.options.baseUrl.endsWith("/") ? this.options.baseUrl : `${this.options.baseUrl}/`).toString();
+    const base = this.options.baseUrl.endsWith("/") ? this.options.baseUrl : `${this.options.baseUrl}/`;
+    const safeKey = key
+      .split("/")
+      .filter((segment) => segment !== "" && segment !== "." && segment !== "..")
+      .map((segment) => encodeURIComponent(segment))
+      .join("/");
+    return `${base}${safeKey}`;
   }
 
   private async signedHeaders(method: string, url: string, headers: Record<string, string>): Promise<Record<string, string>> {

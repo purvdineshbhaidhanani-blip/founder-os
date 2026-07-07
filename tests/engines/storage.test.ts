@@ -1,8 +1,9 @@
 import { mkdtemp, rm, readFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { LocalFsStorage } from "../../src/engines/storage/adapters/local-fs-storage.js";
+import { HttpObjectStorage } from "../../src/engines/storage/adapters/http-object-storage.js";
 import { DownloadManager } from "../../src/engines/storage/download-manager.js";
 import { MediaProcessingPipeline } from "../../src/engines/storage/media-processing.js";
 import { UploadManager } from "../../src/engines/storage/upload-manager.js";
@@ -60,5 +61,41 @@ describe("Storage Engine", () => {
       .use((data) => Buffer.concat([data, Buffer.from("-b")]));
     const result = await pipeline.run(Buffer.from("start"), { metadata: {} });
     expect(result.toString()).toBe("start-a-b");
+  });
+
+  describe("HttpObjectStorage", () => {
+    it("never resolves a key containing a scheme or protocol-relative host outside baseUrl", async () => {
+      const requestedUrls: string[] = [];
+      const fetchImpl = vi.fn(async (url: string | URL) => {
+        requestedUrls.push(url.toString());
+        return new Response("ok", { status: 200 });
+      });
+      const storage = new HttpObjectStorage({
+        baseUrl: "https://bucket.example.com/prefix",
+        fetchImpl: fetchImpl as unknown as typeof fetch,
+      });
+
+      await storage.put("https://evil.example.com/x", Buffer.from("data"));
+      await storage.put("//evil.example.com/x", Buffer.from("data"));
+
+      for (const url of requestedUrls) {
+        expect(new URL(url).host).toBe("bucket.example.com");
+      }
+    });
+
+    it("drops path-traversal segments instead of escaping the base prefix", async () => {
+      const requestedUrls: string[] = [];
+      const fetchImpl = vi.fn(async (url: string | URL) => {
+        requestedUrls.push(url.toString());
+        return new Response("ok", { status: 200 });
+      });
+      const storage = new HttpObjectStorage({
+        baseUrl: "https://bucket.example.com/prefix/",
+        fetchImpl: fetchImpl as unknown as typeof fetch,
+      });
+
+      await storage.put("../../secret", Buffer.from("data"));
+      expect(requestedUrls[0]).toBe("https://bucket.example.com/prefix/secret");
+    });
   });
 });

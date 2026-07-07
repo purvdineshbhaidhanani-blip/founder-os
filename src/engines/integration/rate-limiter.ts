@@ -23,6 +23,10 @@ export class TokenBucketRateLimiter implements RateLimiter {
   private lastRefill = Date.now();
 
   constructor(private readonly options: TokenBucketOptions) {
+    if (options.capacity < 1) throw new Error("TokenBucketRateLimiter: capacity must be at least 1.");
+    if (options.refillPerSecond <= 0) {
+      throw new Error("TokenBucketRateLimiter: refillPerSecond must be greater than 0 (0 or negative would never refill, hanging acquire() forever once the bucket is empty).");
+    }
     this.tokens = options.capacity;
   }
 

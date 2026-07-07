@@ -1,9 +1,10 @@
-import { withRetry, type RetryPolicy } from "../shared/retry.js";
+import { NO_RETRY_POLICY, withRetry, type RetryPolicy } from "../shared/retry.js";
 import type { SyncJobResult } from "./types.js";
 
 export interface SyncJobOptions {
   connectorId: string;
   cursor?: string;
+  /** Defaults to a single attempt (no retry) — pass a policy explicitly once the sync function is confirmed safe to re-run from the same cursor. */
   retry?: RetryPolicy;
 }
 
@@ -14,7 +15,7 @@ export class SyncJobRunner {
   async run(sync: SyncFn, options: SyncJobOptions): Promise<SyncJobResult> {
     const startedAt = new Date().toISOString();
     try {
-      const { itemsSynced, cursor } = await withRetry(() => sync(options.cursor), options.retry);
+      const { itemsSynced, cursor } = await withRetry(() => sync(options.cursor), options.retry ?? NO_RETRY_POLICY);
       return {
         connectorId: options.connectorId,
         startedAt,

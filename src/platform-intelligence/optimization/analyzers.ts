@@ -111,12 +111,15 @@ export function analyzePerformance(context: OptimizationContext): OptimizationDr
 export function analyzeCost(context: OptimizationContext): OptimizationDraft[] {
   return (context.costSignals ?? []).flatMap((signal): OptimizationDraft[] => {
     if (signal.monthlyCostUsd <= signal.threshold) return [];
-    const ratio = signal.monthlyCostUsd / signal.threshold;
+    // A zero/negative budget makes the ratio meaningless (division by zero or
+    // a sign flip) — any spend against it is unambiguously over budget.
+    const ratio = signal.threshold > 0 ? signal.monthlyCostUsd / signal.threshold : Number.POSITIVE_INFINITY;
+    const ratioText = Number.isFinite(ratio) ? `${ratio.toFixed(1)}x its` : "with no";
     return [
       {
         category: "cost",
         title: `Review spend on "${signal.label}"`,
-        description: `"${signal.label}" costs an estimated $${signal.monthlyCostUsd.toFixed(2)}/mo, ${ratio.toFixed(1)}x its $${signal.threshold.toFixed(2)} budget. Consider a lower tier, reduced usage, or a different provider.`,
+        description: `"${signal.label}" costs an estimated $${signal.monthlyCostUsd.toFixed(2)}/mo, ${ratioText} $${signal.threshold.toFixed(2)} budget. Consider a lower tier, reduced usage, or a different provider.`,
         impact: ratio >= 2 ? "high" : "medium",
         confidence: 0.6,
       },

@@ -104,6 +104,15 @@ export interface OAuth2AuthStrategyOptions {
 export class OAuth2AuthStrategy implements AuthStrategy {
   readonly type = "oauth2" as const;
   private token: OAuth2Token;
+  /**
+   * In-flight refresh, shared by every concurrent `applyAuth` call. Without
+   * this, N concurrent requests near token expiry each fire their own
+   * `refresh()` with the same refresh token; most OAuth providers rotate and
+   * invalidate the refresh token on first use, so every refresh after the
+   * first would fail. Single-flighting it means only one refresh ever
+   * happens per expiry.
+   */
+  private refreshing?: Promise<OAuth2Token>;
 
   constructor(private readonly options: OAuth2AuthStrategyOptions) {
     this.token = options.token;
@@ -115,10 +124,24 @@ export class OAuth2AuthStrategy implements AuthStrategy {
     return new Date(this.token.expiresAt).getTime() - Date.now() < skew;
   }
 
+  private refreshOnce(refreshToken: string): Promise<OAuth2Token> {
+    if (!this.refreshing) {
+      this.refreshing = this.options.client
+        .refresh(refreshToken)
+        .then((token) => {
+          this.options.onTokenRefreshed?.(token);
+          return token;
+        })
+        .finally(() => {
+          this.refreshing = undefined;
+        });
+    }
+    return this.refreshing;
+  }
+
   async applyAuth(request: { headers: Record<string, string>; query: Record<string, string> }): Promise<void> {
     if (this.needsRefresh() && this.token.refreshToken) {
-      this.token = await this.options.client.refresh(this.token.refreshToken);
-      this.options.onTokenRefreshed?.(this.token);
+      this.token = await this.refreshOnce(this.token.refreshToken);
     }
     request.headers.Authorization = `${this.token.tokenType ?? "Bearer"} ${this.token.accessToken}`;
   }

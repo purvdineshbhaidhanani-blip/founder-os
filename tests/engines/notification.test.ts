@@ -1,9 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   InAppChannel,
   InMemoryInAppStore,
   NotificationEngine,
   NotificationTemplateRegistry,
+  WebhookChannel,
   type NotificationChannel,
 } from "../../src/engines/notification/index.js";
 
@@ -57,5 +58,19 @@ describe("Notification Engine", () => {
     registry.register({ id: "t", version: "1.0.0", channel: "email", bodyTemplate: "old" });
     registry.register({ id: "t", version: "2.0.0", channel: "email", bodyTemplate: "new" });
     expect(registry.renderById("t", {}).body).toBe("new");
+  });
+
+  it("WebhookChannel does not retry by default (no silent duplicate delivery)", async () => {
+    let calls = 0;
+    const fetchImpl = vi.fn(async () => {
+      calls += 1;
+      return new Response("server error", { status: 500 });
+    });
+    const channel = new WebhookChannel({
+      resolveUrl: () => "https://hooks.example.com/abc",
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+    });
+    await expect(channel.send({ channel: "webhook", recipient: "r", body: "b" })).rejects.toThrow();
+    expect(calls).toBe(1);
   });
 });

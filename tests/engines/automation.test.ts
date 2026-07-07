@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { AutomationEngine, EventBus, InMemoryQueue } from "../../src/engines/automation/index.js";
+import { AutomationEngine, CronAbstraction, EventBus, InMemoryQueue } from "../../src/engines/automation/index.js";
+import { InProcessScheduler, type ScheduleHandle, type ScheduleSpec, type Scheduler } from "../../src/engines/shared/schedule.js";
 
 function flush(): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, 10));
@@ -75,5 +76,45 @@ describe("Automation Engine", () => {
     await queue.enqueue(3);
     await flush();
     expect(processed.sort()).toEqual([1, 2, 3]);
+  });
+
+  it("InMemoryQueue rejects a concurrency or maxAttempts below 1 instead of stalling silently", () => {
+    expect(() => new InMemoryQueue({ concurrency: 0 })).toThrow();
+    expect(() => new InMemoryQueue({ maxAttempts: 0 })).toThrow();
+  });
+
+  it("CronAbstraction reports a listener error via onError instead of an unhandled rejection", async () => {
+    const immediateScheduler: Scheduler = {
+      schedule: (_spec: ScheduleSpec, callback: () => void | Promise<void>): ScheduleHandle => {
+        void callback();
+        return { id: "immediate", spec: _spec, cancel: () => {} };
+      },
+      cancel: () => {},
+      list: () => [],
+    };
+
+    const eventBus = new EventBus();
+    eventBus.on("cron.tick", () => {
+      throw new Error("listener boom");
+    });
+
+    const errors: unknown[] = [];
+    const cron = new CronAbstraction({
+      scheduler: immediateScheduler,
+      eventBus,
+      onError: (error) => errors.push(error),
+    });
+
+    cron.bind("* * * * *", "cron.tick");
+    await flush();
+    expect(errors).toHaveLength(1);
+    expect((errors[0] as Error).message).toBe("listener boom");
+  });
+
+  it("real InProcessScheduler still cancels a cron binding cleanly", () => {
+    const scheduler = new InProcessScheduler();
+    const cron = new CronAbstraction({ scheduler, eventBus: new EventBus() });
+    const handleId = cron.bind("*/5 * * * *", "cron.tick");
+    expect(() => cron.unbind(handleId)).not.toThrow();
   });
 });

@@ -1,4 +1,4 @@
-import { withRetry, type RetryPolicy } from "../shared/retry.js";
+import { NO_RETRY_POLICY, withRetry, type RetryPolicy } from "../shared/retry.js";
 import type { RateLimiter } from "./rate-limiter.js";
 import type { AuthStrategy, ConnectorConfig } from "./types.js";
 
@@ -12,6 +12,12 @@ export interface ConnectorRequestOptions {
 
 export interface ConnectorOptions extends ConnectorConfig {
   rateLimiter?: RateLimiter;
+  /**
+   * Defaults to a single attempt (no retry). `Connector.request` has no way
+   * to know whether a given path/method is idempotent, so it never retries
+   * unless you explicitly opt in — a blind default retry on a POST/PUT/DELETE
+   * could duplicate a non-idempotent write.
+   */
   retry?: RetryPolicy;
   fetchImpl?: typeof fetch;
 }
@@ -66,6 +72,6 @@ export class Connector {
 
       const contentType = response.headers.get("content-type") ?? "";
       return (contentType.includes("application/json") ? await response.json() : await response.text()) as T;
-    }, this.retry);
+    }, this.retry ?? NO_RETRY_POLICY);
   }
 }
