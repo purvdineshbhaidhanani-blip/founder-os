@@ -1,0 +1,106 @@
+/**
+ * Design token values. Products may override any custom property here to
+ * reskin the UI kit without touching component code. Defaults to a neutral
+ * palette; light theme is the default, dark theme applies under
+ * prefers-color-scheme or an explicit [data-theme="dark"] on the root.
+ */
+:root {
+  --fx-color-background: #ffffff;
+  --fx-color-surface: #f7f7f8;
+  --fx-color-surface-muted: #eeeeef;
+  --fx-color-border: #d8d8dc;
+  --fx-color-text: #16161a;
+  --fx-color-text-muted: #5c5c66;
+  --fx-color-primary: #3452eb;
+  --fx-color-primary-text: #ffffff;
+  --fx-color-danger: #c22b3f;
+  --fx-color-danger-text: #ffffff;
+  --fx-color-success: #1f8a4c;
+  --fx-color-warning: #a15c00;
+  --fx-color-focus-ring: #3452eb;
+
+  --fx-space-xs: 4px;
+  --fx-space-sm: 8px;
+  --fx-space-md: 16px;
+  --fx-space-lg: 24px;
+  --fx-space-xl: 32px;
+  --fx-space-xxl: 48px;
+
+  --fx-radius-sm: 4px;
+  --fx-radius-md: 8px;
+  --fx-radius-lg: 16px;
+  --fx-radius-full: 999px;
+
+  --fx-font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --fx-font-family-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --fx-font-size-xs: 0.75rem;
+  --fx-font-size-sm: 0.875rem;
+  --fx-font-size-md: 1rem;
+  --fx-font-size-lg: 1.25rem;
+  --fx-font-size-xl: 1.5rem;
+  --fx-font-size-xxl: 2rem;
+  --fx-font-weight-regular: 400;
+  --fx-font-weight-medium: 500;
+  --fx-font-weight-bold: 700;
+  --fx-line-height-tight: 1.25;
+  --fx-line-height-normal: 1.5;
+
+  --fx-shadow-sm: 0 1px 2px rgba(16, 16, 20, 0.08);
+  --fx-shadow-md: 0 4px 12px rgba(16, 16, 20, 0.12);
+  --fx-shadow-lg: 0 12px 32px rgba(16, 16, 20, 0.18);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fx-color-background: #121214;
+    --fx-color-surface: #1b1b1f;
+    --fx-color-surface-muted: #232328;
+    --fx-color-border: #333338;
+    --fx-color-text: #f2f2f4;
+    --fx-color-text-muted: #a3a3ad;
+    --fx-color-primary: #7c93ff;
+    --fx-color-primary-text: #0d1030;
+    --fx-color-danger: #ff6b7d;
+    --fx-color-danger-text: #300008;
+    --fx-color-success: #4fd383;
+    --fx-color-warning: #e0a94a;
+    --fx-color-focus-ring: #7c93ff;
+
+    --fx-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --fx-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45);
+    --fx-shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
+  }
+}
+
+:root[data-theme="dark"] {
+  --fx-color-background: #121214;
+  --fx-color-surface: #1b1b1f;
+  --fx-color-surface-muted: #232328;
+  --fx-color-border: #333338;
+  --fx-color-text: #f2f2f4;
+  --fx-color-text-muted: #a3a3ad;
+  --fx-color-primary: #7c93ff;
+  --fx-color-primary-text: #0d1030;
+  --fx-color-danger: #ff6b7d;
+  --fx-color-danger-text: #300008;
+  --fx-color-success: #4fd383;
+  --fx-color-warning: #e0a94a;
+  --fx-color-focus-ring: #7c93ff;
+}
+
+:root[data-theme="light"] {
+  --fx-color-background: #ffffff;
+  --fx-color-surface: #f7f7f8;
+  --fx-color-surface-muted: #eeeeef;
+  --fx-color-border: #d8d8dc;
+  --fx-color-text: #16161a;
+  --fx-color-text-muted: #5c5c66;
+  --fx-color-primary: #3452eb;
+  --fx-color-primary-text: #ffffff;
+  --fx-color-danger: #c22b3f;
+  --fx-color-danger-text: #ffffff;
+  --fx-color-success: #1f8a4c;
+  --fx-color-warning: #a15c00;
+  --fx-color-focus-ring: #3452eb;
+}
