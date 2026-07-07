@@ -15,6 +15,7 @@
     "packages/shared/tests/**/*.ts",
     "packages/engines/src/**/*.ts",
     "packages/engines/tests/**/*.ts",
+    "packages/engines/scripts/**/*.ts",
     "packages/factory/src/**/*.ts",
     "packages/factory/tests/**/*.ts",
     "packages/intelligence/src/**/*.ts",

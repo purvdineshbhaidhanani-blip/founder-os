@@ -7,6 +7,8 @@ import { HttpObjectStorage } from "../src/storage/adapters/http-object-storage.j
 import { DownloadManager } from "../src/storage/download-manager.js";
 import { MediaProcessingPipeline } from "../src/storage/media-processing.js";
 import { UploadManager } from "../src/storage/upload-manager.js";
+import { isObjectStorageError } from "../src/storage/errors.js";
+import { createObjectStorageHealthCheck, createObjectStorageReachabilityCheck } from "../src/storage/diagnostics.js";
 
 describe("Storage Engine", () => {
   let root: string;
@@ -96,6 +98,122 @@ describe("Storage Engine", () => {
 
       await storage.put("../../secret", Buffer.from("data"));
       expect(requestedUrls[0]).toBe("https://bucket.example.com/prefix/secret");
+    });
+
+    it("throws immediately on a missing baseUrl", () => {
+      expect(() => new HttpObjectStorage({ baseUrl: "" })).toThrow(/baseUrl/);
+    });
+
+    it("does not retry by default, even on a 500 (retrying is an opt-in)", async () => {
+      let calls = 0;
+      const fetchImpl = vi.fn(async () => {
+        calls += 1;
+        return new Response("server error", { status: 500 });
+      });
+      const storage = new HttpObjectStorage({ baseUrl: "https://bucket.example.com", fetchImpl: fetchImpl as unknown as typeof fetch });
+      await expect(storage.put("k", Buffer.from("d"))).rejects.toThrow();
+      expect(calls).toBe(1);
+    });
+
+    it("retries a 500 once retryPolicy is opted into, then succeeds", async () => {
+      let calls = 0;
+      const fetchImpl = vi.fn(async () => {
+        calls += 1;
+        if (calls < 2) return new Response("server error", { status: 500 });
+        return new Response("ok", { status: 200 });
+      });
+      const storage = new HttpObjectStorage({
+        baseUrl: "https://bucket.example.com",
+        fetchImpl: fetchImpl as unknown as typeof fetch,
+        retryPolicy: { maxAttempts: 3, baseDelayMs: 1 },
+      });
+      await storage.put("k", Buffer.from("d"));
+      expect(calls).toBe(2);
+    });
+
+    it("never retries a non-retryable 403, even with retryPolicy opted in", async () => {
+      let calls = 0;
+      const fetchImpl = vi.fn(async () => {
+        calls += 1;
+        return new Response("forbidden", { status: 403 });
+      });
+      const storage = new HttpObjectStorage({
+        baseUrl: "https://bucket.example.com",
+        fetchImpl: fetchImpl as unknown as typeof fetch,
+        retryPolicy: { maxAttempts: 3, baseDelayMs: 1 },
+      });
+      await expect(storage.get("k")).rejects.toThrow();
+      expect(calls).toBe(1);
+    });
+
+    it("aborts and reports a retryable timeout when a request hangs", async () => {
+      const fetchImpl = vi.fn(
+        (_url: unknown, init?: RequestInit) =>
+          new Promise<Response>((_resolve, reject) => {
+            init?.signal?.addEventListener("abort", () => {
+              const err = new Error("aborted");
+              err.name = "AbortError";
+              reject(err);
+            });
+          }),
+      );
+      const storage = new HttpObjectStorage({
+        baseUrl: "https://bucket.example.com",
+        fetchImpl: fetchImpl as unknown as typeof fetch,
+        timeoutMs: 20,
+      });
+      const error = await storage.get("k").catch((e: unknown) => e);
+      expect(isObjectStorageError(error)).toBe(true);
+      expect((error as Error).message).toMatch(/timed out/i);
+      expect((error as { retryable: boolean }).retryable).toBe(true);
+    });
+
+    it("delete() tolerates 404 without throwing", async () => {
+      const fetchImpl = vi.fn(async () => new Response("not found", { status: 404 }));
+      const storage = new HttpObjectStorage({ baseUrl: "https://bucket.example.com", fetchImpl: fetchImpl as unknown as typeof fetch });
+      await expect(storage.delete("k")).resolves.toBeUndefined();
+    });
+
+    it("exists() returns false on a non-ok response without throwing", async () => {
+      const fetchImpl = vi.fn(async () => new Response(null, { status: 404 }));
+      const storage = new HttpObjectStorage({ baseUrl: "https://bucket.example.com", fetchImpl: fetchImpl as unknown as typeof fetch });
+      expect(await storage.exists("k")).toBe(false);
+    });
+  });
+
+  describe("storage diagnostics", () => {
+    it("createObjectStorageHealthCheck reports ok after a real put/get/delete round-trip, and cleans up the probe key", async () => {
+      const check = createObjectStorageHealthCheck(storage, { label: "local" });
+      const result = await check();
+      expect(result.status).toBe("ok");
+      expect(await storage.exists(".platform-health-check/probe")).toBe(false);
+    });
+
+    it("createObjectStorageHealthCheck reports down when put fails, without ever calling get", async () => {
+      const getSpy = vi.spyOn(storage, "get");
+      vi.spyOn(storage, "put").mockRejectedValue(new Error("disk full"));
+
+      const check = createObjectStorageHealthCheck(storage);
+      const result = await check();
+
+      expect(result.status).toBe("down");
+      expect(result.details).toContain("disk full");
+      expect(getSpy).not.toHaveBeenCalled();
+      vi.restoreAllMocks();
+    });
+
+    it("createObjectStorageReachabilityCheck reports ok on a reachable endpoint and down on a 5xx", async () => {
+      const ok = createObjectStorageReachabilityCheck({
+        baseUrl: "https://bucket.example.com",
+        fetchImpl: (async () => new Response(null, { status: 404 })) as unknown as typeof fetch,
+      });
+      expect((await ok()).status).toBe("ok");
+
+      const down = createObjectStorageReachabilityCheck({
+        baseUrl: "https://bucket.example.com",
+        fetchImpl: (async () => new Response(null, { status: 503 })) as unknown as typeof fetch,
+      });
+      expect((await down()).status).toBe("down");
     });
   });
 });

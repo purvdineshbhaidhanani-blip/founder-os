@@ -1,5 +1,10 @@
+import { NO_RETRY_POLICY, withRetry, withTimeoutSignal, type RetryPolicy } from "@platform/shared";
+import { createObjectStorageError, isObjectStorageError } from "../errors.js";
 import type { ObjectStorageProvider } from "../object-storage.js";
 import type { FileMetadata, PutOptions, StoredObject } from "../types.js";
+
+/** Object storage tends to move larger payloads than a typical REST call. Set 0 to disable. */
+const DEFAULT_TIMEOUT_MS = 30_000;
 
 export interface HttpObjectStorageOptions {
   /** Base URL for the bucket/container, e.g. "https://bucket.s3.amazonaws.com". */
@@ -12,6 +17,18 @@ export interface HttpObjectStorageOptions {
    */
   signRequest?: (request: { method: string; url: string; headers: Record<string, string> }) => Promise<void> | void;
   fetchImpl?: typeof fetch;
+  /** Tag included in error messages/diagnostics, e.g. "s3", "r2", "gcs". Defaults to "http-object-storage". */
+  providerId?: string;
+  /** Aborts a request that runs longer than this. 0 disables the timeout. Defaults to 30s. */
+  timeoutMs?: number;
+  /**
+   * Every method here is a keyed, idempotent overwrite/read/delete, so
+   * retrying is safe — but still opt-in: defaults to `NO_RETRY_POLICY` (no
+   * retry), matching the codebase-wide rule that retrying is a caller
+   * choice, not a side effect of not choosing (see `NO_RETRY_POLICY` in
+   * `@platform/shared`).
+   */
+  retryPolicy?: RetryPolicy;
 }
 
 /**
@@ -22,9 +39,16 @@ export interface HttpObjectStorageOptions {
  */
 export class HttpObjectStorage implements ObjectStorageProvider {
   private readonly fetchImpl: typeof fetch;
+  private readonly providerId: string;
+  private readonly timeoutMs: number;
+  private readonly retryPolicy: RetryPolicy;
 
   constructor(private readonly options: HttpObjectStorageOptions) {
+    if (!options.baseUrl) throw new Error("HttpObjectStorage requires a baseUrl.");
     this.fetchImpl = options.fetchImpl ?? fetch;
+    this.providerId = options.providerId ?? "http-object-storage";
+    this.timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
+    this.retryPolicy = options.retryPolicy ?? NO_RETRY_POLICY;
   }
 
   /**
@@ -52,48 +76,130 @@ export class HttpObjectStorage implements ObjectStorageProvider {
     return headers;
   }
 
+  private effectiveRetryPolicy(): RetryPolicy {
+    return {
+      ...this.retryPolicy,
+      shouldRetry: (error, attempt) => {
+        if (this.retryPolicy.shouldRetry) return this.retryPolicy.shouldRetry(error, attempt);
+        return isObjectStorageError(error) && error.retryable;
+      },
+    };
+  }
+
+  /** Normalizes a timeout into a typed, retryable `ObjectStorageError`; anything already typed passes through. */
+  private normalizeError(error: unknown, method: string): unknown {
+    if (isObjectStorageError(error)) return error;
+    if (error instanceof Error && (error.name === "AbortError" || error.name === "TimeoutError")) {
+      return createObjectStorageError(this.providerId, `Object ${method} timed out after ${this.timeoutMs}ms.`, {
+        retryable: true,
+        cause: error,
+      });
+    }
+    return error;
+  }
+
   async put(key: string, data: Buffer, options: PutOptions = {}): Promise<FileMetadata> {
+    return withRetry(() => this.doPut(key, data, options), this.effectiveRetryPolicy());
+  }
+
+  private async doPut(key: string, data: Buffer, options: PutOptions): Promise<FileMetadata> {
     const url = this.urlFor(key);
     const headers: Record<string, string> = { "content-type": options.contentType ?? "application/octet-stream" };
     for (const [k, v] of Object.entries(options.metadata ?? {})) headers[`x-amz-meta-${k}`] = v;
     await this.signedHeaders("PUT", url, headers);
 
-    const response = await this.fetchImpl(url, { method: "PUT", headers, body: data });
-    if (!response.ok) throw new Error(`Object PUT failed (${response.status}): ${await response.text()}`);
-    return { key, size: data.length, contentType: options.contentType, custom: options.metadata };
+    const { signal, cancel } = withTimeoutSignal(this.timeoutMs);
+    try {
+      const response = await this.fetchImpl(url, { method: "PUT", headers, body: data, signal });
+      if (!response.ok) {
+        const text = await response.text().catch(() => "");
+        throw createObjectStorageError(this.providerId, `Object PUT failed (${response.status}): ${text}`, {
+          statusCode: response.status,
+          retryable: response.status === 429 || response.status >= 500,
+        });
+      }
+      return { key, size: data.length, contentType: options.contentType, custom: options.metadata };
+    } catch (error) {
+      throw this.normalizeError(error, "PUT");
+    } finally {
+      cancel();
+    }
   }
 
   async get(key: string): Promise<StoredObject> {
+    return withRetry(() => this.doGet(key), this.effectiveRetryPolicy());
+  }
+
+  private async doGet(key: string): Promise<StoredObject> {
     const url = this.urlFor(key);
     const headers = await this.signedHeaders("GET", url, {});
-    const response = await this.fetchImpl(url, { method: "GET", headers });
-    if (!response.ok) throw new Error(`Object GET failed (${response.status}): ${await response.text()}`);
-    const data = Buffer.from(await response.arrayBuffer());
-    return {
-      data,
-      metadata: {
-        key,
-        size: data.length,
-        contentType: response.headers.get("content-type") ?? undefined,
-        etag: response.headers.get("etag") ?? undefined,
-        lastModified: response.headers.get("last-modified") ?? undefined,
-      },
-    };
+    const { signal, cancel } = withTimeoutSignal(this.timeoutMs);
+    try {
+      const response = await this.fetchImpl(url, { method: "GET", headers, signal });
+      if (!response.ok) {
+        const text = await response.text().catch(() => "");
+        throw createObjectStorageError(this.providerId, `Object GET failed (${response.status}): ${text}`, {
+          statusCode: response.status,
+          retryable: response.status === 429 || response.status >= 500,
+        });
+      }
+      const data = Buffer.from(await response.arrayBuffer());
+      return {
+        data,
+        metadata: {
+          key,
+          size: data.length,
+          contentType: response.headers.get("content-type") ?? undefined,
+          etag: response.headers.get("etag") ?? undefined,
+          lastModified: response.headers.get("last-modified") ?? undefined,
+        },
+      };
+    } catch (error) {
+      throw this.normalizeError(error, "GET");
+    } finally {
+      cancel();
+    }
   }
 
   async exists(key: string): Promise<boolean> {
+    return withRetry(() => this.doExists(key), this.effectiveRetryPolicy());
+  }
+
+  private async doExists(key: string): Promise<boolean> {
     const url = this.urlFor(key);
     const headers = await this.signedHeaders("HEAD", url, {});
-    const response = await this.fetchImpl(url, { method: "HEAD", headers });
-    return response.ok;
+    const { signal, cancel } = withTimeoutSignal(this.timeoutMs);
+    try {
+      const response = await this.fetchImpl(url, { method: "HEAD", headers, signal });
+      return response.ok;
+    } catch (error) {
+      throw this.normalizeError(error, "HEAD");
+    } finally {
+      cancel();
+    }
   }
 
   async delete(key: string): Promise<void> {
+    return withRetry(() => this.doDelete(key), this.effectiveRetryPolicy());
+  }
+
+  private async doDelete(key: string): Promise<void> {
     const url = this.urlFor(key);
     const headers = await this.signedHeaders("DELETE", url, {});
-    const response = await this.fetchImpl(url, { method: "DELETE", headers });
-    if (!response.ok && response.status !== 404) {
-      throw new Error(`Object DELETE failed (${response.status}): ${await response.text()}`);
+    const { signal, cancel } = withTimeoutSignal(this.timeoutMs);
+    try {
+      const response = await this.fetchImpl(url, { method: "DELETE", headers, signal });
+      if (!response.ok && response.status !== 404) {
+        const text = await response.text().catch(() => "");
+        throw createObjectStorageError(this.providerId, `Object DELETE failed (${response.status}): ${text}`, {
+          statusCode: response.status,
+          retryable: response.status === 429 || response.status >= 500,
+        });
+      }
+    } catch (error) {
+      throw this.normalizeError(error, "DELETE");
+    } finally {
+      cancel();
     }
   }
 

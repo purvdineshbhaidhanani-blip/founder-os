@@ -33,6 +33,7 @@
     "generate:app-generation": "tsx src/departments/app-generation-generate.ts",
     "test": "vitest run",
     "test:watch": "vitest",
+    "validate:providers": "tsx packages/engines/scripts/validate-providers.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit && npm run typecheck --workspaces --if-present",
     "lint": "eslint . --ext .ts,.tsx",
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\" \"packages/*/src/**/*.{ts,tsx}\" \"packages/*/tests/**/*.ts\""

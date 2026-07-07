@@ -7,3 +7,4 @@ export * from "./memory.js";
 export * from "./tool-calling.js";
 export * from "./token-accounting.js";
 export * from "./providers/index.js";
+export * from "./diagnostics.js";
