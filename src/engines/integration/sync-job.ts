@@ -1,0 +1,38 @@
+import { withRetry, type RetryPolicy } from "../shared/retry.js";
+import type { SyncJobResult } from "./types.js";
+
+export interface SyncJobOptions {
+  connectorId: string;
+  cursor?: string;
+  retry?: RetryPolicy;
+}
+
+export type SyncFn = (cursor: string | undefined) => Promise<{ itemsSynced: number; cursor?: string }>;
+
+/** Runs a one-shot sync job (full or incremental) with retry, recording a structured result either way. */
+export class SyncJobRunner {
+  async run(sync: SyncFn, options: SyncJobOptions): Promise<SyncJobResult> {
+    const startedAt = new Date().toISOString();
+    try {
+      const { itemsSynced, cursor } = await withRetry(() => sync(options.cursor), options.retry);
+      return {
+        connectorId: options.connectorId,
+        startedAt,
+        completedAt: new Date().toISOString(),
+        status: "succeeded",
+        itemsSynced,
+        cursor,
+      };
+    } catch (error) {
+      return {
+        connectorId: options.connectorId,
+        startedAt,
+        completedAt: new Date().toISOString(),
+        status: "failed",
+        itemsSynced: 0,
+        error: error instanceof Error ? error.message : String(error),
+        cursor: options.cursor,
+      };
+    }
+  }
+}

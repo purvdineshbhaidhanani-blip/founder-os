@@ -1,0 +1,64 @@
+import { mkdtemp, rm, readFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { LocalFsStorage } from "../../src/engines/storage/adapters/local-fs-storage.js";
+import { DownloadManager } from "../../src/engines/storage/download-manager.js";
+import { MediaProcessingPipeline } from "../../src/engines/storage/media-processing.js";
+import { UploadManager } from "../../src/engines/storage/upload-manager.js";
+
+describe("Storage Engine", () => {
+  let root: string;
+  let storage: LocalFsStorage;
+
+  beforeEach(async () => {
+    root = await mkdtemp(path.join(tmpdir(), "storage-engine-"));
+    storage = new LocalFsStorage(root);
+  });
+
+  afterEach(async () => {
+    await rm(root, { recursive: true, force: true });
+  });
+
+  it("puts, gets, lists, and deletes objects with metadata", async () => {
+    await storage.put("docs/readme.txt", Buffer.from("hello world"), {
+      contentType: "text/plain",
+      metadata: { owner: "ada" },
+    });
+
+    expect(await storage.exists("docs/readme.txt")).toBe(true);
+    const object = await storage.get("docs/readme.txt");
+    expect(object.data.toString()).toBe("hello world");
+    expect(object.metadata.contentType).toBe("text/plain");
+    expect(object.metadata.custom).toEqual({ owner: "ada" });
+
+    const listed = await storage.list("docs");
+    expect(listed.map((f) => f.key)).toContain("docs/readme.txt");
+
+    await storage.delete("docs/readme.txt");
+    expect(await storage.exists("docs/readme.txt")).toBe(false);
+  });
+
+  it("UploadManager reports 0 then 100 percent progress", async () => {
+    const uploads = new UploadManager(storage);
+    const progress: number[] = [];
+    await uploads.upload("file.bin", Buffer.from("data"), { onProgress: (p) => progress.push(p) });
+    expect(progress).toEqual([0, 100]);
+  });
+
+  it("DownloadManager writes an object to a local file", async () => {
+    await storage.put("file.bin", Buffer.from("payload"));
+    const downloads = new DownloadManager(storage);
+    const destPath = path.join(root, "out", "file-copy.bin");
+    await downloads.downloadToFile("file.bin", destPath);
+    expect((await readFile(destPath)).toString()).toBe("payload");
+  });
+
+  it("MediaProcessingPipeline runs hooks in order", async () => {
+    const pipeline = new MediaProcessingPipeline()
+      .use((data) => Buffer.concat([data, Buffer.from("-a")]))
+      .use((data) => Buffer.concat([data, Buffer.from("-b")]));
+    const result = await pipeline.run(Buffer.from("start"), { metadata: {} });
+    expect(result.toString()).toBe("start-a-b");
+  });
+});
