@@ -25,6 +25,8 @@ import { MonitorEngine } from "../monitoring/index.js";
 import { createFounderCopilotService, type FounderCopilotService } from "../founder-copilot/index.js";
 import { ClusterRepository, ProblemIntelligenceEngine } from "../problems/index.js";
 import { OpportunityEngine, OpportunityRepository } from "../opportunities/index.js";
+import { createIdentityStoreFromEnv } from "../identity/index.js";
+import { createIdentityContext, type IdentityContext } from "./routes/identity.js";
 
 /**
  * Every wired subsystem the HTTP server's routes depend on. Composed fresh
@@ -60,6 +62,7 @@ export interface AppContext {
   opportunityRepository: OpportunityRepository;
   opportunities: OpportunityEngine;
   commandCenter: CommandCenterBackend;
+  identity: IdentityContext;
 }
 
 /**
@@ -98,6 +101,7 @@ export function composeAppContext(): AppContext {
   const problems = new ProblemIntelligenceEngine({ repository: clusterRepository });
   const opportunityRepository = new OpportunityRepository({ artifacts, memory });
   const opportunities = new OpportunityEngine({ repository: opportunityRepository });
+  const identity = createIdentityContext(createIdentityStoreFromEnv());
 
   observability.attachBus();
 
@@ -143,5 +147,6 @@ export function composeAppContext(): AppContext {
     opportunityRepository,
     opportunities,
     commandCenter,
+    identity,
   };
 }
