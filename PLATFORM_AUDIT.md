@@ -7,7 +7,8 @@ an analysis document — it makes **no code changes**. Re-run this audit
 (a new product added, the legacy code is removed, standards revised).
 
 _Last updated: 2026-07-09, after establishing the Global Standards
-foundation (Mega Prompt 1)._
+foundation (Mega Prompt 1) and the Common SaaS Foundation / Global Looping
+frameworks (Mega Prompt 2)._
 
 ---
 
@@ -16,8 +17,9 @@ foundation (Mega Prompt 1)._
 | Area | Size | Status |
 |---|---|---|
 | `MASTER_PROJECT_CONTEXT.md`, `CLAUDE.md` | — | New project foundation |
-| `standards/` | 9 docs | New — global standards, complete |
-| `templates/` | 7 doc templates + `product-scaffold/` | New — complete |
+| `standards/` | 9 docs + index | New — global standards, complete |
+| `frameworks/` | 18 frameworks + index | New — Common SaaS Foundation (Global Looping), complete |
+| `templates/` | 7 doc templates + 5 framework fill-ins + `product-scaffold/` | New — complete |
 | `products/`, `shared/`, `packages/`, `infrastructure/` | empty | New — scaffolded, awaiting first product |
 | `src/`, `agents/` (41 agent defs), `blueprints/`, `registry/`, `artifacts/`, `web/`, `tests/`, `supabase/`, `scripts/`, `docs/` | ~6.3 MB, 41 agents, 14 test suites | **Legacy** — "Agent Factory," unrelated prior project |
 | Root toolchain (`package.json`, lockfile, `tsconfig*`, `.eslintrc.cjs`, `.prettierrc`, `playwright.config.ts`, `vitest.config.ts`, `railway.json`, `.env.example`) | — | **Legacy** — wired entirely to `src/`/`web/`, not to the new project |
@@ -116,10 +118,11 @@ dependencies on the legacy code.
    decide pnpm/Turborepo workspaces vs. fully independent product
    toolchains, so `products/*/package.json` don't organically diverge in
    incompatible ways.
-4. **First product** — the standards and scaffold are complete and ready;
-   the highest-value next step is instantiating the first real SaaS
-   product from `templates/product-scaffold/` once its identity (name,
-   problem, target customer, features) is defined.
+4. **First product** — the standards, frameworks (Global Looping), and
+   scaffold are complete and ready; the highest-value next step is
+   instantiating the first real SaaS product from
+   `templates/product-scaffold/` and running it through `frameworks/`,
+   once its identity (name, problem, target customer, features) is defined.
 
 ## 6. Summary
 
@@ -129,4 +132,5 @@ level. All identified risks are structural/organizational (legacy
 coexistence, root-README ambiguity, a future monorepo-tooling decision)
 rather than defects, and are called out for the user rather than acted on
 unilaterally. The repository is ready for the first product to be built
-against `standards/` and `templates/product-scaffold/`.
+against `standards/`, run through the `frameworks/` Global Looping, and
+instantiated from `templates/product-scaffold/`.

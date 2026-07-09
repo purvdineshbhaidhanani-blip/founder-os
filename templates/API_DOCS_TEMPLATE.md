@@ -2,7 +2,7 @@
 
 Base URL: `<https://api.example.com>` (production) / `http://localhost:<port>/api` (dev)
 
-Conventions follow [`standards/api.md`](../../standards/api.md) — error
+Conventions follow [`standards/api.md`](../../../standards/api.md) — error
 shape, pagination, auth, and status codes are not repeated per-route below
 unless a route deviates.
 

@@ -27,9 +27,19 @@ dark/light mode, docs, deployment-ready structure) — never a landing page.
 - `MASTER_PROJECT_CONTEXT.md` — project foundation (highest priority).
 - `standards/` — GLOBAL standards shared by every SaaS: engineering, design
   system, security, AI, database, API, testing, devops, documentation.
+  Defines **how** to build well.
+- `frameworks/` — the **Common SaaS Foundation** (the "Global Looping"):
+  18 reusable frameworks every product runs through. Defines **what** every
+  SaaS contains (dashboard, admin, roles, notifications, reporting,
+  integrations, pricing, etc.) plus the business frameworks (product spec,
+  customer research, competitor analysis, feature classification, success
+  metrics, product evaluation). Overlaps with `standards/` are lenses over
+  the standard, which stays authoritative.
 - `templates/` — reusable document templates (README, architecture, ADR,
-  API docs, changelog, onboarding, troubleshooting) and the
-  `product-scaffold/` directory tree every new SaaS is instantiated from.
+  API docs, changelog, onboarding, troubleshooting), the per-product
+  framework fill-ins (product spec, customer research, competitor analysis,
+  pricing, evaluation scorecard), and the `product-scaffold/` directory
+  tree every new SaaS is instantiated from.
 - `products/<saas-name>/` — one directory per SaaS product. Each product has
   its own identity, branding, features, and spec, but inherits everything
   else from the global standards. Each product owns its own `docs/` and

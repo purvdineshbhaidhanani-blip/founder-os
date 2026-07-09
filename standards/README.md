@@ -8,7 +8,15 @@ explicitly in that product's `ARCHITECTURE.md` under "Deviations from
 global standards," not silently done differently.
 
 Authority order: [`MASTER_PROJECT_CONTEXT.md`](../MASTER_PROJECT_CONTEXT.md)
-→ these standards → individual product specs.
+→ these standards → [frameworks](../frameworks/README.md) → individual
+product specs.
+
+**Standards vs frameworks:** `standards/` defines **how** to build well
+(the binding engineering, security, and design rules).
+[`frameworks/`](../frameworks/README.md) — the Common SaaS Foundation —
+defines **what** every product contains and the business work around it.
+Where they overlap (security, technical foundation), these standards are
+authoritative and the framework is a checklist/lens over them.
 
 | Standard | Covers |
 |---|---|

@@ -19,12 +19,21 @@ and defines only what's genuinely product-specific:
 ## Starting a new product
 
 1. Copy `templates/product-scaffold/` to `products/<name>/`.
-2. Fill in `docs/README.md`, `docs/ARCHITECTURE.md`, and the product's
+2. **Run the Global Looping** ([`frameworks/`](../frameworks/README.md)) —
+   the mandatory 18-framework loop: define the product (spec, customer
+   research, competitor analysis, feature classification), design the
+   standard surfaces (AI, dashboard, admin, users, roles, notifications,
+   reporting, integrations), set the business rails (pricing, compliance,
+   metrics), verify the security/technical gates, and score the product
+   (evaluation). Use the framework fill-in templates in
+   [`templates/`](../templates/README.md) for the per-product artifacts.
+3. Fill in `docs/README.md`, `docs/ARCHITECTURE.md`, and the product's
    own identity content per the list above.
-3. Build Phase 1 (complete architecture, no required credentials,
-   integrations wired but disabled) per
+4. Build Phase 1 (complete architecture, no required credentials,
+   integrations wired but disabled) against
+   [`standards/`](../standards/README.md) and per
    [`MASTER_PROJECT_CONTEXT.md`](../MASTER_PROJECT_CONTEXT.md).
-4. Add the product to the table below once its scaffold exists.
+5. Add the product to the table below once its scaffold exists.
 
 ## Portfolio
 

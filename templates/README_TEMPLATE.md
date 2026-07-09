@@ -41,5 +41,5 @@ standard.>
 ## Standards
 
 This product inherits all GLOBAL standards from
-[`/standards`](../../standards/README.md). This doc only covers what's
+[`/standards`](../../../standards/README.md). This doc only covers what's
 specific to this product.
