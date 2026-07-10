@@ -1,0 +1,95 @@
+// CRMCapture product-specific schema. See products/spendgov/prisma/schema.prisma
+// for the documented rationale on why organizationId/userId columns here
+// are plain indexed strings rather than Prisma relations, and why this
+// schema lives in its own Postgres namespace alongside
+// @founder-os/platform's tables.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/crmcapture-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("CRMCAPTURE_DATABASE_URL")
+}
+
+enum LeadSource {
+  web_form
+  email
+  linkedin
+  csv_import
+  manual
+
+  @@map("lead_source")
+}
+
+model Contact {
+  id             String     @id @default(uuid())
+  organizationId String     @map("organization_id")
+  firstName      String     @map("first_name")
+  lastName       String?    @map("last_name")
+  email          String?
+  normalizedEmail String?   @map("normalized_email")
+  phone          String?
+  normalizedPhone String?   @map("normalized_phone")
+  company        String?
+  jobTitle       String?    @map("job_title")
+  linkedinUrl    String?    @map("linkedin_url")
+  source         LeadSource @default(manual)
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
+
+  leads Lead[]
+
+  @@index([organizationId])
+  @@index([organizationId, normalizedEmail])
+  @@index([organizationId, normalizedPhone])
+  @@map("contacts")
+}
+
+enum LeadStatus {
+  new
+  contacted
+  qualified
+  converted
+  lost
+
+  @@map("lead_status")
+}
+
+model Lead {
+  id             String     @id @default(uuid())
+  organizationId String     @map("organization_id")
+  contactId      String     @map("contact_id")
+  status         LeadStatus @default(new)
+  score          Int        @default(0)
+  source         LeadSource @default(manual)
+  assignedToUserId String?  @map("assigned_to_user_id")
+  notes          String?
+  createdAt      DateTime   @default(now()) @map("created_at")
+  updatedAt      DateTime   @updatedAt @map("updated_at")
+
+  contact           Contact            @relation(fields: [contactId], references: [id], onDelete: Cascade)
+  followUpSuggestion FollowUpSuggestion?
+
+  @@index([organizationId, status])
+  @@index([organizationId, assignedToUserId])
+  @@map("leads")
+}
+
+model FollowUpSuggestion {
+  id                 String   @id @default(uuid())
+  organizationId     String   @map("organization_id")
+  leadId             String   @unique(map: "uq_followup_suggestions_lead_id") @map("lead_id")
+  summary            String
+  nextStepSuggestion String   @map("next_step_suggestion")
+  draftEmail         String   @map("draft_email")
+  opportunityDetected Boolean @default(false) @map("opportunity_detected")
+  generatedAt        DateTime @default(now()) @map("generated_at")
+
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("followup_suggestions")
+}
