@@ -1,0 +1,136 @@
+// CodeAudit product-specific schema. See products/spendgov/prisma/schema.prisma
+// for the documented rationale on why organizationId/userId columns here
+// are plain indexed strings rather than Prisma relations, and why this
+// schema lives in its own Postgres namespace alongside
+// @founder-os/platform's tables.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/codeaudit-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("CODEAUDIT_DATABASE_URL")
+}
+
+enum RepoVisibility {
+  private
+  public
+
+  @@map("repo_visibility")
+}
+
+model Repository {
+  id             String         @id @default(uuid())
+  organizationId String         @map("organization_id")
+  name           String
+  defaultBranch  String         @default("main") @map("default_branch")
+  visibility     RepoVisibility @default(private)
+  createdByUserId String        @map("created_by_user_id")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  scans Scan[]
+
+  @@unique([organizationId, name], map: "uq_repositories_org_name")
+  @@index([organizationId])
+  @@map("repositories")
+}
+
+enum ScanStatus {
+  running
+  completed
+  failed
+
+  @@map("scan_status")
+}
+
+model Scan {
+  id               String     @id @default(uuid())
+  organizationId   String     @map("organization_id")
+  repositoryId     String     @map("repository_id")
+  status           ScanStatus @default(running)
+  triggeredByUserId String    @map("triggered_by_user_id")
+  filesScanned     Int        @default(0) @map("files_scanned")
+  healthScore      Int?       @map("health_score")
+  startedAt        DateTime   @default(now()) @map("started_at")
+  completedAt      DateTime?  @map("completed_at")
+
+  repository Repository @relation(fields: [repositoryId], references: [id], onDelete: Cascade)
+  findings   Finding[]
+
+  @@index([organizationId, repositoryId])
+  @@index([organizationId, startedAt])
+  @@map("scans")
+}
+
+enum FindingCategory {
+  vulnerability
+  secret
+  quality
+  dependency
+
+  @@map("finding_category")
+}
+
+enum FindingSeverity {
+  low
+  medium
+  high
+  critical
+
+  @@map("finding_severity")
+}
+
+enum FindingStatus {
+  open
+  fixed
+  false_positive
+  wont_fix
+
+  @@map("finding_status")
+}
+
+model Finding {
+  id             String          @id @default(uuid())
+  organizationId String          @map("organization_id")
+  scanId         String          @map("scan_id")
+  repositoryId   String          @map("repository_id")
+  filePath       String          @map("file_path")
+  line           Int
+  ruleId         String          @map("rule_id")
+  category       FindingCategory
+  severity       FindingSeverity
+  cwe            String?
+  title          String
+  description    String
+  snippet        String
+  status         FindingStatus   @default(open)
+  effortMinutes  Int             @default(0) @map("effort_minutes")
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+
+  scan        Scan          @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  fixSuggestion FixSuggestion?
+
+  @@index([organizationId, status])
+  @@index([organizationId, scanId])
+  @@index([organizationId, severity])
+  @@map("findings")
+}
+
+model FixSuggestion {
+  id              String   @id @default(uuid())
+  organizationId  String   @map("organization_id")
+  findingId       String   @unique(map: "uq_fix_suggestions_finding_id") @map("finding_id")
+  explanation     String
+  suggestedPatch  String   @map("suggested_patch")
+  riskScore       Int      @map("risk_score")
+  generatedAt     DateTime @default(now()) @map("generated_at")
+
+  finding Finding @relation(fields: [findingId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("fix_suggestions")
+}
