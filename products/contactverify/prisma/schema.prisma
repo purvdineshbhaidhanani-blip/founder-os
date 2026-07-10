@@ -1,0 +1,66 @@
+// ContactVerify product-specific schema. See products/spendgov/prisma/schema.prisma
+// for the documented rationale on why organizationId/userId columns here
+// are plain indexed strings rather than Prisma relations, and why this
+// schema lives in its own Postgres namespace alongside
+// @founder-os/platform's tables.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/contactverify-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("CONTACTVERIFY_DATABASE_URL")
+}
+
+enum VerificationStatus {
+  valid
+  invalid
+  risky
+  unchecked
+
+  @@map("verification_status")
+}
+
+model Contact {
+  id              String             @id @default(uuid())
+  organizationId  String             @map("organization_id")
+  firstName       String             @map("first_name")
+  lastName        String?            @map("last_name")
+  email           String?
+  normalizedEmail String?            @map("normalized_email")
+  phone           String?
+  normalizedPhone String?            @map("normalized_phone")
+  company         String?
+  jobTitle        String?            @map("job_title")
+  emailStatus     VerificationStatus @default(unchecked) @map("email_status")
+  phoneStatus     VerificationStatus @default(unchecked) @map("phone_status")
+  healthScore     Int                @default(0) @map("health_score")
+  createdAt       DateTime           @default(now()) @map("created_at")
+  updatedAt       DateTime           @updatedAt @map("updated_at")
+
+  healthProfile ContactHealthProfile?
+
+  @@index([organizationId])
+  @@index([organizationId, normalizedEmail])
+  @@index([organizationId, normalizedPhone])
+  @@map("contacts")
+}
+
+model ContactHealthProfile {
+  id                  String   @id @default(uuid())
+  organizationId      String   @map("organization_id")
+  contactId           String   @unique(map: "uq_contact_health_profiles_contact_id") @map("contact_id")
+  leadQuality         String   @map("lead_quality")
+  missingFields       String[] @map("missing_fields")
+  suggestedEnrichment String[] @map("suggested_enrichment")
+  confidenceScore     Int      @map("confidence_score")
+  explanation         String
+  generatedAt         DateTime @default(now()) @map("generated_at")
+
+  contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("contact_health_profiles")
+}
