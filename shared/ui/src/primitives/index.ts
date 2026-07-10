@@ -2,6 +2,7 @@ export { Button, type ButtonProps, type ButtonVariant, type ButtonSize } from ".
 export { Badge, type BadgeProps, type BadgeVariant } from "./Badge.js";
 export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "./Card.js";
 export { Input, type InputProps } from "./Input.js";
+export { Textarea, type TextareaProps } from "./Textarea.js";
 export { Select, type SelectProps, type SelectOption } from "./Select.js";
 export { Checkbox, type CheckboxProps } from "./Checkbox.js";
 export { Tabs, TabList, Tab, TabPanel, type TabsProps, type TabListProps, type TabProps, type TabPanelProps } from "./Tabs.js";

@@ -16,6 +16,7 @@
 .fos-btn:focus-visible,
 .fos-input:focus-visible,
 .fos-select:focus-visible,
+.fos-textarea:focus-visible,
 .fos-checkbox:focus-visible,
 .fos-tab:focus-visible {
   outline: 2px solid hsl(var(--ring));
@@ -95,18 +96,23 @@
 .fos-field { display: flex; flex-direction: column; gap: var(--space-1); }
 .fos-label { font-size: var(--font-size-sm); font-weight: var(--font-weight-emphasis); color: hsl(var(--foreground)); }
 .fos-input,
-.fos-select {
-  height: 40px;
+.fos-select,
+.fos-textarea {
   padding: 0 var(--space-3);
   border-radius: var(--radius-md);
   border: 1px solid hsl(var(--input));
   background: hsl(var(--background));
   color: hsl(var(--foreground));
   font-size: var(--font-size-base);
+  font-family: inherit;
   transition: border-color var(--duration-micro) var(--ease-out);
 }
+.fos-input,
+.fos-select { height: 40px; }
+.fos-textarea { padding-top: var(--space-2); padding-bottom: var(--space-2); resize: vertical; min-height: 96px; }
 .fos-input:hover,
-.fos-select:hover { border-color: hsl(var(--ring)); }
+.fos-select:hover,
+.fos-textarea:hover { border-color: hsl(var(--ring)); }
 .fos-input-error { border-color: hsl(var(--destructive)); }
 .fos-field-hint { font-size: var(--font-size-xs); color: hsl(var(--muted-foreground)); }
 .fos-field-error { font-size: var(--font-size-xs); color: hsl(var(--destructive)); }
