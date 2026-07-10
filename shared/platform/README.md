@@ -55,7 +55,21 @@ wait on its own credentials to turn a given integration on.
    product's database using this package's `prisma/schema.prisma` before
    the product's own product-specific migrations run — this package's
    tables (`users`, `organizations`, `sessions`, etc.) are the foundation
-   every product-specific table's foreign keys point back to.
+   every product-specific table's `organizationId`/`userId` columns
+   logically reference. Point this package's `PLATFORM_DATABASE_URL` at the
+   database's default (`public`) Postgres schema, and give the product's
+   own Prisma project its own Postgres schema/namespace in the **same**
+   database via a `?schema=<product>_app` query param on its own database
+   URL (e.g. `SPENDGOV_DATABASE_URL=...db/spendgov?schema=spendgov_app`).
+   This is required, not optional: both Prisma projects otherwise write to
+   the same `_prisma_migrations` bookkeeping table in `public` and corrupt
+   each other's migration history the moment the product runs its own
+   `prisma migrate dev`. There is no Prisma-level relation between the two
+   schemas — a product's `organizationId` column is a plain indexed
+   `String`, not a `@relation` — since Prisma has no concept of a model it
+   doesn't own; referential integrity across the two is enforced at the
+   application layer via this package's services, the same way `app_id`
+   scoping already protects against cross-tenant mixing.
 4. In the product's route handlers: parse and validate input (this
    package's zod schemas), call the service function, format the response
    — never reach into `@prisma/client` directly for `users`/`organizations`/

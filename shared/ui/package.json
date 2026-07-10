@@ -8,21 +8,22 @@
     "node": ">=20.11.0"
   },
   "exports": {
-    "./tokens": "./src/tokens/index.ts",
+    "./tokens": { "types": "./dist/tokens/index.d.ts", "default": "./dist/tokens/index.js" },
     "./tokens.css": "./src/tokens/tokens.css",
-    "./theme": "./src/theme/index.ts",
-    "./primitives": "./src/primitives/index.ts",
+    "./theme": { "types": "./dist/theme/index.d.ts", "default": "./dist/theme/index.js" },
+    "./primitives": { "types": "./dist/primitives/index.d.ts", "default": "./dist/primitives/index.js" },
     "./primitives.css": "./src/primitives/primitives.css",
-    "./dashboard": "./src/dashboard/index.ts",
-    "./layout": "./src/layout/index.ts",
-    "./admin": "./src/admin/index.ts",
+    "./dashboard": { "types": "./dist/dashboard/index.d.ts", "default": "./dist/dashboard/index.js" },
+    "./layout": { "types": "./dist/layout/index.d.ts", "default": "./dist/layout/index.js" },
+    "./admin": { "types": "./dist/admin/index.d.ts", "default": "./dist/admin/index.js" },
     "./dashboard.css": "./src/dashboard/dashboard.css",
     "./layout.css": "./src/layout/layout.css",
     "./admin.css": "./src/admin/admin.css",
-    "./hooks": "./src/hooks/index.ts",
-    "./utils": "./src/utils/index.ts"
+    "./hooks": { "types": "./dist/hooks/index.d.ts", "default": "./dist/hooks/index.js" },
+    "./utils": { "types": "./dist/utils/index.d.ts", "default": "./dist/utils/index.js" }
   },
   "scripts": {
+    "prepare": "npm run build",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
     "lint": "eslint src tests",

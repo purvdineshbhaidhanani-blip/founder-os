@@ -92,7 +92,7 @@ enum OAuthProvider {
 model Session {
   id         String    @id @default(uuid())
   userId     String    @map("user_id")
-  tokenHash  String    @map("token_hash") // sha256 of the opaque session token; raw token never stored
+  tokenHash  String    @unique(map: "uq_sessions_token_hash") @map("token_hash") // sha256 of the opaque session token; raw token never stored
   ipAddress  String?   @map("ip_address")
   userAgent  String?   @map("user_agent")
   createdAt  DateTime  @default(now()) @map("created_at")
@@ -102,7 +102,6 @@ model Session {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([tokenHash], name: "uq_sessions_token_hash")
   @@index([userId])
   @@index([expiresAt])
   @@map("sessions")
@@ -131,14 +130,13 @@ enum MfaType {
 model PasswordResetToken {
   id        String    @id @default(uuid())
   userId    String    @map("user_id")
-  tokenHash String    @map("token_hash")
+  tokenHash String    @unique(map: "uq_password_reset_tokens_token_hash") @map("token_hash")
   expiresAt DateTime  @map("expires_at")
   usedAt    DateTime? @map("used_at")
   createdAt DateTime  @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([tokenHash], name: "uq_password_reset_tokens_token_hash")
   @@index([userId])
   @@map("password_reset_tokens")
 }
@@ -146,14 +144,13 @@ model PasswordResetToken {
 model MagicLinkToken {
   id        String    @id @default(uuid())
   userId    String    @map("user_id")
-  tokenHash String    @map("token_hash")
+  tokenHash String    @unique(map: "uq_magic_link_tokens_token_hash") @map("token_hash")
   expiresAt DateTime  @map("expires_at")
   usedAt    DateTime? @map("used_at")
   createdAt DateTime  @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([tokenHash], name: "uq_magic_link_tokens_token_hash")
   @@index([userId])
   @@map("magic_link_tokens")
 }
@@ -253,7 +250,7 @@ model Invitation {
   email          String
   role           OrgRole          @default(member)
   productRole    String?          @map("product_role")
-  tokenHash      String           @map("token_hash")
+  tokenHash      String           @unique(map: "uq_invitations_token_hash") @map("token_hash")
   invitedById    String           @map("invited_by_id")
   status         InvitationStatus @default(pending)
   expiresAt      DateTime         @map("expires_at")
@@ -263,7 +260,6 @@ model Invitation {
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   invitedBy    User         @relation("InvitationSender", fields: [invitedById], references: [id])
 
-  @@unique([tokenHash], name: "uq_invitations_token_hash")
   @@index([organizationId])
   @@index([email])
   @@map("invitations")
@@ -315,7 +311,7 @@ model ApiKey {
   createdById    String    @map("created_by_id")
   name           String
   keyPrefix      String    @map("key_prefix") // first 8 chars, shown in UI so a key is identifiable without re-revealing it
-  keyHash        String    @map("key_hash") // sha256 of the full key; raw key never stored
+  keyHash        String    @unique(map: "uq_api_keys_key_hash") @map("key_hash") // sha256 of the full key; raw key never stored
   scopes         Json      @default("[]")
   lastUsedAt     DateTime? @map("last_used_at")
   expiresAt      DateTime? @map("expires_at")
@@ -325,7 +321,6 @@ model ApiKey {
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
   createdBy    User         @relation("ApiKeyCreator", fields: [createdById], references: [id])
 
-  @@unique([keyHash], name: "uq_api_keys_key_hash")
   @@index([organizationId])
   @@index([appId])
   @@map("api_keys")
