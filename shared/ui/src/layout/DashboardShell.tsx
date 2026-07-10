@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, type ReactNode } from "react";
 import { useBreakpoint } from "../hooks/useBreakpoint.js";
 import { cn } from "../utils/cn.js";

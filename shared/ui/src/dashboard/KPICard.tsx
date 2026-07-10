@@ -1,3 +1,5 @@
+"use client";
+
 import type { ReactNode } from "react";
 import { LineChart, Line, ResponsiveContainer } from "recharts";
 import { Card, CardContent } from "../primitives/Card.js";

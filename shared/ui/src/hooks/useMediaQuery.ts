@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 
 /** SSR-safe media query hook — returns false on the server and during first client render, then updates, avoiding a hydration mismatch. */

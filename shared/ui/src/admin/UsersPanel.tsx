@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { DataTable, type DataTableColumn } from "../dashboard/DataTable.js";
 import { Badge, type BadgeVariant } from "../primitives/Badge.js";

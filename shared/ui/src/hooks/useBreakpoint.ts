@@ -1,3 +1,5 @@
+"use client";
+
 import { breakpoints, type Breakpoint } from "../tokens/index.js";
 import { useMediaQuery } from "./useMediaQuery.js";
 

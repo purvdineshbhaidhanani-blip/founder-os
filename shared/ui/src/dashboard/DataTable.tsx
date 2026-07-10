@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, type ReactNode } from "react";
 import { Skeleton } from "../primitives/Skeleton.js";
 import { EmptyState } from "../primitives/EmptyState.js";
