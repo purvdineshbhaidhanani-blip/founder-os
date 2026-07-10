@@ -14,7 +14,7 @@ Security and quality tools are siloed. SAST tools exist but require expensive se
 
 ## 4. Target Customer
 
-Mid-size technology companies (100–1,000 engineers) and growing startups (20–200 engineers) building production software who care about velocity, quality, and incident reduction.
+Individual developers and open-source maintainers as the free-tier entry point (bottom-up adoption), expanding to mid-size technology companies (100–1,000 engineers) and growing startups (20–200 engineers) on Starter/Pro once a team formalizes CI/CD scanning, and large orgs (>1,000 engineers) with compliance needs on Enterprise.
 
 ## 5. Business Value
 
@@ -23,6 +23,8 @@ Mid-size technology companies (100–1,000 engineers) and growing startups (20�
 - **Debt visibility:** Track technical debt accumulation per team; quantify cost of cutting corners.
 - **Developer productivity:** Shift-left feedback: errors caught in PR, not production; developers learn patterns from feedback.
 - **Confidence to ship:** Teams deploy more frequently (3–5× higher deployment rate) when quality is visible and gated.
+
+**Killer Feature — AI Fix Engine (Pro tier):** Instead of saying "SQL Injection Found," it automatically suggests a production-ready secure patch — turning a finding into a mergeable fix instead of a research task.
 
 ## 6. Success Goal
 
@@ -215,67 +217,76 @@ Technology companies meeting ALL:
 
 ## 20. Pricing Strategy
 
-**Principle:** Developers are the primary users. Price by developer count and scan volume (bigger team = higher price). Lock in before annual planning (September). Freemium model to drive adoption (free tier for small open-source projects, startup discount).
+**Principle:** Pure product-led growth, no credit card at signup. Individual developers and open-source maintainers get real value for free (not a crippled demo), which drives bottom-up adoption inside companies. Price per-developer/month once a team needs private repos at scale, CI/CD integration, or team-wide dashboards — the natural point where an individual tool becomes a team system of record for code health.
 
-**Model:** Subscription SaaS, annual billing, five-tier pricing ladder + developer-count overage pricing.
+**Model:** Subscription SaaS, per-developer monthly billing (annual discount available), four-tier pricing ladder (Free → Starter → Pro → Enterprise).
 
 ## 21. Pricing Tiers & Entitlements
 
-| | Free | Starter | Professional | Enterprise | Premium |
-|---|---|---|---|---|---|
-| **Annual Price** | $0 | $8K | $24K | $60K | Custom |
-| **Target** | Startups, open-source | Small teams <50 eng | Growing teams 50–200 eng | Large orgs >200 eng | Security-first orgs |
-| **Developer Count** | 5 | 20 | 100 | Unlimited | Unlimited |
-| **Monthly Scans** | 100 | 500 | 2,000 | 10,000 | Unlimited |
-| **Repositories** | 2 | 10 | 50 | Unlimited | Unlimited |
-| **Languages** | JS/TS, Python | All 3 + Ruby, PHP | All 5 + Go, Java, C# | All + custom rules | All + custom rules |
-| **Vulnerability DB** | OWASP Top 10 | OWASP + CWE 25 | Full CWE + CVE data | Full + private rules | Full + private + custom |
-| **Code Quality Rules** | Basic (50) | Standard (150) | Advanced (500) | All + custom | All + custom |
-| **Educational Feedback** | — | Basic | Full | Full | Full + security training |
-| **Dashboard** | Team only | Team + org | Org-wide | Org-wide + multi-org | Org-wide + custom |
-| **Integration** | GitHub only | GitHub, GitLab | GitHub, GitLab, Bitbucket | GitHub, GitLab, Bitbucket, custom | All + custom |
-| **Historical Scanning** | No | Last 3 months | Last 12 months | Unlimited | Unlimited |
-| **Audit Logging** | 30-day retention | 1-year | 3-year | 7-year | 10-year |
-| **Technical Debt Reports** | — | Basic | Advanced | Advanced + forecasting | Advanced + forecasting + consulting |
-| **Support** | Community | Email | Priority email | Dedicated success manager | Dedicated + quarterly reviews |
-| **Gated Features** | — | — | Auto-fix suggestions, architectural analysis | All reports, multi-org | All + consulting hours |
+| | Free (No Card) | Starter | Pro | Enterprise |
+|---|---|---|---|---|
+| **Price** | $0 | $19/developer/month | $49/developer/month | Custom |
+| **Target** | Individual developers, OSS maintainers | Small teams formalizing CI | Teams scaling security + quality | Large orgs, compliance-driven |
+| **Developers** | 1 | Per-seat | Per-seat | Per-seat, volume pricing |
+| **Private Repositories** | 1 | 10 | Unlimited | Unlimited |
+| **Public Repositories** | 3 | Unlimited | Unlimited | Unlimited |
+| **Files Scanned / Month** | 500 | 5,000 | Unlimited | Unlimited |
+| **PR Scans / Month** | 20 | 300 | Unlimited | Unlimited |
+| **AI Code Review** | Basic | Basic + AI Explanations | AI Refactoring + AI Fix Suggestions | AI Refactoring + Fix + Dedicated AI |
+| **OWASP Top 10 Detection** | Yes | Yes | Yes | Yes + custom rules |
+| **Secret Detection** | — | — | Yes | Yes |
+| **Dependency Scan** | — | — | Yes | Yes |
+| **Container Scan** | — | — | Yes | Yes |
+| **Security / Quality Score** | Yes | Yes | Yes | Yes |
+| **Custom Rules** | — | — | Yes | Yes + compliance rule packs |
+| **Team Dashboard** | — | — | Yes | Yes + multi-org |
+| **API Access** | — | — | Yes | Yes |
+| **Integrations** | — | GitHub, GitLab, Bitbucket, Jira | + Slack Alerts | + custom |
+| **CI/CD** | No | Yes | Yes | Yes |
+| **Reports** | Email report | Weekly reports | Weekly + team reports | Custom + compliance reports |
+| **Support** | Community | Email | Priority email | Dedicated + premium support |
+| **Compliance & Enterprise** | — | — | — | SSO, SCIM, audit logs, compliance, private deployment, SLA |
 
 **Rationale:**
-- Free tier: 5 developers, 100 scans/month. Ideal for small startups + open-source projects. Drives adoption.
-- Starter: 20 developers, 500 scans/month. Small teams (10–20 engineers); catches adoption signals.
-- Professional: 100 developers, 2,000 scans/month. Growing teams (50–200 engineers). 5 languages covers 90% of use cases.
-- Enterprise: Unlimited scale + multi-org support.
-- Premium: Security-first orgs (financial services, healthcare); sold as 1-1 custom with dedicated success manager + security training.
+- Free (no card): 1 developer, 1 private + 3 public repos, 500 files / 20 PR scans monthly — genuinely useful for an individual or small OSS project, which is what drives viral, bottom-up adoption. No API/team/CI-CD keeps it individual-scoped.
+- Starter ($19/dev/mo): Unlocks the CI/CD integrations (GitHub/GitLab/Bitbucket) and Jira — the point where a team formalizes code review in their pipeline.
+- Pro ($49/dev/mo): Unlocks the AI Fix Engine (killer feature), secret/dependency/container scanning, custom rules, and team dashboard — this is where CodeAudit becomes the team's security + quality system of record, and where most revenue concentrates.
+- Enterprise (Custom): SSO/SCIM/compliance/private deployment for orgs with procurement and regulatory requirements; sold directly.
 
 ## 22. Entitlements Logic (Pricing Engine)
 
-| Feature / Limit | Free | Starter | Professional | Enterprise | Premium |
-|---|---|---|---|---|---|
-| `can("scan_pr")` | Yes | Yes | Yes | Yes | Yes |
-| `can("scan_language")` | JS/TS, Python | All 3 | All 5 + Go, Java, C# | All + custom | All + custom |
-| `withinMonthly("scans", org)` | 100 | 500 | 2,000 | 10,000 | Unlimited |
-| `withinLimit("developers", org)` | 5 | 20 | 100 | Unlimited | Unlimited |
-| `can("view_dashboard")` | Team only | Team + org | Org-wide | Org-wide + multi-org | Org-wide + multi-org |
-| `can("use_educational_feedback")` | No | No | Yes | Yes | Yes |
-| `can("use_auto_fix")` | No | No | Yes | Yes | Yes |
-| `can("view_technical_debt_report")` | No | No | Yes | Yes | Yes |
-| `can("use_custom_rules")` | No | No | No | Yes | Yes |
-| `can("forecast_debt_reduction")` | No | No | No | Yes | Yes |
+| Feature / Limit | Free | Starter | Pro | Enterprise |
+|---|---|---|---|---|
+| `can("scan_pr")` | Yes | Yes | Yes | Yes |
+| `withinLimit("private_repos", org)` | 1 | 10 | Unlimited | Unlimited |
+| `withinLimit("public_repos", org)` | 3 | Unlimited | Unlimited | Unlimited |
+| `withinMonthly("files_scanned", org)` | 500 | 5,000 | Unlimited | Unlimited |
+| `withinMonthly("pr_scans", org)` | 20 | 300 | Unlimited | Unlimited |
+| `can("use_ci_cd")` | No | Yes | Yes | Yes |
+| `can("use_ai_explanations")` | No | Yes | Yes | Yes |
+| `can("use_ai_fix_engine")` | No | No | Yes | Yes |
+| `can("use_secret_detection")` | No | No | Yes | Yes |
+| `can("use_dependency_scan")` | No | No | Yes | Yes |
+| `can("use_container_scan")` | No | No | Yes | Yes |
+| `can("use_custom_rules")` | No | No | Yes | Yes |
+| `can("view_team_dashboard")` | No | No | Yes | Yes (multi-org) |
+| `can("use_api")` | No | No | Yes | Yes |
+| `can("use_sso")` / `can("use_scim")` | No | No | No | Yes |
 
 ## 23. Limit Behavior
 
-- **Approaching limit:** Banner appears at 80% of monthly scans (e.g., "You've scanned 1,600 of 2,000 repos this month"). Suggests upgrade.
-- **At limit:** Cannot scan new PRs. Popup offers upgrade with cost calculator (e.g., "Unlock 10,000 scans/month for Professional tier").
-- **Upgrade impact:** Limit resets on next billing cycle; no prorating.
+- **Approaching limit:** Banner at 80% of monthly file-scan or PR-scan limit (e.g., "You've scanned 400 of 500 files this month"). Suggests upgrade.
+- **At limit:** New PR scans are queued (not silently skipped); merge is not auto-blocked on a queued scan. Popup offers upgrade with a per-developer cost calculator.
+- **Upgrade impact:** Limit increases immediately on upgrade; monthly per-seat billing prorates the first cycle.
 
 ## 24. Billing States
 
 | State | Effect on Entitlements | Behavior |
 |---|---|---|
-| **Trialing (30 days)** | Professional features enabled | Auto-converts to Starter unless card added. |
-| **Active (paid subscription)** | Tier-appropriate features | Full access; scanning runs as configured. |
-| **Past due (30+ days unpaid)** | Downgrade to Free on day 30 | Grace period; scan history preserved. |
-| **Canceled** | Downgrade to Free tier | Historical data retained for 90 days; can restart. |
+| **Trialing (14 days, Pro features)** | Full Pro features enabled | Auto-downgrades to Free (capped) unless card added. |
+| **Active (paid subscription)** | Tier-appropriate features, billed per developer seat | Full access; scanning runs as configured. |
+| **Past due (7+ days unpaid)** | Read-only scan history; no new scans | Grace period for card retry; scan history preserved. |
+| **Canceled** | Downgrade to Free tier limits | Historical data retained 90 days; can restart without re-onboarding. |
 
 ## 25. Market Potential
 
@@ -289,17 +300,21 @@ Technology companies meeting ALL:
 
 ## 26. Revenue Potential
 
-**Year 1:** 100 companies (Free tier active, 20% convert to paid) = $1M ARR.
-**Year 2:** 300 companies = $4M ARR.
-**Year 3:** 700 companies = $12M ARR.
-**Year 5:** 1,500 companies = $35M ARR.
+**PLG funnel assumption:** Free signups (individual developers, no card) → team adoption inside a company → 1+ seats convert to Starter/Pro once the team needs private-repo scale or CI/CD → Enterprise sourced from Pro accounts hitting org-wide/compliance needs.
 
-**Expansion revenue:** Educational content (+$10K/org/year), consulting on code health (+$50K/engagement), enterprise custom rules (+$20K–$100K/org/year).
+**Year 1:** 40,000 free developer signups → 3,000 paid seats (60% Starter $19, 40% Pro $49; blended ~$31/seat/mo) + 15 Enterprise accounts ($40K avg annual) = ~$1.1M ARR seats + $600K ARR Enterprise = **~$1.7M ARR**.
+**Year 2:** 150,000 signups → 12,000 paid seats + 50 Enterprise = **$6.5M ARR**.
+**Year 3:** 400,000 signups → 32,000 paid seats + 130 Enterprise = **$17M ARR**.
+**Year 5:** 1.2M signups → 90,000 paid seats + 350 Enterprise = **$48M ARR**.
+
+**Expansion revenue:** Starter → Pro upgrade (35% of Starter seats within 12 months as teams add secret/dependency scanning), enterprise custom rule packs (+$20K–$100K/org/year), consulting on code health (+$50K/engagement).
 
 **Unit economics:**
-- CAC: $5K (viral freemium + community activation; self-serve; 70% close rate from free-to-paid conversion).
-- LTV (4-year retention, $24K avg annual contract): $96K.
-- LTV:CAC ratio = 19.2× (exceptional for SaaS).
+- CAC (self-serve, per-seat): ~$60 (pure viral/OSS-driven; near-zero paid acquisition cost).
+- CAC (Enterprise, sales-assisted): ~$10K (outbound + 4-month cycle; 30% close rate).
+- LTV (self-serve seat, 3-year retention, $31/mo blended avg): ~$1,116.
+- LTV (Enterprise, 4-year retention, $40K/year): ~$160K.
+- Blended LTV:CAC ratio: ~18–20× (viral free tier keeps self-serve CAC near zero; Enterprise adds ACV depth) — still exceptional for SaaS.
 
 ## 27. Technical Difficulty (Inverted: 5 = Easy/Low-Risk)
 

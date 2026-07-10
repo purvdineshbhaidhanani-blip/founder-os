@@ -24,6 +24,8 @@ Mid-market companies (500–5,000 employees) and high-security verticals (financ
 - **Compliance:** Automated alerting + audit trail for breach investigation. Faster breach response improves regulatory standing (HIPAA, PCI, SOC2).
 - **Cost avoidance:** Enterprise SIEM alternative at 10–20% of TCO.
 
+**Killer Feature — AI Incident Graph (Pro tier):** Automatically connects related alerts into a single attack timeline with recommended next actions, replacing hours of manual timeline reconstruction across five tools with one visual graph.
+
 ## 6. Success Goal
 
 Customers identify and investigate a simulated APT (lateral movement + data exfil) in <30 minutes using SecCorrelate. Reduce analyst time-to-investigate from hours to 15 minutes.
@@ -211,63 +213,69 @@ Mid-market and high-security companies meeting ALL:
 
 ## 20. Pricing Strategy
 
-**Principle:** Security budgets are fixed per fiscal year. Price by log volume and number of data sources (bigger security footprint = higher price). Lock customers in before budget freeze (September).
+**Principle:** Product-led growth for security teams. Security buyers still need a trial before trusting a detection tool with production log data, so entry is a 14-day free trial with real (capped) alert volume — not a sales-gated demo. Price scales with integration count and alert volume (proxy for security footprint); the AI-heavy capabilities (threat hunting, MITRE mapping, root cause analysis, playbooks) unlock at Pro, where the real time-savings show up. Enterprise remains a custom, sales-assisted tier for multi-tenant MSSPs and compliance-driven buyers.
 
-**Model:** Subscription SaaS, annual billing, five-tier pricing ladder.
+**Model:** Subscription SaaS, monthly (or annual at a discount) billing, four-tier pricing ladder (Free trial → Starter → Pro → Enterprise).
 
 ## 21. Pricing Tiers & Entitlements
 
-| | Free | Starter | Professional | Enterprise | Advanced |
-|---|---|---|---|---|---|
-| **Annual Price** | $0 | $18K | $50K | $120K | Custom |
-| **Target** | Evaluation | Mid-market <2K employees | Mid-market 2K–5K | Large enterprise | Regional / MSSP |
-| **Daily Log Ingestion** | 10M | 100M | 500M | 5B | Unlimited |
-| **Data Sources** | 2 | 5 | 10 | Unlimited | Unlimited |
-| **Custom Rules** | 5 | 25 | 100 | Unlimited | Unlimited |
-| **Alert Retention** | 30 days | 90 days | 1 year | 2 years | Custom |
-| **Rule Templates** | Basic (5) | Standard (25) | Advanced (50) | All + custom | All + custom |
-| **Automated Investigation** | 3 fields | 10 fields | 50 fields | Unlimited | Unlimited |
-| **Timeline Analysis** | Limited | 30-day window | 90-day window | 1-year window | Unlimited |
-| **Team Collaboration** | None | Email | In-app comments | In-app + Slack (Phase 2) | In-app + Teams (Phase 2) |
-| **Hunting Features** | — | — | IOC search, tactical queries | Full hunting suite | Full suite + managed service |
-| **Support** | Community | Email | Priority email | Dedicated + QBR | Dedicated + 24/7 SOC |
-| **Gated Features** | — | — | Threat hunting, advanced timeline | All analytics | All + managed hunting |
+| | Free (14-Day Trial) | Starter | Pro | Enterprise |
+|---|---|---|---|---|
+| **Price** | $0 | $49/month | $199/month | Custom |
+| **Target** | Evaluation, small SOC | Growing security teams | Mature SOC / threat hunting teams | MSSPs, multi-tenant, compliance-driven |
+| **Security Integrations** | 2 | 10 | Unlimited | Unlimited |
+| **Alerts / Day** | 1,000 | 50,000 | Unlimited | Unlimited |
+| **Dashboard** | Basic | Basic | Advanced | Advanced + custom |
+| **AI Incident Summaries** | Yes | Yes | Yes | Yes |
+| **AI Correlation** | — | Yes | Yes | Yes |
+| **Incident Timeline** | — | Yes | Yes (AI Incident Graph) | Yes (AI Incident Graph + custom) |
+| **AI Threat Hunting** | — | — | Yes | Yes |
+| **MITRE ATT&CK Mapping** | — | — | Yes | Yes |
+| **Root Cause Analysis** | — | — | Yes | Yes |
+| **Playbooks** | — | — | Yes | Yes + custom |
+| **API Access** | — | — | Yes | Yes |
+| **Reports** | — | Basic | Advanced | Advanced + custom |
+| **Notifications** | Email | Email + Slack | All channels | All channels + custom |
+| **Compliance & Enterprise** | — | — | — | Multi-tenant, SSO, SOC2 support, SIEM integrations, custom rules, dedicated support, SLA |
 
 **Rationale:**
-- Free tier: Evaluation for small teams; 2 sources max to prevent abuse.
-- Starter: Mid-market SMB; 5 sources covers firewall + EDR + IAM + app logs + DNS.
-- Professional: Mid-market growth; 500M logs/day handles 2K–5K employee company with 50+ alerts/day.
-- Enterprise: Large enterprise; unlimited scale + custom integrations.
-- Advanced: Managed security service + rule optimization; sold as 1-1 custom with dedicated success manager.
+- Free: 2 integrations, 1,000 alerts/day — enough to prove correlation value on a real (if small) log stream during the 14-day trial.
+- Starter ($49/mo): 10 integrations, 50K alerts/day covers most mid-market single-product SOCs; AI correlation + incident timeline is the habit-forming feature.
+- Pro ($199/mo): Unlimited integrations/alerts + the full AI investigation suite (threat hunting, MITRE mapping, root cause, playbooks) — this is where SecCorrelate replaces manual analyst correlation work, and where most revenue concentrates.
+- Enterprise (Custom): Multi-tenant MSSP support, SSO, SOC2, and SIEM integrations are compliance/deployment needs specific to large or regulated buyers; sold directly with a managed-SOC upsell path.
 
 ## 22. Entitlements Logic (Pricing Engine)
 
-| Feature / Limit | Free | Starter | Professional | Enterprise | Advanced |
-|---|---|---|---|---|---|
-| `can("ingest_logs")` | Yes | Yes | Yes | Yes | Yes |
-| `can("create_correlation_rule")` | Limit: 5 | Limit: 25 | Limit: 100 | Unlimited | Unlimited |
-| `can("use_rule_template")` | Limit: 5 | Limit: 25 | Limit: 50 | Unlimited | Unlimited |
-| `can("add_data_source")` | Limit: 2 | Limit: 5 | Limit: 10 | Unlimited | Unlimited |
-| `can("view_timeline")` | Yes (30-day) | Yes (30-day) | Yes (90-day) | Yes (1-year) | Yes (unlimited) |
-| `can("use_hunting_dashboard")` | No | No | Yes | Yes | Yes |
-| `withinDaily("log_ingestion", org)` | 10M logs/day | 100M | 500M | 5B | Unlimited |
-| `withinDaily("alert_ingestion", org)` | 100 alerts/day | 500 | 2,000 | 10,000 | Unlimited |
-| `can("request_managed_soc")` | No | No | No | Upgrade to Advanced | Yes |
+| Feature / Limit | Free | Starter | Pro | Enterprise |
+|---|---|---|---|---|
+| `can("ingest_logs")` | Yes | Yes | Yes | Yes |
+| `withinLimit("integrations", org)` | 2 | 10 | Unlimited | Unlimited |
+| `withinDaily("alert_ingestion", org)` | 1,000 | 50,000 | Unlimited | Unlimited |
+| `can("use_ai_incident_summary")` | Yes | Yes | Yes | Yes |
+| `can("use_ai_correlation")` | No | Yes | Yes | Yes |
+| `can("view_incident_timeline")` | No | Yes | Yes (AI graph) | Yes (AI graph + custom) |
+| `can("use_ai_threat_hunting")` | No | No | Yes | Yes |
+| `can("use_mitre_mapping")` | No | No | Yes | Yes |
+| `can("use_root_cause_analysis")` | No | No | Yes | Yes |
+| `can("use_playbooks")` | No | No | Yes | Yes |
+| `can("use_api")` | No | No | Yes | Yes |
+| `can("use_sso")` / `can("multi_tenant")` | No | No | No | Yes |
+| `can("request_managed_soc")` | No | No | Upgrade to Enterprise | Yes |
 
 ## 23. Limit Behavior
 
-- **Approaching limit:** Alert appears at 80% of daily log limit (e.g., "You've ingested 400M of 500M logs today"). Suggests upgrade path.
-- **At limit:** If log volume hits cap, oldest logs are rolled to archive (queryable but not in real-time detection). Alert to customer.
-- **Upgrade impact:** Limit resets daily; upgrade takes effect next billing cycle.
+- **Approaching limit:** In-app alert at 80% of daily alert-ingestion limit (e.g., "You've ingested 40,000 of 50,000 alerts today"). Suggests upgrade path with correlation-quality impact ("Upgrading removes the cap so no alerts are silently dropped").
+- **At limit:** Additional alerts beyond the daily cap are queued and correlated on a delay rather than dropped, with a clear in-app notice; real-time detection resumes at the next billing-cycle reset or upgrade.
+- **Upgrade impact:** Limit increases immediately on upgrade; monthly billing prorates the first cycle.
 
 ## 24. Billing States
 
 | State | Effect on Entitlements | Behavior |
 |---|---|---|
-| **Trialing (14 days)** | All features enabled (Professional tier) | Converts to Starter on day 15 unless card added. |
-| **Active (paid subscription)** | Tier-appropriate features | Full access; alerts as configured. |
-| **Past due (30+ days unpaid)** | Downgrade to Starter on day 30; Free on day 60 | Grace period; data retention paused but not deleted. |
-| **Canceled** | Downgrade to Free tier | Data retained for 90 days; can restart without re-onboarding. |
+| **Trialing (14 days)** | Full Pro features enabled | Auto-downgrades to Free (capped) on day 15 unless card added. |
+| **Active (paid subscription)** | Tier-appropriate features | Full access; alerts correlate as configured. |
+| **Past due (7+ days unpaid)** | Read-only access; ingestion paused | Grace period for card retry; data retained, not deleted. |
+| **Canceled** | Downgrade to Free tier limits | Data retained 90 days; can restart without re-onboarding. |
 
 ## 25. Market Potential
 
@@ -281,17 +289,21 @@ Mid-market and high-security companies meeting ALL:
 
 ## 26. Revenue Potential
 
-**Year 1:** 20 companies (Starter + Professional mix) = $800K ARR.
-**Year 2:** 60 companies = $2.5M ARR.
-**Year 3:** 150 companies = $6M ARR.
-**Year 5:** 400 companies = $18M ARR.
+**PLG funnel assumption:** Free trial (self-serve, but higher-touch than pure PLG since security buyers vet tools carefully) → 10–15% convert to Starter/Pro within 30 days → Enterprise/MSSP sourced via outbound + Pro accounts outgrowing self-serve limits.
 
-**Expansion revenue:** Managed SOC service (+$50K–$200K per customer annually), rule consulting (+$20K/engagement).
+**Year 1:** 1,500 trials → 180 paying self-serve accounts (60% Starter, 40% Pro blended ≈ $115/mo avg) + 8 Enterprise accounts ($60K avg annual) = ~$250K ARR self-serve + $480K ARR Enterprise = **~$730K ARR**.
+**Year 2:** 5,000 trials → 700 paying accounts + 25 Enterprise = **$2.4M ARR**.
+**Year 3:** 12,000 trials → 1,800 paying accounts + 60 Enterprise = **$6M ARR**.
+**Year 5:** 30,000 trials → 5,000 paying accounts + 150 Enterprise = **$16M ARR**.
+
+**Expansion revenue:** Managed SOC service (+$50K–$200K per Enterprise customer annually), Starter → Pro upgrade (30% of Starter accounts within 12 months), rule consulting (+$20K/engagement).
 
 **Unit economics:**
-- CAC: $15K (self-serve + community activation; 3-month decision cycle; 40% close rate).
-- LTV (3-year retention, $50K avg annual contract): $150K.
-- LTV:CAC ratio = 10× (excellent for SaaS).
+- CAC (self-serve, Starter/Pro): ~$400 (security content/community + light-touch demo calls).
+- CAC (Enterprise/MSSP, sales-assisted): ~$18K (outbound + 4-month cycle; 30% close rate).
+- LTV (self-serve, 3-year retention, $115/mo blended avg): ~$4,140.
+- LTV (Enterprise, 4-year retention, $60K/year): ~$240K.
+- Blended LTV:CAC ratio: ~10–12× (Enterprise ACV drives absolute revenue; self-serve drives volume and top-of-funnel for Enterprise).
 
 ## 27. Technical Difficulty (Inverted: 5 = Easy/Low-Risk)
 

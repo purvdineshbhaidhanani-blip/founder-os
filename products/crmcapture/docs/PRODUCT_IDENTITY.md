@@ -24,6 +24,8 @@ B2B SaaS companies (20–500 employees) and sales-driven SMBs (50–500 employee
 - **Conversion lift:** Faster follow-up (leads are auto-routed to reps same day); 2–3% conversion lift from faster response.
 - **Scaling:** Add lead sources without adding headcount; data automatically flows to CRM.
 
+**Killer Feature — AI Sales Assistant (Pro tier):** Automatically reads emails, reads meeting transcripts, creates CRM records, updates opportunities, suggests next follow-up, and generates follow-up emails — the rep never manually enters data or drafts a routine follow-up again.
+
 ## 6. Success Goal
 
 Customers reduce manual data entry by 80% and improve contact completeness from 40% to 85% within 3 months. Sales forecasts become accurate enough to use for business decisions.
@@ -214,65 +216,70 @@ B2B SaaS and sales-driven SMBs meeting ALL:
 
 ## 20. Pricing Strategy
 
-**Principle:** SaaS pricing by lead volume and CRM users. More leads = higher tier. Lock customers in before budget cycle (September). Freemium model to drive adoption (free tier for <100 leads/month).
+**Principle:** Product-led growth, per-user monthly pricing. A rep can sign up alone (1 user, 14-day trial) and get real value from AI meeting/email summaries before ever talking to a salesperson — the same bottom-up motion that works for developer tools, applied to sales reps. Price scales with seats, not lead volume, since the core value (AI reads your emails/calls and updates the CRM for you) is per-rep, not per-lead. Enterprise remains custom for unlimited-seat, compliance-driven buyers.
 
-**Model:** Subscription SaaS, annual billing, five-tier pricing ladder + lead-volume overage pricing.
+**Model:** Subscription SaaS, per-user monthly billing (annual discount available), four-tier pricing ladder (Free trial → Starter → Pro → Enterprise).
 
 ## 21. Pricing Tiers & Entitlements
 
-| | Free | Growth | Professional | Enterprise | Premium |
-|---|---|---|---|---|---|
-| **Annual Price** | $0 | $10K | $30K | $75K | Custom |
-| **Target** | Pilots, startups | SMB <50 sales reps | Mid-market 50–200 reps | Enterprise >200 reps | Complex workflows |
-| **Monthly Leads** | 100 | 500 | 2,000 | 10,000 | Unlimited |
-| **CRM Connections** | 1 | 1 | 3 | Unlimited | Unlimited |
-| **CRM Types** | HubSpot only | HubSpot, Salesforce | HubSpot, Salesforce, Pipedrive | All + custom | All + custom |
-| **Lead Sources** | Web form | Web form, CSV | Web form, email, CSV, LinkedIn export | All + webhooks | All + custom |
-| **Deduplication** | Basic (email) | Basic + phone | Advanced (email + phone + fuzzy) | Advanced | Advanced |
-| **Lead Routing** | Round-robin | Round-robin, territory | Round-robin, territory, custom | Custom + ML | Custom + ML |
-| **Lead Scoring** | None | Basic (source) | Basic + engagement | Advanced + predictive (Phase 2) | Advanced + predictive |
-| **Enrichment** | None | None (available Phase 2) | Enrichment available (Phase 2) | Enrichment + intent | Enrichment + intent |
-| **Lead Storage** | 30 days | 6 months | 2 years | 5 years | Unlimited |
-| **Support** | Community | Email | Priority email | Dedicated success manager | Dedicated + quarterly reviews |
-| **Gated Features** | — | — | Advanced dedup, custom routing | ML scoring, advanced routing | All + consulting |
+| | Free (14-Day Trial) | Starter | Pro | Enterprise |
+|---|---|---|---|---|
+| **Price** | $0 | $29/user/month | $79/user/month | Custom |
+| **Target** | Individual reps, pilots | Small sales teams | Growing sales teams | Enterprise, complex workflows |
+| **Users** | 1 | Per-seat | Per-seat | Unlimited, volume pricing |
+| **Contacts** | 100 | 10,000 | Unlimited | Unlimited |
+| **Leads** | 100 | Unlimited | Unlimited | Unlimited |
+| **AI Summaries** | 20 | Unlimited (Meeting + Email) | Unlimited (+ Call Summary) | Unlimited + custom models |
+| **AI Lead Extraction** | — | Yes | Yes | Yes |
+| **AI Follow-up Email** | — | — | Yes | Yes |
+| **AI Lead Scoring** | — | — | Yes | Yes |
+| **AI Opportunity Detection** | — | — | Yes | Yes |
+| **CRM Sync** | Gmail, Outlook | + HubSpot, Salesforce, Zoho | + custom fields | + custom CRM connectors |
+| **Automation** | — | Basic | Workflow automation | Workflow automation + custom |
+| **Dashboard** | Basic CRM | Basic CRM | Team Dashboard | Team + multi-org |
+| **API Access** | — | — | Yes | Yes |
+| **Integrations** | — | — | Slack, Teams | Slack, Teams + custom |
+| **Support** | Community | Email | Priority email | Dedicated + SLA |
+| **Compliance & Enterprise** | — | — | — | SSO, audit logs, enterprise security, SLA, dedicated support |
 
 **Rationale:**
-- Free tier: 100 leads/month, 1 CRM. Ideal for startups + pilots. Drives adoption.
-- Growth: 500 leads/month, web form + CSV. Small teams (10–20 sales reps).
-- Professional: 2,000 leads/month, 3 CRM types, email-to-lead. Growing teams (50–100 reps).
-- Enterprise: Unlimited scale + custom workflows.
-- Premium: Complex integrations + ML scoring; sold as 1-1 custom.
+- Free (14-day trial): 1 user, 100 contacts/leads, 20 AI summaries, Gmail/Outlook only — enough for one rep to feel the AI Sales Assistant work on real emails before paying.
+- Starter ($29/user/mo): Unlocks unlimited leads/contacts and the major CRM integrations (HubSpot, Salesforce, Zoho) — the point a team commits to CRMCapture as their lead capture layer.
+- Pro ($79/user/mo): Unlocks the full AI Sales Assistant (call summaries, follow-up emails, lead scoring, opportunity detection) plus workflow automation and team dashboard — this is where CRMCapture replaces manual CRM data entry entirely, and where most revenue concentrates.
+- Enterprise (Custom): Unlimited users, SSO, audit logs, and custom CRM connectors for large sales orgs with procurement/compliance requirements.
 
 ## 22. Entitlements Logic (Pricing Engine)
 
-| Feature / Limit | Free | Growth | Professional | Enterprise | Premium |
-|---|---|---|---|---|---|
-| `can("capture_web_lead")` | Yes | Yes | Yes | Yes | Yes |
-| `withinMonthly("lead_capture", org)` | 100 | 500 | 2,000 | 10,000 | Unlimited |
-| `can("sync_to_crm")` | Yes | Yes | Yes | Yes | Yes |
-| `can("add_crm_connection")` | Limit: 1 | Limit: 1 | Limit: 3 | Unlimited | Unlimited |
-| `can("use_email_to_lead")` | No | No | Yes | Yes | Yes |
-| `can("import_csv")` | No | Yes (manual) | Yes (bulk + scheduled) | Yes | Yes |
-| `can("deduplicate_advanced")` | No | No | Yes | Yes | Yes |
-| `can("route_custom_rules")` | No | No | Yes | Yes | Yes |
-| `can("use_enrichment")` | No | No | Available Phase 2 | Available Phase 2 | Available Phase 2 |
-| `can("use_predictive_scoring")` | No | No | No | Available Phase 2 | Available Phase 2 |
-| `withinMonthly("lead_storage", org)` | 30 days | 6 months | 2 years | 5 years | Unlimited |
+| Feature / Limit | Free | Starter | Pro | Enterprise |
+|---|---|---|---|---|
+| `can("capture_web_lead")` | Yes | Yes | Yes | Yes |
+| `withinLimit("contacts", org)` | 100 | 10,000 | Unlimited | Unlimited |
+| `withinLimit("leads", org)` | 100 | Unlimited | Unlimited | Unlimited |
+| `withinMonthly("ai_summaries", org)` | 20 | Unlimited | Unlimited | Unlimited |
+| `can("use_ai_lead_extraction")` | No | Yes | Yes | Yes |
+| `can("use_ai_call_summary")` | No | No | Yes | Yes |
+| `can("use_ai_followup_email")` | No | No | Yes | Yes |
+| `can("use_ai_lead_scoring")` | No | No | Yes | Yes |
+| `can("use_ai_opportunity_detection")` | No | No | Yes | Yes |
+| `can("sync_to_crm")` | Gmail, Outlook only | + HubSpot, Salesforce, Zoho | + custom fields | + custom connectors |
+| `can("use_workflow_automation")` | No | Basic | Yes | Yes + custom |
+| `can("use_api")` | No | No | Yes | Yes |
+| `can("use_sso")` | No | No | No | Yes |
 
 ## 23. Limit Behavior
 
-- **Approaching limit:** Alert at 80% of monthly leads (e.g., "You've captured 1,600 of 2,000 leads this month"). Suggests upgrade.
-- **At limit:** Cannot capture new leads. Popup offers upgrade (e.g., "Unlock 10,000 leads/month for Enterprise tier").
-- **Upgrade impact:** Limit resets next month; no prorating.
+- **Approaching limit:** In-app alert at 80% of Free-tier contact/lead/AI-summary limit (e.g., "You've used 16 of 20 AI summaries this trial"). Suggests upgrade path.
+- **At limit:** New leads/contacts beyond the Free cap are captured but held un-enriched until upgrade; AI summaries beyond the monthly cap queue until the next cycle or upgrade — never silently dropped.
+- **Upgrade impact:** Limit increases immediately on upgrade; monthly per-seat billing prorates the first cycle.
 
 ## 24. Billing States
 
 | State | Effect on Entitlements | Behavior |
 |---|---|---|
-| **Trialing (14 days)** | Professional features enabled | Auto-converts to Growth unless card added. |
-| **Active (paid subscription)** | Tier-appropriate features | Full access; leads capture as configured. |
-| **Past due (30+ days unpaid)** | Downgrade to Free on day 30 | Grace period; lead history preserved. |
-| **Canceled** | Downgrade to Free tier | Lead data retained for 90 days; can restart. |
+| **Trialing (14 days)** | Full Pro features enabled | Auto-downgrades to Free (capped) unless card added. |
+| **Active (paid subscription)** | Tier-appropriate features, billed per user seat | Full access; leads capture as configured. |
+| **Past due (7+ days unpaid)** | Read-only CRM data; no new capture | Grace period for card retry; lead history preserved. |
+| **Canceled** | Downgrade to Free tier limits | Lead data retained 90 days; can restart without re-onboarding. |
 
 ## 25. Market Potential
 
@@ -286,17 +293,21 @@ B2B SaaS and sales-driven SMBs meeting ALL:
 
 ## 26. Revenue Potential
 
-**Year 1:** 80 companies (free tier conversion 10%) = $500K ARR.
-**Year 2:** 250 companies = $2M ARR.
-**Year 3:** 500 companies = $5M ARR.
-**Year 5:** 1,000 companies = $15M ARR.
+**PLG funnel assumption:** Free trial (individual rep signup) → 12–18% convert to Starter/Pro within 30 days as team adopts → Enterprise sourced from Pro accounts hitting seat-count/compliance needs.
 
-**Expansion revenue:** Workflow automation packs (+$20K/org/year), advanced enrichment (+$50K+/org/year), managed data services (+$100K+/org/year).
+**Year 1:** 10,000 free trials → 1,200 paid seats (55% Starter $29, 45% Pro $79; blended ~$51/seat/mo) + 12 Enterprise accounts ($35K avg annual) = ~$735K ARR seats + $420K ARR Enterprise = **~$1.15M ARR**.
+**Year 2:** 35,000 trials → 4,500 paid seats + 40 Enterprise = **$4M ARR**.
+**Year 3:** 80,000 trials → 11,000 paid seats + 100 Enterprise = **$10M ARR**.
+**Year 5:** 200,000 trials → 30,000 paid seats + 280 Enterprise = **$28M ARR**.
+
+**Expansion revenue:** Starter → Pro upgrade (30% of Starter seats within 12 months for AI call summaries + opportunity detection), advanced enrichment add-ons (+$50K+/org/year), managed data services (+$100K+/org/year).
 
 **Unit economics:**
-- CAC: $8K (viral freemium + community; self-serve; 50% free-to-paid conversion).
-- LTV (5-year retention, $30K avg annual contract): $150K.
-- LTV:CAC ratio = 18.75× (exceptional for SaaS).
+- CAC (self-serve, per-seat): ~$120 (viral freemium + community; near-zero paid acquisition).
+- CAC (Enterprise, sales-assisted): ~$9K (outbound + 4-month cycle; 30% close rate).
+- LTV (self-serve seat, 3-year retention, $51/mo blended avg): ~$1,836.
+- LTV (Enterprise, 4-year retention, $35K/year): ~$140K.
+- Blended LTV:CAC ratio: ~15–18× (viral free tier keeps self-serve CAC low; Enterprise adds ACV depth) — still exceptional for SaaS.
 
 ## 27. Technical Difficulty (Inverted: 5 = Easy/Low-Risk)
 

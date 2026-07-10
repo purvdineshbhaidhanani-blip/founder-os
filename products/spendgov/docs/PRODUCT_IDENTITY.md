@@ -14,7 +14,7 @@ SaaS purchases are decentralized. Each department (product, engineering, sales, 
 
 ## 4. Target Customer
 
-Mid-to-large companies (200–5,000 employees) with $5M–$100M annual SaaS spend, decentralized purchasing, multiple AI tools in use, and strong cost-consciousness (post-IPO, investor pressure, or economic uncertainty).
+50–5,000 employee companies, self-serve entry point (small finance/ops teams, startups) through the free trial and Starter/Pro tiers, expanding to mid-to-large companies ($5M–$100M annual SaaS spend, decentralized purchasing, multiple AI tools in use) on Pro, and enterprises needing SSO/SCIM/compliance on the custom Enterprise tier. Primary buyers: CFO, Finance Team, IT Team, Procurement.
 
 ## 5. Business Value
 
@@ -23,6 +23,8 @@ Mid-to-large companies (200–5,000 employees) with $5M–$100M annual SaaS spen
 - **AI cost governance:** Track and optimize AI API spend (OpenAI, Anthropic, Claude API, etc.). Prevent runaway costs. Typical savings: 20–40% through better resource allocation.
 - **Budget forecasting:** Predict annual SaaS and AI spend; prevent surprise Q4 billing; enable strategic planning.
 - **License utilization:** Right-size licenses. Consolidate tools. Shift seat counts down as AI handles more work. Typical savings: 15–25% of license cost.
+
+**Killer Feature — AI CFO Copilot (Pro tier):** Tells companies exactly where to save money and estimates the financial impact of each recommendation, turning spend data into a ranked, dollar-quantified action list instead of a dashboard the CFO has to interpret alone.
 
 ## 6. Success Goal
 
@@ -219,65 +221,74 @@ Mid-to-large companies meeting ALL:
 
 ## 20. Pricing Strategy
 
-**Principle:** Finance budgets are fixed; price by total SaaS spend (bigger spender = higher ROI for them = can pay more). Lock in before budget cycle (September). Value-based pricing (% of recovered savings is multiple of tool cost).
+**Principle:** Product-led growth. Low-friction monthly self-serve pricing removes the enterprise sales gate so finance teams at companies of any size can start recovering waste in minutes, not after a 6-month procurement cycle. Land with a free trial, expand via usage (SaaS apps, AI tools, orgs tracked) and AI-powered capability (CFO Copilot unlocks at Pro), and reserve custom annual contracts for enterprises that need SSO/SCIM/compliance.
 
-**Model:** Subscription SaaS, annual billing, five-tier pricing ladder + optional success-based pricing (% of first-year savings).
+**Model:** Subscription SaaS, monthly (or annual at a discount) billing, four-tier pricing ladder (Free trial → Starter → Pro → Enterprise). No success-based pricing in the PLG model — value is proven fast enough during the 14-day trial that usage-based expansion replaces it.
 
 ## 21. Pricing Tiers & Entitlements
 
-| | Free | Starter | Professional | Enterprise | Premium |
-|---|---|---|---|---|---|
-| **Annual Price** | $0 | $15K | $40K | $100K | Custom |
-| **Target** | Evaluation, small companies | Cos. <$20M SaaS spend | Cos. $20M–$100M spend | Large enterprise >$100M | Strategic partnerships |
-| **Annual SaaS Spend** | $0–$5M | $5M–$20M | $20M–$100M | >$100M | Unlimited |
-| **Billing Integrations** | 1 | 2 | 5 | Unlimited | Unlimited |
-| **AI Spend Tracking** | 1 service | 3 services | All 10+ | All + custom | All + custom |
-| **Renewal Calendar** | Manual entry | Parse contracts (text) | Parse contracts (PDF + email) | PDF + email + vendor API | PDF + email + vendor API |
-| **Duplicate Detection** | Basic | Standard (50 tool pairs) | Advanced (500 tool pairs) | Advanced + custom patterns | Advanced + custom |
-| **Department Visibility** | None | 1 department | Unlimited | Unlimited | Unlimited |
-| **Consolidation Recommendations** | — | Basic | Advanced | Advanced + benchmarking | Advanced + benchmarking |
-| **License Utilization** | No | Manual entry | Auto-fetch (SSO logs) | Auto-fetch + predictive | Auto-fetch + predictive |
-| **Spend Retention** | 3 months | 12 months | 3 years | 5 years | Unlimited |
-| **Support** | Community | Email | Priority + quarterly reviews | Dedicated success manager | Dedicated + quarterly business reviews |
-| **Negotiation Playbooks** | — | Basic (email templates) | Advanced (vendor templates + benchmarks) | Custom + playbook consulting | Custom + dedicated consultant |
-| **Gated Features** | — | — | AI optimization, forecasting | All analytics + benchmarking | All + success-based pricing option |
+| | Free (14-Day Trial) | Starter | Pro | Enterprise |
+|---|---|---|---|---|
+| **Price** | $0 | $29/month | $99/month | Custom |
+| **Target** | Evaluation, solo finance/ops | Small teams, single-department companies | Growing finance/procurement teams | Large enterprises with compliance needs |
+| **Organizations** | 1 | 3 | Unlimited | Unlimited |
+| **SaaS Apps Tracked** | Up to 25 | Up to 100 | Unlimited | Unlimited |
+| **AI Tools Tracked** | Up to 10 | Unlimited | Unlimited | Unlimited |
+| **Dashboard** | Basic | Basic + department-wise spend | Advanced analytics | Advanced + custom |
+| **Renewal Calendar** | Yes | Renewal tracking | Renewal tracking + AI recommendations | + vendor API sync |
+| **Duplicate Software Detection** | — | Yes | Yes (AI-powered) | Yes (AI-powered + custom rules) |
+| **AI CFO Copilot** | — | — | Yes | Yes + custom AI models |
+| **AI Spend Optimization** | — | — | Yes | Yes |
+| **License Optimization** | — | — | Yes | Yes |
+| **Approval Workflows** | — | — | Yes | Yes + custom |
+| **Team Management** | — | — | Yes | Yes |
+| **API Access** | — | — | Yes | Yes |
+| **Vendor Comparison** | — | — | Yes | Yes |
+| **Forecasting** | — | — | Yes | Yes |
+| **Reports** | Monthly spend report, CSV export | Unlimited reports | Unlimited + advanced analytics | Unlimited + custom |
+| **Alerts** | Email | Email + budget alerts + Slack | All channels | All channels + custom |
+| **Historical Data** | 14 days | 90 days | 3 years | Custom retention |
+| **Compliance & Enterprise** | — | — | — | SSO, SCIM, audit logs, custom integrations, dedicated support, SLA, multi-region deployment |
 
 **Rationale:**
-- Free tier: $5M spend, 1 integration. Ideal for evaluations + startups in growth phase.
-- Starter: $5M–$20M spend, 2 billing integrations. Small-to-mid market.
-- Professional: $20M–$100M spend, 5 integrations, PDF contract parsing, advanced dedup. Mid-market sweet spot.
-- Enterprise: Unlimited scale + vendor APIs + benchmarking.
-- Premium: Strategic partnerships; co-selling; success-based pricing option (SpendGov gets % of recovered savings).
+- Free: 14-day trial, no credit card friction, capped at 25 SaaS apps / 10 AI tools — enough to prove value (find real duplicates/waste) without giving away the full product.
+- Starter ($29/mo): Removes the org/app ceiling for small teams; adds duplicate detection and Slack alerts — the habit-forming tier.
+- Pro ($99/mo): Unlocks the AI CFO Copilot (killer feature), unlimited orgs, and the workflow/API surface that growing finance teams need — the expansion tier where most revenue concentrates.
+- Enterprise (Custom): Compliance and deployment requirements (SSO, SCIM, audit logs, multi-region) that only large orgs need; priced and sold directly.
 
 ## 22. Entitlements Logic (Pricing Engine)
 
-| Feature / Limit | Free | Starter | Professional | Enterprise | Premium |
-|---|---|---|---|---|---|
-| `can("view_spend_dashboard")` | Yes | Yes | Yes | Yes | Yes |
-| `can("ingest_spend_source")` | Limit: 1 | Limit: 2 | Limit: 5 | Unlimited | Unlimited |
-| `can("track_ai_service")` | No | Limit: 3 | Limit: 10+ | Unlimited | Unlimited |
-| `can("parse_contracts")` | No | Text only | PDF + email | PDF + email + API | PDF + email + API |
-| `can("view_by_department")` | No | No | Yes | Yes | Yes |
-| `can("use_consolidation_ai")` | No | No | Yes | Yes | Yes |
-| `can("use_forecasting")` | No | No | Yes | Yes | Yes |
-| `can("view_benchmarks")` | No | No | No | Yes | Yes |
-| `withinMonthly("spend_tracking", org)` | Unlimited | Unlimited | Unlimited | Unlimited | Unlimited |
-| `withinMonthly("spend_retention", org)` | 3 months | 12 months | 3 years | 5 years | Unlimited |
+| Feature / Limit | Free | Starter | Pro | Enterprise |
+|---|---|---|---|---|
+| `can("view_spend_dashboard")` | Yes | Yes | Yes | Yes |
+| `withinLimit("organizations", org)` | 1 | 3 | Unlimited | Unlimited |
+| `withinLimit("saas_apps_tracked", org)` | 25 | 100 | Unlimited | Unlimited |
+| `withinLimit("ai_tools_tracked", org)` | 10 | Unlimited | Unlimited | Unlimited |
+| `can("detect_duplicates")` | No | Yes | Yes (AI) | Yes (AI + custom) |
+| `can("use_ai_cfo_copilot")` | No | No | Yes | Yes |
+| `can("use_spend_optimization_ai")` | No | No | Yes | Yes |
+| `can("use_license_optimization")` | No | No | Yes | Yes |
+| `can("use_approval_workflows")` | No | No | Yes | Yes |
+| `can("use_api")` | No | No | Yes | Yes |
+| `can("use_forecasting")` | No | No | Yes | Yes |
+| `can("send_slack_alerts")` | No | Yes | Yes | Yes |
+| `can("use_sso")` / `can("use_scim")` | No | No | No | Yes |
+| `withinLimit("history_days", org)` | 14 | 90 | 1,095 | Custom |
 
 ## 23. Limit Behavior
 
-- **Approaching limit:** Alert at 90% of billing integrations (e.g., "You've connected 4 of 5 integrations. Add 1 more for Professional tier."). Suggests upgrade path with ROI.
-- **At limit:** Cannot add new integration. Popup offers upgrade with savings calculator (e.g., "Unlimited integrations for Professional tier — typical customer saves $500K in first 90 days").
-- **Upgrade impact:** Limit resets immediately; no prorating; full value delivered.
+- **Approaching limit:** In-app banner at 90% of SaaS-app or AI-tool tracking limit (e.g., "You're tracking 23 of 25 SaaS apps on Free. Upgrade to Starter for 100."). Suggests upgrade path with concrete savings example.
+- **At limit:** New app/tool discovery is queued, not silently dropped; user is prompted to upgrade before it's tracked. Trial expiry (day 14) auto-downgrades to a capped free view (read-only on existing data) rather than deleting anything.
+- **Upgrade impact:** Limit increases immediately on upgrade; monthly billing prorates the first cycle.
 
 ## 24. Billing States
 
 | State | Effect on Entitlements | Behavior |
 |---|---|---|
-| **Trialing (30 days)** | Professional features enabled | Auto-converts to Starter unless card added. |
-| **Active (paid subscription)** | Tier-appropriate features | Full access; spend tracking continues. |
-| **Past due (30+ days unpaid)** | Downgrade to Free on day 30 | Grace period for collections; data never deleted. |
-| **Canceled** | Downgrade to Free tier | Spend history retained 12 months; can restart anytime. |
+| **Trialing (14 days)** | Full Pro features enabled | Auto-downgrades to Free (capped, read-only on data beyond Free limits) unless card added. |
+| **Active (paid subscription)** | Tier-appropriate features | Full access; spend tracking continues; monthly renewal. |
+| **Past due (7+ days unpaid)** | Read-only access; no new tracking | Grace period for card retry; data never deleted. |
+| **Canceled** | Downgrade to Free tier limits | Spend history retained 12 months; can restart anytime without re-onboarding. |
 
 ## 25. Market Potential
 
@@ -291,17 +302,21 @@ Mid-to-large companies meeting ALL:
 
 ## 26. Revenue Potential
 
-**Year 1:** 50 companies (high-touch sales, small percentage of SAM) = $750K ARR.
-**Year 2:** 150 companies = $3M ARR.
-**Year 3:** 400 companies = $10M ARR.
-**Year 5:** 1,000 companies = $30M ARR.
+**PLG funnel assumption:** Free trial (self-serve signup) → 15–20% convert to Starter/Pro within 30 days → Enterprise deals sourced separately (outbound + Starter/Pro accounts that outgrow self-serve limits).
 
-**Expansion revenue:** Success-based pricing (% of recovered savings; 10–15% of savings = $2M–$10M/year), consulting/implementation ($50K–$200K per customer).
+**Year 1:** 3,000 free trials → 500 paying self-serve accounts (70% Starter, 30% Pro blended ≈ $50/mo avg) + 10 Enterprise accounts ($30K avg annual) = ~$600K ARR self-serve + $300K ARR Enterprise = **$900K ARR**.
+**Year 2:** 12,000 trials → 2,200 paying accounts + 35 Enterprise = **$3.2M ARR**.
+**Year 3:** 30,000 trials → 6,000 paying accounts + 90 Enterprise = **$9M ARR**.
+**Year 5:** 80,000 trials → 18,000 paying accounts + 250 Enterprise = **$28M ARR**.
+
+**Expansion revenue:** Starter → Pro upgrade (25% of Starter accounts within 12 months), Free → paid conversion campaigns, Enterprise upsell from Pro accounts hitting org-count/compliance needs.
 
 **Unit economics:**
-- CAC: $25K (enterprise sales; 6-month cycle; direct + partner channels; 30% close rate).
-- LTV (5-year retention, $50K avg annual contract): $250K.
-- LTV:CAC ratio = 10× (excellent for enterprise SaaS).
+- CAC (self-serve, Starter/Pro): ~$150 (content/SEO/product-led; no sales-assisted cost).
+- CAC (Enterprise, sales-assisted): ~$8K (outbound + 3-month cycle; 25% close rate).
+- LTV (self-serve, 3-year retention, $65/mo blended avg): ~$2,340.
+- LTV (Enterprise, 5-year retention, $30K/year): ~$150K.
+- Blended LTV:CAC ratio: ~12–15× (self-serve volume drives most of the ratio; Enterprise adds ACV depth).
 
 ## 27. Technical Difficulty (Inverted: 5 = Easy/Low-Risk)
 
