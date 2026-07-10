@@ -1,0 +1,159 @@
+// ERPAudit product-specific schema. See products/spendgov/prisma/schema.prisma
+// for the documented rationale on why organizationId/userId columns here
+// are plain indexed strings rather than Prisma relations, and why this
+// schema lives in its own Postgres namespace alongside
+// @founder-os/platform's tables.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/erpaudit-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("ERPAUDIT_DATABASE_URL")
+}
+
+enum ErpSystem {
+  sap
+  oracle
+  dynamics
+
+  @@map("erp_system")
+}
+
+model ErpInstance {
+  id             String    @id @default(uuid())
+  organizationId String    @map("organization_id")
+  name           String
+  erpSystem      ErpSystem @map("erp_system")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  scans           Scan[]
+  roleAssignments RoleAssignment[]
+  configSettings  ConfigSetting[]
+
+  @@unique([organizationId, name], map: "uq_erp_instances_org_name")
+  @@index([organizationId])
+  @@map("erp_instances")
+}
+
+model RoleAssignment {
+  id             String   @id @default(uuid())
+  organizationId String   @map("organization_id")
+  instanceId     String   @map("instance_id")
+  userIdentifier String   @map("user_identifier")
+  permission     String
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  instance ErpInstance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+
+  @@unique([instanceId, userIdentifier, permission], map: "uq_role_assignments_instance_user_permission")
+  @@index([organizationId, instanceId])
+  @@map("role_assignments")
+}
+
+model ConfigSetting {
+  id             String   @id @default(uuid())
+  organizationId String   @map("organization_id")
+  instanceId     String   @map("instance_id")
+  key            String
+  value          String
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  instance ErpInstance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+
+  @@unique([instanceId, key], map: "uq_config_settings_instance_key")
+  @@index([organizationId, instanceId])
+  @@map("config_settings")
+}
+
+enum ScanStatus {
+  running
+  completed
+  failed
+
+  @@map("scan_status")
+}
+
+model Scan {
+  id              String     @id @default(uuid())
+  organizationId  String     @map("organization_id")
+  instanceId      String     @map("instance_id")
+  status          ScanStatus @default(running)
+  triggeredByUserId String   @map("triggered_by_user_id")
+  complianceScore Int?       @map("compliance_score")
+  startedAt       DateTime   @default(now()) @map("started_at")
+  completedAt     DateTime?  @map("completed_at")
+
+  instance ErpInstance @relation(fields: [instanceId], references: [id], onDelete: Cascade)
+  findings Finding[]
+
+  @@index([organizationId, instanceId])
+  @@index([organizationId, startedAt])
+  @@map("scans")
+}
+
+enum FindingCategory {
+  sod_violation
+  config_error
+  process_deviation
+
+  @@map("finding_category")
+}
+
+enum FindingSeverity {
+  low
+  medium
+  high
+  critical
+
+  @@map("finding_severity")
+}
+
+enum FindingStatus {
+  open
+  resolved
+  accepted_risk
+
+  @@map("finding_status")
+}
+
+model Finding {
+  id             String          @id @default(uuid())
+  organizationId String          @map("organization_id")
+  scanId         String          @map("scan_id")
+  instanceId     String          @map("instance_id")
+  category       FindingCategory
+  severity       FindingSeverity
+  title          String
+  description    String
+  status         FindingStatus   @default(open)
+  createdAt      DateTime        @default(now()) @map("created_at")
+  updatedAt      DateTime        @updatedAt @map("updated_at")
+
+  scan    Scan            @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  summary AuditSummary?
+
+  @@index([organizationId, status])
+  @@index([organizationId, scanId])
+  @@map("findings")
+}
+
+model AuditSummary {
+  id                String   @id @default(uuid())
+  organizationId    String   @map("organization_id")
+  findingId         String   @unique(map: "uq_audit_summaries_finding_id") @map("finding_id")
+  explanation       String
+  complianceImpact  String   @map("compliance_impact")
+  recommendedFix    String   @map("recommended_fix")
+  businessImpact    String   @map("business_impact")
+  generatedAt       DateTime @default(now()) @map("generated_at")
+
+  finding Finding @relation(fields: [findingId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("audit_summaries")
+}

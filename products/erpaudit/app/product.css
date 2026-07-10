@@ -1,0 +1,33 @@
+/* ERPAudit product-specific styles — layered on top of @founder-os/ui's tokens/primitives/dashboard/layout/admin CSS. */
+
+.ea-landing { max-width: 1100px; margin: 0 auto; padding: var(--space-6); }
+.ea-landing-header { display: flex; align-items: center; justify-content: space-between; padding: var(--space-4) 0; }
+.ea-landing-logo { font-size: var(--font-size-xl); font-weight: var(--font-weight-heading); color: hsl(var(--foreground)); }
+.ea-landing-nav { display: flex; align-items: center; gap: var(--space-4); }
+.ea-landing-hero { text-align: center; padding: var(--space-16) 0; }
+.ea-landing-hero h1 { font-size: var(--font-size-4xl); font-weight: var(--font-weight-heading); color: hsl(var(--foreground)); max-width: 800px; margin: 0 auto var(--space-4); }
+.ea-landing-hero p { font-size: var(--font-size-lg); color: hsl(var(--muted-foreground)); max-width: 640px; margin: 0 auto var(--space-6); }
+.ea-landing-cta { display: flex; justify-content: center; }
+.ea-landing-features { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-4); padding: var(--space-10) 0; }
+
+.ea-auth-page { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: var(--space-4); }
+.ea-auth-card { width: 100%; max-width: 420px; }
+.ea-auth-form { display: flex; flex-direction: column; gap: var(--space-4); }
+.ea-auth-footer { text-align: center; font-size: var(--font-size-sm); color: hsl(var(--muted-foreground)); margin-top: var(--space-4); }
+
+.ea-kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6); }
+.ea-section { margin-bottom: var(--space-8); }
+.ea-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); }
+.ea-page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-6); }
+.ea-page-title { font-size: var(--font-size-2xl); font-weight: var(--font-weight-heading); color: hsl(var(--foreground)); margin: 0; }
+.ea-page-description { color: hsl(var(--muted-foreground)); margin: var(--space-1) 0 0; }
+.ea-section-title { font-size: var(--font-size-lg); font-weight: var(--font-weight-heading); color: hsl(var(--foreground)); margin: 0; }
+.ea-category-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); font-size: var(--font-size-sm); color: hsl(var(--foreground)); }
+.ea-form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-3); }
+.ea-form-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-4); }
+.ea-code-snippet { background: hsl(var(--muted)); border: 1px solid hsl(var(--border)); border-radius: var(--radius-md); padding: var(--space-3); font-family: var(--font-mono, monospace); font-size: var(--font-size-sm); overflow-x: auto; white-space: pre-wrap; word-break: break-word; }
+.ea-plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--space-4); }
+.ea-plan-price { font-size: var(--font-size-3xl); font-weight: var(--font-weight-heading); color: hsl(var(--foreground)); margin: var(--space-2) 0; }
+.ea-plan-features { list-style: none; margin: var(--space-4) 0; padding: 0; display: flex; flex-direction: column; gap: var(--space-2); font-size: var(--font-size-sm); color: hsl(var(--foreground)); }
+.ea-copilot-action { padding: var(--space-4); border: 1px solid hsl(var(--border)); border-radius: var(--radius-lg); margin-bottom: var(--space-3); }
+.ea-copilot-action-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-2); }
