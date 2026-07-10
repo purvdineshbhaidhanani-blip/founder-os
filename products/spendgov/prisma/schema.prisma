@@ -1,0 +1,180 @@
+// SpendGov product-specific schema. Tables here live in the same physical
+// database as @founder-os/platform's tables (one database per product, per
+// shared/platform/README.md) but are modeled and migrated separately.
+// organizationId/userId columns below are plain indexed strings that
+// logically reference shared/platform's Organization.id / User.id — no
+// Prisma-level cross-schema relation exists (Prisma has no concept of a
+// model it doesn't own), so referential integrity for those columns is
+// enforced at the application layer via @founder-os/platform's services,
+// consistent with the multi-tenant app_id scoping pattern in
+// standards/database.md.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/spendgov-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("SPENDGOV_DATABASE_URL")
+}
+
+enum SubscriptionKind {
+  saas
+  ai_tool
+
+  @@map("subscription_kind")
+}
+
+enum SubscriptionStatus {
+  active
+  canceled
+  trial
+
+  @@map("subscription_status")
+}
+
+enum SubscriptionSource {
+  manual
+  csv_import
+
+  @@map("subscription_source")
+}
+
+model Subscription {
+  id                String             @id @default(uuid())
+  organizationId    String             @map("organization_id")
+  kind              SubscriptionKind
+  vendorName        String             @map("vendor_name")
+  productName       String             @map("product_name")
+  category          String
+  department        String?
+  status            SubscriptionStatus @default(active)
+  source            SubscriptionSource @default(manual)
+  monthlyCostCents  Int                @map("monthly_cost_cents")
+  billingCycle      String             @default("monthly") @map("billing_cycle")
+  seatsPurchased    Int?               @map("seats_purchased")
+  seatsActive       Int?               @map("seats_active")
+  lastUsedAt        DateTime?          @map("last_used_at")
+  renewalDate       DateTime?          @map("renewal_date")
+  contractNotes     String?            @map("contract_notes")
+  createdByUserId   String             @map("created_by_user_id")
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+  deletedAt         DateTime?          @map("deleted_at")
+
+  duplicateFindingMembers DuplicateFindingSubscription[]
+  wasteFindings           WasteFinding[]
+  contractExtractions     ContractExtraction[]
+
+  @@index([organizationId])
+  @@index([organizationId, kind])
+  @@index([organizationId, renewalDate])
+  @@map("subscriptions")
+}
+
+enum FindingStatus {
+  open
+  dismissed
+  resolved
+
+  @@map("finding_status")
+}
+
+model DuplicateFinding {
+  id                    String        @id @default(uuid())
+  organizationId        String        @map("organization_id")
+  category              String
+  rationale             String
+  estimatedSavingsCents Int           @map("estimated_savings_cents")
+  status                FindingStatus @default(open)
+  detectedAt            DateTime      @default(now()) @map("detected_at")
+  resolvedAt            DateTime?     @map("resolved_at")
+
+  subscriptions DuplicateFindingSubscription[]
+
+  @@index([organizationId, status])
+  @@map("duplicate_findings")
+}
+
+model DuplicateFindingSubscription {
+  duplicateFindingId String @map("duplicate_finding_id")
+  subscriptionId     String @map("subscription_id")
+
+  duplicateFinding DuplicateFinding @relation(fields: [duplicateFindingId], references: [id], onDelete: Cascade)
+  subscription     Subscription     @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@id([duplicateFindingId, subscriptionId])
+  @@map("duplicate_finding_subscriptions")
+}
+
+enum WasteFindingType {
+  unused
+  underutilized
+  overprovisioned
+
+  @@map("waste_finding_type")
+}
+
+model WasteFinding {
+  id                    String           @id @default(uuid())
+  organizationId        String           @map("organization_id")
+  subscriptionId        String           @map("subscription_id")
+  type                  WasteFindingType
+  evidence              String
+  estimatedSavingsCents Int              @map("estimated_savings_cents")
+  status                FindingStatus    @default(open)
+  detectedAt            DateTime         @default(now()) @map("detected_at")
+  resolvedAt            DateTime?        @map("resolved_at")
+
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, status])
+  @@map("waste_findings")
+}
+
+model VendorConsolidationRecommendation {
+  id                    String        @id @default(uuid())
+  organizationId        String        @map("organization_id")
+  vendorGroup           String        @map("vendor_group")
+  vendorNames           String[]      @map("vendor_names")
+  rationale             String
+  estimatedSavingsCents Int           @map("estimated_savings_cents")
+  status                FindingStatus @default(open)
+  detectedAt            DateTime      @default(now()) @map("detected_at")
+
+  @@index([organizationId, status])
+  @@map("vendor_consolidation_recommendations")
+}
+
+model ContractExtraction {
+  id               String    @id @default(uuid())
+  organizationId   String    @map("organization_id")
+  subscriptionId   String?   @map("subscription_id")
+  sourceText       String    @map("source_text")
+  vendorName       String?   @map("vendor_name")
+  renewalDate      DateTime? @map("renewal_date")
+  autoRenews       Boolean?  @map("auto_renews")
+  noticePeriodDays Int?      @map("notice_period_days")
+  annualValueCents Int?      @map("annual_value_cents")
+  keyTerms         String[]  @map("key_terms")
+  extractedByUserId String   @map("extracted_by_user_id")
+  createdAt        DateTime  @default(now()) @map("created_at")
+
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId])
+  @@map("contract_extractions")
+}
+
+model CopilotRecommendation {
+  id             String   @id @default(uuid())
+  organizationId String   @map("organization_id")
+  summary        String
+  actions        Json
+  totalImpactCents Int    @map("total_impact_cents")
+  generatedAt    DateTime @default(now()) @map("generated_at")
+
+  @@index([organizationId, generatedAt])
+  @@map("copilot_recommendations")
+}

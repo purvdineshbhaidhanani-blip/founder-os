@@ -1,0 +1,34 @@
+import { signUpWithPassword } from "@founder-os/platform/auth";
+import { createOrganization } from "@founder-os/platform/organizations";
+import { startTrialSubscription } from "./billing.js";
+
+export interface SignUpAndOnboardInput {
+  email: string;
+  password: string;
+  displayName: string;
+  organizationName: string;
+  organizationSlug: string;
+}
+
+/**
+ * The full new-account flow: create the user, create their first
+ * organization (they become owner), start the 14-day trial. Composed from
+ * three independent shared/platform + local calls rather than a bespoke
+ * signup implementation, per the mission's "never duplicate shared
+ * functionality" rule.
+ */
+export async function signUpAndOnboard(input: SignUpAndOnboardInput, context: { ipAddress?: string; userAgent?: string }) {
+  const authResult = await signUpWithPassword(
+    { email: input.email, password: input.password, displayName: input.displayName },
+    context,
+  );
+
+  const organization = await createOrganization({
+    creatorUserId: authResult.userId,
+    input: { name: input.organizationName, slug: input.organizationSlug },
+  });
+
+  await startTrialSubscription(organization.id);
+
+  return { userId: authResult.userId, organizationId: organization.id, session: authResult.session };
+}
