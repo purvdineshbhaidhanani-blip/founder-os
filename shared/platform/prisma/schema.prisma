@@ -16,28 +16,33 @@ datasource db {
 // ---------------------------------------------------------------------------
 
 model User {
-  id              String    @id @default(uuid())
-  appId           String    @map("app_id")
+  id              String     @id @default(uuid())
+  appId           String     @map("app_id")
   email           String
-  emailVerifiedAt DateTime? @map("email_verified_at")
-  passwordHash    String?   @map("password_hash")
-  displayName     String    @map("display_name")
-  avatarUrl       String?   @map("avatar_url")
+  emailVerifiedAt DateTime?  @map("email_verified_at")
+  passwordHash    String?    @map("password_hash")
+  displayName     String     @map("display_name")
+  avatarUrl       String?    @map("avatar_url")
   status          UserStatus @default(active)
-  settings        Json      @default("{}") // account settings: timezone, locale, notification prefs — JSON to avoid a migration per new setting
-  lastLoginAt     DateTime? @map("last_login_at")
-  createdAt       DateTime  @default(now()) @map("created_at")
-  updatedAt       DateTime  @updatedAt @map("updated_at")
-  deletedAt       DateTime? @map("deleted_at")
+  settings        Json       @default("{}") // account settings: timezone, locale, notification prefs — JSON to avoid a migration per new setting
+  lastLoginAt     DateTime?  @map("last_login_at")
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime   @updatedAt @map("updated_at")
+  deletedAt       DateTime?  @map("deleted_at")
 
-  oauthAccounts    OAuthAccount[]
-  sessions         Session[]
-  mfaFactors       MfaFactor[]
-  passwordResets   PasswordResetToken[]
-  magicLinks       MagicLinkToken[]
-  memberships      OrganizationMember[]
-  sentInvitations  Invitation[]          @relation("InvitationSender")
-  auditLogEntries  AuditLogEntry[]       @relation("AuditLogActor")
+  oauthAccounts            OAuthAccount[]
+  sessions                 Session[]
+  mfaFactors               MfaFactor[]
+  passwordResets           PasswordResetToken[]
+  magicLinks               MagicLinkToken[]
+  memberships              OrganizationMember[]
+  sentInvitations          Invitation[]         @relation("InvitationSender")
+  auditLogEntries          AuditLogEntry[]      @relation("AuditLogActor")
+  notifications            Notification[]
+  savedFilters             SavedFilter[]
+  connectedIntegrations    Integration[]        @relation("IntegrationConnector")
+  createdReportDefinitions ReportDefinition[]   @relation("ReportDefinitionCreator")
+  createdApiKeys           ApiKey[]             @relation("ApiKeyCreator")
 
   @@unique([appId, email], name: "uq_users_app_id_email")
   @@index([appId])
@@ -55,15 +60,15 @@ enum UserStatus {
 }
 
 model OAuthAccount {
-  id             String   @id @default(uuid())
-  userId         String   @map("user_id")
+  id             String        @id @default(uuid())
+  userId         String        @map("user_id")
   provider       OAuthProvider
-  providerUserId String   @map("provider_user_id")
-  accessToken    String?  @map("access_token") // encrypted at the application layer before write
-  refreshToken   String?  @map("refresh_token") // encrypted at the application layer before write
-  expiresAt      DateTime? @map("expires_at")
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  providerUserId String        @map("provider_user_id")
+  accessToken    String?       @map("access_token") // encrypted at the application layer before write
+  refreshToken   String?       @map("refresh_token") // encrypted at the application layer before write
+  expiresAt      DateTime?     @map("expires_at")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -85,15 +90,15 @@ enum OAuthProvider {
 // ---------------------------------------------------------------------------
 
 model Session {
-  id           String   @id @default(uuid())
-  userId       String   @map("user_id")
-  tokenHash    String   @map("token_hash") // sha256 of the opaque session token; raw token never stored
-  ipAddress    String?  @map("ip_address")
-  userAgent    String?  @map("user_agent")
-  createdAt    DateTime @default(now()) @map("created_at")
-  lastSeenAt   DateTime @default(now()) @map("last_seen_at")
-  expiresAt    DateTime @map("expires_at")
-  revokedAt    DateTime? @map("revoked_at")
+  id         String    @id @default(uuid())
+  userId     String    @map("user_id")
+  tokenHash  String    @map("token_hash") // sha256 of the opaque session token; raw token never stored
+  ipAddress  String?   @map("ip_address")
+  userAgent  String?   @map("user_agent")
+  createdAt  DateTime  @default(now()) @map("created_at")
+  lastSeenAt DateTime  @default(now()) @map("last_seen_at")
+  expiresAt  DateTime  @map("expires_at")
+  revokedAt  DateTime? @map("revoked_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -104,12 +109,12 @@ model Session {
 }
 
 model MfaFactor {
-  id         String     @id @default(uuid())
-  userId     String     @map("user_id")
-  type       MfaType    @default(totp)
-  secret     String     // encrypted at the application layer before write
-  verifiedAt DateTime?  @map("verified_at")
-  createdAt  DateTime   @default(now()) @map("created_at")
+  id         String    @id @default(uuid())
+  userId     String    @map("user_id")
+  type       MfaType   @default(totp)
+  secret     String // encrypted at the application layer before write
+  verifiedAt DateTime? @map("verified_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -124,12 +129,12 @@ enum MfaType {
 }
 
 model PasswordResetToken {
-  id        String   @id @default(uuid())
-  userId    String   @map("user_id")
-  tokenHash String   @map("token_hash")
-  expiresAt DateTime @map("expires_at")
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  tokenHash String    @map("token_hash")
+  expiresAt DateTime  @map("expires_at")
   usedAt    DateTime? @map("used_at")
-  createdAt DateTime @default(now()) @map("created_at")
+  createdAt DateTime  @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -139,12 +144,12 @@ model PasswordResetToken {
 }
 
 model MagicLinkToken {
-  id        String   @id @default(uuid())
-  userId    String   @map("user_id")
-  tokenHash String   @map("token_hash")
-  expiresAt DateTime @map("expires_at")
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  tokenHash String    @map("token_hash")
+  expiresAt DateTime  @map("expires_at")
   usedAt    DateTime? @map("used_at")
-  createdAt DateTime @default(now()) @map("created_at")
+  createdAt DateTime  @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -158,19 +163,29 @@ model MagicLinkToken {
 // ---------------------------------------------------------------------------
 
 model Organization {
-  id        String   @id @default(uuid())
-  appId     String   @map("app_id")
+  id        String    @id @default(uuid())
+  appId     String    @map("app_id")
   name      String
   slug      String
-  settings  Json     @default("{}")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  settings  Json      @default("{}")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  members     OrganizationMember[]
-  teams       Team[]
-  invitations Invitation[]
-  auditLog    AuditLogEntry[]
+  members              OrganizationMember[]
+  teams                Team[]
+  invitations          Invitation[]
+  auditLog             AuditLogEntry[]
+  subscriptions        Subscription[]
+  usageCounters        UsageCounter[]
+  invoices             Invoice[]
+  notifications        Notification[]
+  reportDefinitions    ReportDefinition[]
+  savedFilters         SavedFilter[]
+  integrations         Integration[]
+  webhookEndpoints     WebhookEndpoint[]
+  apiKeys              ApiKey[]
+  featureFlagOverrides FeatureFlagOverride[]
 
   @@unique([appId, slug], name: "uq_organizations_app_id_slug")
   @@index([appId])
@@ -178,11 +193,11 @@ model Organization {
 }
 
 model Team {
-  id             String   @id @default(uuid())
-  organizationId String   @map("organization_id")
+  id             String    @id @default(uuid())
+  organizationId String    @map("organization_id")
   name           String
-  createdAt      DateTime @default(now()) @map("created_at")
-  updatedAt      DateTime @updatedAt @map("updated_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
   deletedAt      DateTime? @map("deleted_at")
 
   organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
@@ -287,4 +302,488 @@ model AuditLogEntry {
   @@index([actorId])
   @@index([createdAt])
   @@map("audit_log_entries")
+}
+
+// ---------------------------------------------------------------------------
+// API Keys
+// ---------------------------------------------------------------------------
+
+model ApiKey {
+  id             String    @id @default(uuid())
+  appId          String    @map("app_id")
+  organizationId String    @map("organization_id")
+  createdById    String    @map("created_by_id")
+  name           String
+  keyPrefix      String    @map("key_prefix") // first 8 chars, shown in UI so a key is identifiable without re-revealing it
+  keyHash        String    @map("key_hash") // sha256 of the full key; raw key never stored
+  scopes         Json      @default("[]")
+  lastUsedAt     DateTime? @map("last_used_at")
+  expiresAt      DateTime? @map("expires_at")
+  revokedAt      DateTime? @map("revoked_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdBy    User         @relation("ApiKeyCreator", fields: [createdById], references: [id])
+
+  @@unique([keyHash], name: "uq_api_keys_key_hash")
+  @@index([organizationId])
+  @@index([appId])
+  @@map("api_keys")
+}
+
+// ---------------------------------------------------------------------------
+// Billing & Subscriptions
+// ---------------------------------------------------------------------------
+
+model Plan {
+  id              String          @id @default(uuid())
+  appId           String          @map("app_id")
+  code            String // e.g. "free", "starter", "pro", "enterprise" — matches each product's PRODUCT_IDENTITY.md pricing tiers
+  name            String
+  billingInterval BillingInterval @map("billing_interval")
+  priceCents      Int             @map("price_cents") // integer minor units per standards/database.md; 0 for free tier
+  currency        String          @default("usd")
+  isActive        Boolean         @default(true) @map("is_active")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  entitlements  PlanEntitlement[]
+  subscriptions Subscription[]
+
+  @@unique([appId, code, billingInterval], name: "uq_plans_app_id_code_interval")
+  @@index([appId])
+  @@map("plans")
+}
+
+enum BillingInterval {
+  monthly
+  yearly
+
+  @@map("billing_interval")
+}
+
+model PlanEntitlement {
+  id           String          @id @default(uuid())
+  planId       String          @map("plan_id")
+  featureKey   String          @map("feature_key") // e.g. "use_ai_copilot", "scan_pr"
+  kind         EntitlementKind
+  boolValue    Boolean?        @map("bool_value")
+  numericLimit Int?            @map("numeric_limit") // null = unlimited
+  createdAt    DateTime        @default(now()) @map("created_at")
+
+  plan Plan @relation(fields: [planId], references: [id], onDelete: Cascade)
+
+  @@unique([planId, featureKey], name: "uq_plan_entitlements_plan_feature")
+  @@index([planId])
+  @@map("plan_entitlements")
+}
+
+enum EntitlementKind {
+  boolean
+  numeric_limit
+
+  @@map("entitlement_kind")
+}
+
+model Subscription {
+  id                   String             @id @default(uuid())
+  appId                String             @map("app_id")
+  organizationId       String             @map("organization_id")
+  planId               String             @map("plan_id")
+  status               SubscriptionStatus @default(trialing)
+  stripeCustomerId     String?            @map("stripe_customer_id")
+  stripeSubscriptionId String?            @map("stripe_subscription_id")
+  currentPeriodStart   DateTime           @map("current_period_start")
+  currentPeriodEnd     DateTime           @map("current_period_end")
+  trialEndsAt          DateTime?          @map("trial_ends_at")
+  cancelAtPeriodEnd    Boolean            @default(false) @map("cancel_at_period_end")
+  canceledAt           DateTime?          @map("canceled_at")
+  pastDueSince         DateTime?          @map("past_due_since")
+  createdAt            DateTime           @default(now()) @map("created_at")
+  updatedAt            DateTime           @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  plan         Plan         @relation(fields: [planId], references: [id])
+  invoices     Invoice[]
+
+  @@unique([organizationId, appId], name: "uq_subscriptions_org_app")
+  @@index([organizationId])
+  @@index([appId])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+enum SubscriptionStatus {
+  trialing
+  active
+  past_due
+  canceled
+
+  @@map("subscription_status")
+}
+
+model UsageCounter {
+  id             String   @id @default(uuid())
+  organizationId String   @map("organization_id")
+  metricKey      String   @map("metric_key") // e.g. "monthly_scans", "ai_tools_tracked"
+  periodStart    DateTime @map("period_start")
+  periodEnd      DateTime @map("period_end")
+  value          Int      @default(0)
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, metricKey, periodStart], name: "uq_usage_counters_org_metric_period")
+  @@index([organizationId])
+  @@map("usage_counters")
+}
+
+model Invoice {
+  id               String        @id @default(uuid())
+  organizationId   String        @map("organization_id")
+  subscriptionId   String        @map("subscription_id")
+  stripeInvoiceId  String?       @map("stripe_invoice_id")
+  amountDueCents   Int           @map("amount_due_cents")
+  amountPaidCents  Int           @default(0) @map("amount_paid_cents")
+  currency         String        @default("usd")
+  status           InvoiceStatus @default(open)
+  hostedInvoiceUrl String?       @map("hosted_invoice_url")
+  issuedAt         DateTime      @map("issued_at")
+  dueAt            DateTime?     @map("due_at")
+  paidAt           DateTime?     @map("paid_at")
+  createdAt        DateTime      @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  subscription Subscription @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([subscriptionId])
+  @@map("invoices")
+}
+
+enum InvoiceStatus {
+  open
+  paid
+  past_due
+  void
+
+  @@map("invoice_status")
+}
+
+// ---------------------------------------------------------------------------
+// Notifications
+// ---------------------------------------------------------------------------
+
+model Notification {
+  id             String    @id @default(uuid())
+  appId          String    @map("app_id")
+  organizationId String?   @map("organization_id")
+  userId         String    @map("user_id")
+  category       String // e.g. "billing", "security", "product_alert"
+  title          String
+  body           String
+  metadata       Json      @default("{}")
+  readAt         DateTime? @map("read_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  organization Organization?          @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deliveries   NotificationDelivery[]
+
+  @@index([userId, readAt])
+  @@index([organizationId])
+  @@map("notifications")
+}
+
+model NotificationPreference {
+  id       String              @id @default(uuid())
+  userId   String              @map("user_id")
+  channel  NotificationChannel
+  category String
+  enabled  Boolean             @default(true)
+
+  @@unique([userId, channel, category], name: "uq_notification_prefs_user_channel_category")
+  @@index([userId])
+  @@map("notification_preferences")
+}
+
+model NotificationDelivery {
+  id             String                     @id @default(uuid())
+  notificationId String                     @map("notification_id")
+  channel        NotificationChannel
+  status         NotificationDeliveryStatus @default(pending)
+  attemptedAt    DateTime?                  @map("attempted_at")
+  deliveredAt    DateTime?                  @map("delivered_at")
+  error          String?
+
+  notification Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  @@index([notificationId])
+  @@map("notification_deliveries")
+}
+
+enum NotificationChannel {
+  in_app
+  email
+  slack
+  teams
+  webhook
+
+  @@map("notification_channel")
+}
+
+enum NotificationDeliveryStatus {
+  pending
+  sent
+  failed
+  skipped_not_configured
+
+  @@map("notification_delivery_status")
+}
+
+// ---------------------------------------------------------------------------
+// Reporting
+// ---------------------------------------------------------------------------
+
+model ReportDefinition {
+  id             String   @id @default(uuid())
+  appId          String   @map("app_id")
+  organizationId String   @map("organization_id")
+  createdById    String   @map("created_by_id")
+  name           String
+  reportType     String   @map("report_type") // product-defined, e.g. "spend_summary", "compliance_report"
+  config         Json     @default("{}")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  organization     Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  createdBy        User              @relation("ReportDefinitionCreator", fields: [createdById], references: [id])
+  scheduledReports ScheduledReport[]
+  runs             ReportRun[]
+
+  @@index([organizationId])
+  @@map("report_definitions")
+}
+
+model ScheduledReport {
+  id                 String       @id @default(uuid())
+  reportDefinitionId String       @map("report_definition_id")
+  cronExpression     String       @map("cron_expression")
+  recipients         Json         @default("[]") // array of emails or user IDs
+  format             ReportFormat @default(pdf)
+  enabled            Boolean      @default(true)
+  lastRunAt          DateTime?    @map("last_run_at")
+  nextRunAt          DateTime?    @map("next_run_at")
+  createdAt          DateTime     @default(now()) @map("created_at")
+
+  reportDefinition ReportDefinition @relation(fields: [reportDefinitionId], references: [id], onDelete: Cascade)
+
+  @@index([reportDefinitionId])
+  @@index([nextRunAt])
+  @@map("scheduled_reports")
+}
+
+model ReportRun {
+  id                 String          @id @default(uuid())
+  reportDefinitionId String          @map("report_definition_id")
+  format             ReportFormat
+  status             ReportRunStatus @default(pending)
+  startedAt          DateTime?       @map("started_at")
+  completedAt        DateTime?       @map("completed_at")
+  resultStorageKey   String?         @map("result_storage_key")
+  error              String?
+  createdAt          DateTime        @default(now()) @map("created_at")
+
+  reportDefinition ReportDefinition @relation(fields: [reportDefinitionId], references: [id], onDelete: Cascade)
+
+  @@index([reportDefinitionId])
+  @@map("report_runs")
+}
+
+enum ReportFormat {
+  pdf
+  csv
+  excel
+
+  @@map("report_format")
+}
+
+enum ReportRunStatus {
+  pending
+  running
+  completed
+  failed
+
+  @@map("report_run_status")
+}
+
+// ---------------------------------------------------------------------------
+// Search
+// ---------------------------------------------------------------------------
+
+model SavedFilter {
+  id             String   @id @default(uuid())
+  organizationId String   @map("organization_id")
+  userId         String   @map("user_id")
+  name           String
+  resourceType   String   @map("resource_type") // product-defined, e.g. "leads", "incidents"
+  filter         Json
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, resourceType])
+  @@index([userId])
+  @@map("saved_filters")
+}
+
+// ---------------------------------------------------------------------------
+// Analytics
+// ---------------------------------------------------------------------------
+
+model AnalyticsEvent {
+  id             String   @id @default(uuid())
+  appId          String   @map("app_id")
+  organizationId String?  @map("organization_id")
+  userId         String?  @map("user_id")
+  eventName      String   @map("event_name")
+  properties     Json     @default("{}")
+  occurredAt     DateTime @default(now()) @map("occurred_at")
+
+  @@index([appId, eventName, occurredAt])
+  @@index([organizationId])
+  @@map("analytics_events")
+}
+
+// ---------------------------------------------------------------------------
+// Integrations & Webhooks
+// ---------------------------------------------------------------------------
+
+model Integration {
+  id                   String            @id @default(uuid())
+  appId                String            @map("app_id")
+  organizationId       String            @map("organization_id")
+  connectedById        String?           @map("connected_by_id")
+  provider             String // e.g. "salesforce", "hubspot", "slack", "github"
+  status               IntegrationStatus @default(disabled)
+  encryptedCredentials String?           @map("encrypted_credentials")
+  config               Json              @default("{}")
+  connectedAt          DateTime?         @map("connected_at")
+  createdAt            DateTime          @default(now()) @map("created_at")
+  updatedAt            DateTime          @updatedAt @map("updated_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  connectedBy  User?        @relation("IntegrationConnector", fields: [connectedById], references: [id], onDelete: SetNull)
+
+  @@unique([organizationId, provider], name: "uq_integrations_org_provider")
+  @@index([organizationId])
+  @@map("integrations")
+}
+
+enum IntegrationStatus {
+  disabled // built and wired, no credentials yet — Phase 1 default per standards/security.md
+  connected
+  error
+
+  @@map("integration_status")
+}
+
+model WebhookEndpoint {
+  id              String   @id @default(uuid())
+  organizationId  String   @map("organization_id")
+  url             String
+  encryptedSecret String   @map("encrypted_secret") // HMAC signing secret, encrypted at rest
+  eventTypes      Json     @default("[]")
+  isActive        Boolean  @default(true) @map("is_active")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  organization Organization      @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  deliveries   WebhookDelivery[]
+
+  @@index([organizationId])
+  @@map("webhook_endpoints")
+}
+
+model WebhookDelivery {
+  id                String                @id @default(uuid())
+  webhookEndpointId String                @map("webhook_endpoint_id")
+  eventType         String                @map("event_type")
+  payload           Json
+  status            WebhookDeliveryStatus @default(pending)
+  attempts          Int                   @default(0)
+  lastAttemptAt     DateTime?             @map("last_attempt_at")
+  responseStatus    Int?                  @map("response_status")
+  createdAt         DateTime              @default(now()) @map("created_at")
+
+  webhookEndpoint WebhookEndpoint @relation(fields: [webhookEndpointId], references: [id], onDelete: Cascade)
+
+  @@index([webhookEndpointId])
+  @@index([status])
+  @@map("webhook_deliveries")
+}
+
+enum WebhookDeliveryStatus {
+  pending
+  delivered
+  failed
+
+  @@map("webhook_delivery_status")
+}
+
+// ---------------------------------------------------------------------------
+// Feature Flags / Settings
+// ---------------------------------------------------------------------------
+
+model FeatureFlag {
+  id                 String   @id @default(uuid())
+  appId              String   @map("app_id")
+  key                String
+  description        String?
+  isEnabledByDefault Boolean  @default(false) @map("is_enabled_by_default")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  overrides FeatureFlagOverride[]
+
+  @@unique([appId, key], name: "uq_feature_flags_app_key")
+  @@map("feature_flags")
+}
+
+model FeatureFlagOverride {
+  id             String  @id @default(uuid())
+  featureFlagId  String  @map("feature_flag_id")
+  organizationId String  @map("organization_id")
+  isEnabled      Boolean @map("is_enabled")
+
+  featureFlag  FeatureFlag  @relation(fields: [featureFlagId], references: [id], onDelete: Cascade)
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@unique([featureFlagId, organizationId], name: "uq_feature_flag_overrides_flag_org")
+  @@map("feature_flag_overrides")
+}
+
+// ---------------------------------------------------------------------------
+// AI Platform — usage & cost tracking
+// ---------------------------------------------------------------------------
+
+model AiUsageLog {
+  id             String   @id @default(uuid())
+  appId          String   @map("app_id")
+  organizationId String?  @map("organization_id")
+  userId         String?  @map("user_id")
+  feature        String // caller-supplied label, e.g. "spendgov.cfo_copilot", "codeaudit.fix_engine"
+  provider       String // "anthropic" | "openai"
+  model          String
+  promptVersion  String?  @map("prompt_version")
+  inputTokens    Int      @map("input_tokens")
+  outputTokens   Int      @map("output_tokens")
+  costMicroCents Int      @map("cost_micro_cents") // 1/1,000,000 of a cent — precise enough for sub-cent per-token pricing
+  latencyMs      Int      @map("latency_ms")
+  wasFallback    Boolean  @default(false) @map("was_fallback")
+  wasCacheHit    Boolean  @default(false) @map("was_cache_hit")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  @@index([appId, feature, createdAt])
+  @@index([organizationId])
+  @@map("ai_usage_logs")
 }

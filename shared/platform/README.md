@@ -1,29 +1,43 @@
 # @founder-os/platform
 
-The shared authentication, user management, and organizations/teams/RBAC
-system used by every product in the portfolio. See
-[`ARCHITECTURE.md`](./ARCHITECTURE.md) for the full design rationale,
-module boundaries, and what's deliberately deferred to a later pass
-(billing, dashboard, notifications, reporting, AI provider abstraction,
-integrations).
+The shared backend platform used by every product in the portfolio:
+authentication, user management, organizations/teams/RBAC, billing, AI,
+storage, notifications, reporting, search, analytics, integrations,
+monitoring, and settings. See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for
+the full design rationale and module boundaries.
 
-**Status: Phase A shipped.** Authentication, user management, and
-organizations/teams/RBAC are implemented, tested, and ready for products to
-import. Billing, dashboard, and the remaining shared systems described in
-`products/PORTFOLIO_WAVE_1_EXECUTION_PLAN.md` Step 5 are follow-up work,
-tracked separately — importing this package today does not give a product
-those systems yet.
+**Status: Shared Platform complete.** All 19 modules below are
+implemented, typechecked, linted, tested, and built. Every external
+integration (OAuth, email, AI providers, Stripe, object storage, outbound
+webhooks) is fully built and wired but fails closed with
+`INTEGRATION_NOT_CONFIGURED` until its Phase 2 credentials are supplied —
+no product needs to wait on this package to start building; it needs to
+wait on its own credentials to turn a given integration on.
 
-## What's in Phase A
+## What's included
 
 | Module | Import path | Covers |
 |---|---|---|
-| Auth | `@founder-os/platform/auth` | Email/password, OAuth (Google/Microsoft/GitHub — built, disabled until Phase 2 credentials), magic links, password reset, MFA (TOTP), session management, rate limiting |
+| Auth | `@founder-os/platform/auth` | Email/password, OAuth (Google/Microsoft/GitHub), magic links, password reset, MFA (TOTP), session management, rate limiting |
 | Users | `@founder-os/platform/users` | Profile, avatar, account settings, user status (active/invited/suspended/deactivated) |
 | Organizations | `@founder-os/platform/organizations` | Organizations, teams, membership, invitations, centralized RBAC (`can()`/`requireCan()`) |
 | Errors | `@founder-os/platform/errors` | Shared error shape (`standards/api.md`) every route response uses |
-| Config | `@founder-os/platform/config` | Typed, validated env access; integration-configured checks |
-| DB | `@founder-os/platform/db` | Prisma client singleton, current app-id accessor |
+| Config | `@founder-os/platform/config` | Typed, validated env access; `isXConfigured()` checks for every optional integration |
+| DB | `@founder-os/platform/db` | Prisma client singleton, Redis client singleton, current app-id accessor |
+| Logging | `@founder-os/platform/logging` | Structured JSON logging, sensitive-key redaction, request-context propagation (`AsyncLocalStorage`) |
+| API | `@founder-os/platform/api` | Standard response/error shapes, zod validate-at-boundary helpers, cursor pagination, idempotency keys, API key issuance/verification |
+| AI | `@founder-os/platform/ai` | Provider-agnostic `complete()`/`streamComplete()`/`embed()` — Anthropic default, OpenAI fallback, cost tracking, response caching, retry, prompt versioning, structured outputs, human-approval tiers |
+| Billing | `@founder-os/platform/billing` | Plans, entitlements, subscriptions (trial/active/past_due/canceled), usage metering, Stripe checkout/portal/webhooks, invoices |
+| Storage | `@founder-os/platform/storage` | S3-compatible upload/download, signed URLs, upload validation (mime/size allow-list) |
+| Notifications | `@founder-os/platform/notifications` | In-app + email + Slack/Teams/webhook delivery, per-user channel preferences, unread counts |
+| Reporting | `@founder-os/platform/reporting` | Real CSV/XLSX/PDF export, cron-scheduled reports, AI-generated report summaries |
+| Search | `@founder-os/platform/search` | Filter validation and Prisma `where` translation, Postgres full-text search, saved filters |
+| Analytics | `@founder-os/platform/analytics` | Event tracking, funnel computation, MRR/ARR/churn revenue metrics |
+| Integrations | `@founder-os/platform/integrations` | Per-org encrypted credential storage, outbound webhook delivery (HMAC-signed, retried with backoff), inbound signature verification |
+| Monitoring | `@founder-os/platform/monitoring` | DB/Redis health checks, provider-agnostic error capture, frontend/API performance budgets |
+| Settings | `@founder-os/platform/settings` | App-scoped feature flags with per-org overrides, org-level settings |
+| Audit | `@founder-os/platform/audit` | Append-only audit log, written to by every mutating module above |
+| Crypto | `@founder-os/platform/crypto` | AES-256-GCM encryption at rest, used internally for OAuth tokens, MFA secrets, and integration credentials |
 
 ## Setup (per product)
 
@@ -97,6 +111,42 @@ async function canApproveBudgetPolicy(actor: RbacActor): Promise<boolean> {
 }
 ```
 
+## Example: gating a feature behind a billing entitlement
+
+```ts
+import { can, withinLimit } from "@founder-os/platform/billing";
+import { requireCan } from "@founder-os/platform/organizations";
+import { PlatformError } from "@founder-os/platform/errors";
+
+export async function createAutomationRule(actor: RbacActor, organizationId: string, input: unknown) {
+  await requireCan(actor, "settings.manage"); // RBAC: can this user act at all?
+  if (!(await can(organizationId, "automation_rules"))) { // Billing: does their plan include this feature?
+    throw new PlatformError("UNAUTHORIZED", "Automation rules require the Growth plan or higher.");
+  }
+  if (!(await withinLimit(organizationId, "automation_rules_count"))) {
+    throw new PlatformError("UNAUTHORIZED", "You've reached your plan's automation rule limit.");
+  }
+  // ... create the rule
+}
+```
+
+## Example: an AI-powered feature via the provider abstraction
+
+```ts
+// Never import @anthropic-ai/sdk or openai directly from product code —
+// always route through SH-AI so cost tracking, caching, retry, and
+// provider fallback apply uniformly (standards/ai.md).
+import { complete } from "@founder-os/platform/ai";
+
+const response = await complete({
+  feature: "spendgov.invoice_summary",
+  organizationId,
+  system: "Summarize this invoice in two sentences for a finance approver.",
+  messages: [{ role: "user", content: invoiceText }],
+  cacheable: true,
+});
+```
+
 This keeps the shared package product-agnostic (per `ARCHITECTURE.md`)
 while giving every product a documented extension point instead of forking
 the RBAC logic.
@@ -112,29 +162,52 @@ the RBAC logic.
 | IncidentTriage | `incidenttriage` | Product roles: `on_call_engineer`, `sre_lead`. |
 | AuthStartup | `authstartup` | Special case: AuthStartup *is* an authentication product sold to external developers — its own end-customers' auth (the users AuthStartup's customers manage) is **not** the same thing as this package. AuthStartup's own team/dashboard auth (the AuthStartup employees and org admins who configure it) uses this package exactly like every other product; the auth-as-a-service AuthStartup sells to its customers is separate product surface built on the same underlying primitives (see `products/authstartup/docs/PRODUCT_IDENTITY.md` §30 for that relationship). Do not conflate the two when wiring `PLATFORM_APP_ID`. |
 
+The remaining six Wave 2 products (ERPAudit, ContactVerify,
+CharacterConsistency, PayrollAudit, TranscriptionQA, SchemaLint) integrate
+identically — set `PLATFORM_APP_ID` to the product's own slug and follow
+`docs/PRODUCT_IDENTITY.md` in each product's directory for any
+product-specific roles layered on top of base RBAC, per the extension
+pattern shown above. This package makes no other distinction between Wave 1
+and Wave 2 products.
+
 ## Local development
 
 ```bash
 cd shared/platform
 npm install
-cp .env.example .env   # fill in local Postgres/Redis URLs; leave OAuth/email blank
+cp .env.example .env   # fill in local Postgres/Redis URLs; leave everything else blank
 npx prisma migrate dev
 npm run typecheck
+npm run lint
 npm test
+npm run build
 ```
 
-## What's still open (Phase 1 completion checklist, tracked separately)
+## Status
 
-- [ ] Billing/subscriptions module (`frameworks/13-pricing.md`)
-- [ ] Dashboard framework component library (`frameworks/06-dashboard-framework.md`)
-- [ ] Notifications engine (`frameworks/10-notifications.md`)
-- [ ] Reporting/export (`frameworks/11-reporting.md`)
-- [ ] AI provider abstraction layer (`standards/ai.md`)
-- [ ] Integrations/webhook framework (`frameworks/12-integrations.md`)
-- [ ] Search service
-- [ ] File upload/storage service
+All 19 modules above are complete: 104 tests passing across 12 test files,
+clean typecheck, clean lint (`eslint.config.js`), clean build. Pure-logic
+code paths (validation, cost calculation, retry backoff, cron scheduling,
+CSV/XLSX/PDF byte-level output, HMAC signature verification, filter/query
+building) are behavior-tested directly. Code paths that are thin
+orchestration over a live external service — Stripe API calls, the
+Anthropic/OpenAI SDK adapters, S3 upload, SMTP send — are typechecked and
+exercised up to the point where a real credential would be required, but
+not integration-tested against a live provider in this environment, per
+this repository's Phase 1 rule of never inventing credentials
+(`standards/security.md`). They will need a live smoke test against real
+Phase 2 credentials before a product first relies on them in production.
 
-Encryption at rest for OAuth tokens and MFA secrets (`src/crypto/`,
-AES-256-GCM keyed from `PLATFORM_ENCRYPTION_KEY`) is implemented and used
-internally by `auth/oauth.ts` and `auth/mfa.ts` — callers pass plaintext in,
-this package handles the encrypt/decrypt boundary.
+Encryption at rest for OAuth tokens, MFA secrets, and per-organization
+integration credentials (`src/crypto/`, AES-256-GCM keyed from
+`PLATFORM_ENCRYPTION_KEY`) is implemented and used internally by
+`auth/oauth.ts`, `auth/mfa.ts`, and `integrations/registry.ts` — callers
+pass plaintext in, this package handles the encrypt/decrypt boundary.
+
+## The component library
+
+Every product's frontend also depends on
+[`@founder-os/ui`](../ui/README.md) — the design system implementation,
+primitives, dashboard framework, layout shell, and admin panel component
+library that pairs with this backend package. See that package's README
+for its own module table and setup.

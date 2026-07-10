@@ -1,0 +1,230 @@
+/* Component styles for shared/ui primitives — consumes tokens.css. Import both in a product's root layout: `@founder-os/ui/tokens.css` then this file. */
+
+.fos-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus-visible ring — every interactive element, never `outline: none` without this replacement, per standards/design-system.md. */
+.fos-btn:focus-visible,
+.fos-input:focus-visible,
+.fos-select:focus-visible,
+.fos-checkbox:focus-visible,
+.fos-tab:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Button */
+.fos-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-weight: var(--font-weight-emphasis);
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background-color var(--duration-micro) var(--ease-out), border-color var(--duration-micro) var(--ease-out), opacity var(--duration-micro) var(--ease-out);
+  white-space: nowrap;
+}
+.fos-btn:disabled,
+.fos-btn-loading {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+.fos-btn-sm { height: 32px; padding: 0 var(--space-3); font-size: var(--font-size-sm); }
+.fos-btn-md { height: 40px; padding: 0 var(--space-4); font-size: var(--font-size-base); }
+.fos-btn-lg { height: 48px; padding: 0 var(--space-6); font-size: var(--font-size-lg); }
+
+.fos-btn-primary { background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); }
+.fos-btn-primary:hover:not(:disabled) { background: hsl(var(--primary) / 0.9); }
+.fos-btn-secondary { background: hsl(var(--secondary)); color: hsl(var(--secondary-foreground)); }
+.fos-btn-secondary:hover:not(:disabled) { background: hsl(var(--secondary) / 0.8); }
+.fos-btn-destructive { background: hsl(var(--destructive)); color: hsl(var(--destructive-foreground)); }
+.fos-btn-destructive:hover:not(:disabled) { background: hsl(var(--destructive) / 0.9); }
+.fos-btn-outline { background: transparent; border-color: hsl(var(--border)); color: hsl(var(--foreground)); }
+.fos-btn-outline:hover:not(:disabled) { background: hsl(var(--muted)); }
+.fos-btn-ghost { background: transparent; color: hsl(var(--foreground)); }
+.fos-btn-ghost:hover:not(:disabled) { background: hsl(var(--muted)); }
+
+.fos-btn-spinner { display: inline-flex; width: 1em; height: 1em; animation: fos-spin 0.8s linear infinite; }
+.fos-btn-spinner svg { width: 100%; height: 100%; }
+@keyframes fos-spin { to { transform: rotate(360deg); } }
+
+/* Badge */
+.fos-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-emphasis);
+  line-height: 1;
+}
+.fos-badge-default { background: hsl(var(--muted)); color: hsl(var(--muted-foreground)); }
+.fos-badge-secondary { background: hsl(var(--secondary)); color: hsl(var(--secondary-foreground)); }
+.fos-badge-success { background: hsl(var(--success) / 0.15); color: hsl(var(--success)); }
+.fos-badge-warning { background: hsl(var(--warning) / 0.15); color: hsl(var(--warning)); }
+.fos-badge-destructive { background: hsl(var(--destructive) / 0.15); color: hsl(var(--destructive)); }
+.fos-badge-info { background: hsl(var(--info) / 0.15); color: hsl(var(--info)); }
+.fos-badge-icon { display: inline-flex; width: 12px; height: 12px; }
+
+/* Card */
+.fos-card {
+  background: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+.fos-card-header { padding: var(--space-6) var(--space-6) var(--space-4); }
+.fos-card-title { font-size: var(--font-size-lg); font-weight: var(--font-weight-heading); line-height: var(--line-height-heading); color: hsl(var(--foreground)); margin: 0; }
+.fos-card-description { font-size: var(--font-size-sm); color: hsl(var(--muted-foreground)); margin: var(--space-1) 0 0; }
+.fos-card-content { padding: 0 var(--space-6) var(--space-6); }
+.fos-card-footer { padding: var(--space-4) var(--space-6); border-top: 1px solid hsl(var(--border)); display: flex; align-items: center; gap: var(--space-2); }
+
+/* Form fields */
+.fos-field { display: flex; flex-direction: column; gap: var(--space-1); }
+.fos-label { font-size: var(--font-size-sm); font-weight: var(--font-weight-emphasis); color: hsl(var(--foreground)); }
+.fos-input,
+.fos-select {
+  height: 40px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-md);
+  border: 1px solid hsl(var(--input));
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-size: var(--font-size-base);
+  transition: border-color var(--duration-micro) var(--ease-out);
+}
+.fos-input:hover,
+.fos-select:hover { border-color: hsl(var(--ring)); }
+.fos-input-error { border-color: hsl(var(--destructive)); }
+.fos-field-hint { font-size: var(--font-size-xs); color: hsl(var(--muted-foreground)); }
+.fos-field-error { font-size: var(--font-size-xs); color: hsl(var(--destructive)); }
+
+.fos-checkbox-field { display: flex; align-items: center; gap: var(--space-2); }
+.fos-checkbox { width: 18px; height: 18px; border-radius: var(--radius-sm); accent-color: hsl(var(--primary)); }
+.fos-checkbox-label { font-size: var(--font-size-sm); color: hsl(var(--foreground)); }
+
+/* Tabs */
+.fos-tab-list { display: flex; gap: var(--space-1); border-bottom: 1px solid hsl(var(--border)); }
+.fos-tab {
+  padding: var(--space-2) var(--space-4);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: hsl(var(--muted-foreground));
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-emphasis);
+  cursor: pointer;
+  transition: color var(--duration-micro) var(--ease-out), border-color var(--duration-micro) var(--ease-out);
+}
+.fos-tab:hover { color: hsl(var(--foreground)); }
+.fos-tab-active { color: hsl(var(--primary)); border-bottom-color: hsl(var(--primary)); }
+.fos-tab-panel { padding-top: var(--space-4); }
+
+/* Modal */
+.fos-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  z-index: 50;
+  animation: fos-fade-in var(--duration-enter) var(--ease-out);
+}
+.fos-modal {
+  background: hsl(var(--background));
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  padding: var(--space-6);
+  max-width: 480px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: fos-scale-in var(--duration-enter) var(--ease-out);
+}
+.fos-modal-title { font-size: var(--font-size-xl); font-weight: var(--font-weight-heading); margin: 0 0 var(--space-2); color: hsl(var(--foreground)); }
+.fos-modal-description { font-size: var(--font-size-sm); color: hsl(var(--muted-foreground)); margin: 0 0 var(--space-4); }
+@keyframes fos-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes fos-scale-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
+
+/* Toast */
+.fos-toast-region {
+  position: fixed;
+  bottom: var(--space-4);
+  right: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  z-index: 60;
+  max-width: 360px;
+}
+.fos-toast {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  background: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+  animation: fos-slide-in var(--duration-enter) var(--ease-out);
+}
+.fos-toast-title { font-size: var(--font-size-sm); font-weight: var(--font-weight-emphasis); margin: 0; color: hsl(var(--foreground)); }
+.fos-toast-description { font-size: var(--font-size-xs); color: hsl(var(--muted-foreground)); margin: var(--space-1) 0 0; }
+.fos-toast-success { border-left: 3px solid hsl(var(--success)); }
+.fos-toast-warning { border-left: 3px solid hsl(var(--warning)); }
+.fos-toast-destructive { border-left: 3px solid hsl(var(--destructive)); }
+@keyframes fos-slide-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Skeleton */
+.fos-skeleton {
+  background: hsl(var(--muted));
+  border-radius: var(--radius-md);
+  position: relative;
+  overflow: hidden;
+}
+.fos-skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, hsl(var(--background) / 0.4), transparent);
+  animation: fos-shimmer 1.5s infinite;
+}
+@keyframes fos-shimmer { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+
+/* Empty / error states */
+.fos-empty-state,
+.fos-error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: var(--space-10) var(--space-6);
+  gap: var(--space-2);
+}
+.fos-empty-state-icon { width: 48px; height: 48px; color: hsl(var(--muted-foreground)); margin-bottom: var(--space-2); }
+.fos-empty-state-title,
+.fos-error-state-title { font-size: var(--font-size-lg); font-weight: var(--font-weight-heading); color: hsl(var(--foreground)); margin: 0; }
+.fos-empty-state-description,
+.fos-error-state-description { font-size: var(--font-size-sm); color: hsl(var(--muted-foreground)); margin: 0; max-width: 400px; }
+.fos-empty-state-action { margin-top: var(--space-2); }
+.fos-error-state-title { color: hsl(var(--destructive)); }
+
+@media (prefers-reduced-motion: reduce) {
+  .fos-modal-overlay,
+  .fos-modal,
+  .fos-toast,
+  .fos-skeleton::after {
+    animation: none;
+  }
+}

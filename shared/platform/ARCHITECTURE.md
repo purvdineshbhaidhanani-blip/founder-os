@@ -2,13 +2,16 @@
 
 ## What this is
 
-`shared/platform/` is the single, reusable implementation of the systems every
-product in the portfolio needs identically: authentication, user management,
-and organizations/teams/RBAC (Phase A — see `frameworks/08-user-management.md`
-and `frameworks/09-roles-permissions.md`). Later phases add billing,
-dashboard, notifications, reporting, integrations, and AI provider
-abstraction (frameworks 05–07, 10–13) as separate modules in this same
-package, following the same pattern.
+`shared/platform/` is the single, reusable implementation of the backend
+systems every product in the portfolio needs identically: authentication,
+user management, organizations/teams/RBAC (Phase A — see
+`frameworks/08-user-management.md` and `frameworks/09-roles-permissions.md`),
+plus billing, AI, storage, notifications, reporting, search, analytics,
+integrations, monitoring, and settings (frameworks 05, 10–13), all built as
+separate modules in this same package, following the same pattern.
+`shared/ui/` is the companion frontend package: the design system
+implementation plus the dashboard and admin framework component library
+(frameworks 06–07) — see `shared/ui/ARCHITECTURE.md`.
 
 Per `shared/README.md`, this is only justified because six products
 (SpendGov, SecCorrelate, CodeAudit, CRMCapture, IncidentTriage, AuthStartup)
@@ -44,31 +47,41 @@ while every other product consumes it internally as a library. See
 `products/authstartup/docs/PRODUCT_IDENTITY.md` section 30 for that
 dogfooding relationship.
 
-## Module boundaries (Phase A — this build)
+## Module boundaries
 
 ```
 shared/platform/
   prisma/
-    schema.prisma        # users, organizations, teams, sessions, roles — see below
+    schema.prisma        # every table this package owns — see standards/database.md
   src/
     auth/                 # authentication: password, OAuth, magic link, MFA, sessions
     users/                 # user profile, avatar, account settings, status
     organizations/          # orgs, teams, members, invitations, RBAC
-    db/                      # Prisma client singleton, tenant-scoping helpers
-    config/                   # env validation (zod), typed config
-    errors/                    # shared error types (standards/api.md error shape)
+    ai/                      # provider-agnostic completion/streaming/embedding, cost tracking, caching
+    billing/                  # plans, entitlements, subscriptions, usage metering, Stripe
+    storage/                   # S3-compatible upload/download, signed URLs
+    notifications/               # in-app/email/Slack/Teams/webhook delivery, preferences
+    reporting/                     # CSV/XLSX/PDF export, scheduled reports, AI summaries
+    search/                         # filter validation, full-text search, saved filters
+    analytics/                       # event tracking, funnels, revenue metrics
+    integrations/                     # per-org credential storage, outbound webhook delivery
+    monitoring/                        # health checks, error capture, performance budgets
+    settings/                          # feature flags, org settings
+    audit/                              # append-only audit log (write path + query API)
+    api/                                 # response/error shapes, pagination, idempotency, API keys
+    logging/                              # structured logging, redaction, request context
+    db/                                    # Prisma + Redis client singletons, tenant-scoping helpers
+    config/                                 # env validation (zod), typed config, isXConfigured() checks
+    errors/                                  # shared error types (standards/api.md error shape)
+    crypto/                                   # AES-256-GCM encryption at rest
   tests/
     unit/
-    integration/
-  README.md                     # how a product imports and configures this package
+  README.md                                     # how a product imports and configures this package
 ```
 
-Deferred to later phases (not built in this pass — tracked as follow-up
-work): billing/subscriptions, dashboard framework, notifications engine,
-reporting/export, audit-log *query* UI (the audit *write* path ships now,
-since every mutation in auth/users/organizations must be audited from day
-one per `standards/security.md`), AI provider abstraction, integrations/
-webhook framework, search, file upload.
+Audit-log *query* UI, dashboard rendering, and admin panel rendering are
+frontend concerns and live in `shared/ui/`, not here — this package ships
+the data and mutation layer each of those UIs calls into.
 
 ## Tech stack decisions
 

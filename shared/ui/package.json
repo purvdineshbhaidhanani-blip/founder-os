@@ -1,0 +1,55 @@
+{
+  "name": "@founder-os/ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared design system implementation (standards/design-system.md) and dashboard/admin component library used by every product in the portfolio.",
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "exports": {
+    "./tokens": "./src/tokens/index.ts",
+    "./tokens.css": "./src/tokens/tokens.css",
+    "./theme": "./src/theme/index.ts",
+    "./primitives": "./src/primitives/index.ts",
+    "./primitives.css": "./src/primitives/primitives.css",
+    "./dashboard": "./src/dashboard/index.ts",
+    "./layout": "./src/layout/index.ts",
+    "./admin": "./src/admin/index.ts",
+    "./dashboard.css": "./src/dashboard/dashboard.css",
+    "./layout.css": "./src/layout/layout.css",
+    "./admin.css": "./src/admin/admin.css",
+    "./hooks": "./src/hooks/index.ts",
+    "./utils": "./src/utils/index.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
+    "lint": "eslint src tests",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "peerDependencies": {
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  },
+  "dependencies": {
+    "clsx": "^2.1.1",
+    "recharts": "^2.13.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.2",
+    "@testing-library/react": "^16.0.1",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.1",
+    "eslint": "^9.39.4",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "jsdom": "^25.0.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "^5.6.2",
+    "typescript-eslint": "^8.63.0",
+    "vitest": "^2.1.2"
+  }
+}

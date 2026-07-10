@@ -32,6 +32,33 @@ const envSchema = z.object({
   // fail closed with INTEGRATION_NOT_CONFIGURED until present.
   PLATFORM_EMAIL_FROM: z.string().email().optional(),
   PLATFORM_EMAIL_PROVIDER_API_KEY: z.string().optional(),
+
+  // AI providers — optional; SH-AI fails closed with INTEGRATION_NOT_CONFIGURED
+  // until at least the primary provider's key is present. A configured
+  // secondary provider enables automatic fallback on primary failure.
+  ANTHROPIC_API_KEY: z.string().optional(),
+  OPENAI_API_KEY: z.string().optional(),
+
+  // Billing — optional; Stripe-backed billing fails closed until present, per
+  // the same Phase 1 rule as every other integration.
+  STRIPE_SECRET_KEY: z.string().optional(),
+  STRIPE_WEBHOOK_SECRET: z.string().optional(),
+
+  // Object storage — optional; upload endpoints fail closed until present.
+  PLATFORM_STORAGE_BUCKET: z.string().optional(),
+  PLATFORM_STORAGE_REGION: z.string().optional(),
+  PLATFORM_STORAGE_ACCESS_KEY_ID: z.string().optional(),
+  PLATFORM_STORAGE_SECRET_ACCESS_KEY: z.string().optional(),
+  PLATFORM_STORAGE_ENDPOINT: z.string().optional(), // for S3-compatible providers (R2, MinIO, etc.)
+
+  // Outbound integrations (Slack, Teams, generic webhooks) — optional,
+  // per-organization credentials are stored encrypted via SH-INTEG rather
+  // than as process-level env vars; this flag just gates whether the
+  // outbound webhook dispatcher runs at all in this environment.
+  PLATFORM_WEBHOOKS_ENABLED: z
+    .string()
+    .optional()
+    .transform((v) => v === "true"),
 });
 
 export type PlatformEnv = z.infer<typeof envSchema>;
@@ -65,4 +92,21 @@ export function isOAuthProviderConfigured(provider: "google" | "microsoft" | "gi
 export function isEmailConfigured(): boolean {
   const env = getPlatformEnv();
   return Boolean(env.PLATFORM_EMAIL_FROM && env.PLATFORM_EMAIL_PROVIDER_API_KEY);
+}
+
+export function isAIProviderConfigured(provider: "anthropic" | "openai"): boolean {
+  const env = getPlatformEnv();
+  return provider === "anthropic" ? Boolean(env.ANTHROPIC_API_KEY) : Boolean(env.OPENAI_API_KEY);
+}
+
+export function isStripeConfigured(): boolean {
+  const env = getPlatformEnv();
+  return Boolean(env.STRIPE_SECRET_KEY);
+}
+
+export function isStorageConfigured(): boolean {
+  const env = getPlatformEnv();
+  return Boolean(
+    env.PLATFORM_STORAGE_BUCKET && env.PLATFORM_STORAGE_ACCESS_KEY_ID && env.PLATFORM_STORAGE_SECRET_ACCESS_KEY,
+  );
 }

@@ -1,0 +1,42 @@
+/* Admin Panel Framework styles (frameworks/07-admin-panel-framework.md) — consumes tokens.css, primitives.css, dashboard.css, layout.css. */
+
+.fos-admin-panel { display: flex; flex-direction: column; gap: var(--space-4); }
+.fos-admin-panel-toolbar { display: flex; justify-content: flex-end; }
+
+.fos-admin-user-cell { display: flex; flex-direction: column; }
+.fos-admin-user-name { font-size: var(--font-size-sm); font-weight: var(--font-weight-emphasis); color: hsl(var(--foreground)); }
+.fos-admin-user-email { font-size: var(--font-size-xs); color: hsl(var(--muted-foreground)); }
+
+.fos-confirm-dialog-actions { display: flex; justify-content: flex-end; gap: var(--space-2); margin-top: var(--space-2); }
+
+.fos-admin-permission-matrix-wrapper { overflow-x: auto; }
+.fos-admin-permission-matrix { width: 100%; border-collapse: collapse; font-size: var(--font-size-sm); }
+.fos-admin-permission-matrix th,
+.fos-admin-permission-matrix td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid hsl(var(--border));
+  text-align: center;
+}
+.fos-admin-permission-matrix th[scope="row"] { text-align: left; color: hsl(var(--foreground)); font-weight: var(--font-weight-emphasis); }
+.fos-admin-permission-matrix-corner { text-align: left; }
+.fos-admin-permission-matrix-cell { color: hsl(var(--success)); font-weight: var(--font-weight-emphasis); }
+
+.fos-admin-billing-panel { display: flex; flex-direction: column; gap: var(--space-4); }
+.fos-admin-billing-seats { font-size: var(--font-size-sm); color: hsl(var(--foreground)); margin: 0 0 var(--space-1); }
+.fos-admin-billing-usage-line { font-size: var(--font-size-sm); color: hsl(var(--muted-foreground)); margin: 0 0 var(--space-1); }
+.fos-admin-invoice-download { font-size: var(--font-size-sm); color: hsl(var(--primary)); text-decoration: none; }
+
+.fos-admin-integrations-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-4);
+}
+.fos-admin-integration-header { display: flex; align-items: center; gap: var(--space-2); flex-wrap: wrap; }
+.fos-admin-integration-icon { width: 24px; height: 24px; }
+.fos-admin-integration-unavailable { font-size: var(--font-size-xs); color: hsl(var(--muted-foreground)); margin: 0; }
+
+.fos-admin-audit-log { display: flex; flex-direction: column; gap: var(--space-4); }
+
+@media (max-width: 767px) {
+  .fos-admin-integrations-grid { grid-template-columns: 1fr; }
+}

@@ -17,19 +17,23 @@ the single product that needs it.
 
 ```
 shared/
-  platform/     # authentication, user management, organizations/teams/RBAC
-                # (Phase A) — used identically by all six products; see
+  platform/     # backend: auth, user management, organizations/teams/RBAC, billing, AI,
+                # storage, notifications, reporting, search, analytics, integrations,
+                # monitoring, settings — used identically by every product; see
                 # shared/platform/ARCHITECTURE.md and shared/platform/README.md
-  ui/           # design-system component implementation (standards/design-system.md) — not yet extracted
+  ui/           # frontend: design-system implementation, dashboard framework, and admin
+                # panel framework component library — used identically by every product;
+                # see shared/ui/ARCHITECTURE.md and shared/ui/README.md
   lib/          # cross-product utilities — not yet extracted
   types/        # shared TypeScript types/contracts — not yet extracted
   config/       # shared lint/tsconfig/tooling config — not yet extracted
 ```
 
-`platform/` is the first extraction, justified because six products
-(SpendGov, SecCorrelate, CodeAudit, CRMCapture, IncidentTriage, AuthStartup)
-need byte-for-byte identical auth/org/RBAC behavior — see
-`shared/platform/ARCHITECTURE.md` for why this earns the abstraction rather
-than violating the "don't build shared code speculatively" rule above.
-`ui/`, `lib/`, `types/`, and `config/` remain unextracted until a second
-product actually needs that code identically.
+`platform/` and `ui/` are the two extractions made so far, justified
+because every product in the portfolio needs byte-for-byte identical
+auth/org/RBAC/billing/AI/etc. behavior on the backend and an identical
+dashboard/admin-panel anatomy on the frontend — see each package's own
+`ARCHITECTURE.md` for why this earns the abstraction rather than violating
+the "don't build shared code speculatively" rule above. `lib/`, `types/`,
+and `config/` remain unextracted until a second product actually needs
+that code identically.

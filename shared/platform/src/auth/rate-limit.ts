@@ -1,15 +1,5 @@
-import { Redis } from "ioredis";
-import { getPlatformEnv } from "../config/index.js";
+import { getPlatformRedis } from "../db/redis.js";
 import { PlatformError } from "../errors/index.js";
-
-let redis: Redis | undefined;
-
-function getRedis(): Redis {
-  if (!redis) {
-    redis = new Redis(getPlatformEnv().PLATFORM_REDIS_URL);
-  }
-  return redis;
-}
 
 /**
  * Sliding-window counter, sized per standards/security.md: "auth endpoints
@@ -21,7 +11,7 @@ export async function checkRateLimit(params: {
   limit: number;
   windowSeconds: number;
 }): Promise<{ allowed: boolean; retryAfterSeconds: number }> {
-  const client = getRedis();
+  const client = getPlatformRedis();
   const redisKey = `ratelimit:${params.key}`;
   const count = await client.incr(redisKey);
   if (count === 1) {
