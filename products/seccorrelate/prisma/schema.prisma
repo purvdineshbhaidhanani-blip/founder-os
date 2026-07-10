@@ -1,0 +1,126 @@
+// SecCorrelate product-specific schema. See products/spendgov/prisma/schema.prisma
+// for the documented rationale on why organizationId/userId columns here
+// are plain indexed strings rather than Prisma relations, and why this
+// schema lives in its own Postgres namespace alongside
+// @founder-os/platform's tables.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/seccorrelate-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("SECCORRELATE_DATABASE_URL")
+}
+
+enum LogSource {
+  firewall
+  edr
+  iam
+  app
+  dns
+
+  @@map("log_source")
+}
+
+enum LogSeverity {
+  info
+  low
+  medium
+  high
+  critical
+
+  @@map("log_severity")
+}
+
+model LogEvent {
+  id             String      @id @default(uuid())
+  organizationId String      @map("organization_id")
+  source         LogSource
+  eventType      String      @map("event_type")
+  severity       LogSeverity @default(info)
+  sourceIp       String?     @map("source_ip")
+  actorId        String?     @map("actor_id")
+  payload        Json        @default("{}")
+  occurredAt     DateTime    @map("occurred_at")
+  createdAt      DateTime    @default(now()) @map("created_at")
+
+  firstEventAlerts  Alert[] @relation("FirstLogEvent")
+  secondEventAlerts Alert[] @relation("SecondLogEvent")
+
+  @@index([organizationId, occurredAt])
+  @@index([organizationId, eventType])
+  @@index([organizationId, sourceIp])
+  @@map("log_events")
+}
+
+model CorrelationRule {
+  id                String   @id @default(uuid())
+  organizationId    String   @map("organization_id")
+  name              String
+  description       String?
+  firstEventType    String   @map("first_event_type")
+  secondEventType   String   @map("second_event_type")
+  correlationField  String   @default("sourceIp") @map("correlation_field")
+  windowMinutes     Int      @map("window_minutes")
+  severity          LogSeverity @default(medium)
+  isActive          Boolean  @default(true) @map("is_active")
+  createdByUserId   String   @map("created_by_user_id")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  alerts Alert[]
+
+  @@index([organizationId, isActive])
+  @@map("correlation_rules")
+}
+
+enum AlertStatus {
+  open
+  investigating
+  resolved
+  dismissed
+
+  @@map("alert_status")
+}
+
+model Alert {
+  id               String      @id @default(uuid())
+  organizationId   String      @map("organization_id")
+  ruleId           String?     @map("rule_id")
+  title            String
+  severity         LogSeverity @default(medium)
+  status           AlertStatus @default(open)
+  correlationKey   String?     @map("correlation_key")
+  firstLogEventId  String      @map("first_log_event_id")
+  secondLogEventId String      @map("second_log_event_id")
+  mitreTechniqueIds String[]   @map("mitre_technique_ids")
+  detectedAt       DateTime    @default(now()) @map("detected_at")
+  resolvedAt       DateTime?   @map("resolved_at")
+
+  rule            CorrelationRule? @relation(fields: [ruleId], references: [id], onDelete: SetNull)
+  firstLogEvent   LogEvent         @relation("FirstLogEvent", fields: [firstLogEventId], references: [id], onDelete: Cascade)
+  secondLogEvent  LogEvent         @relation("SecondLogEvent", fields: [secondLogEventId], references: [id], onDelete: Cascade)
+  incidentSummary IncidentSummary?
+
+  @@index([organizationId, status])
+  @@index([organizationId, detectedAt])
+  @@map("alerts")
+}
+
+model IncidentSummary {
+  id                 String   @id @default(uuid())
+  organizationId     String   @map("organization_id")
+  alertId            String   @unique(map: "uq_incident_summaries_alert_id") @map("alert_id")
+  summary            String
+  rootCause          String   @map("root_cause")
+  recommendedActions String[] @map("recommended_actions")
+  mitreTechniqueIds  String[] @map("mitre_technique_ids")
+  generatedAt        DateTime @default(now()) @map("generated_at")
+
+  alert Alert @relation(fields: [alertId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("incident_summaries")
+}
