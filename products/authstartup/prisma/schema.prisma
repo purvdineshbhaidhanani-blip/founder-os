@@ -1,0 +1,163 @@
+// AuthStartup product-specific schema. See products/spendgov/prisma/schema.prisma
+// for the documented rationale on why organizationId/userId columns here
+// are plain indexed strings rather than Prisma relations, and why this
+// schema lives in its own Postgres namespace alongside
+// @founder-os/platform's tables.
+//
+// AuthStartup is architecturally different from the other 11 products:
+// @founder-os/platform's auth/org tables (in the "public" schema) model
+// AuthStartup's OWN developer-facing accounts (the people who sign up to
+// AuthStartup to manage Projects). The models below are a SECOND,
+// project-scoped identity layer — the end users of the apps AuthStartup's
+// customers are building — deliberately kept separate so one customer's
+// end-user pool never touches another's, per products/authstartup/docs/
+// PRODUCT_IDENTITY.md's "project-scoped identity layer" architecture note.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/authstartup-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("AUTHSTARTUP_DATABASE_URL")
+}
+
+enum ProjectEnvironment {
+  development
+  production
+
+  @@map("project_environment")
+}
+
+model Project {
+  id                String             @id @default(uuid())
+  organizationId    String             @map("organization_id")
+  name              String
+  environment       ProjectEnvironment @default(development)
+  requireMfa        Boolean            @default(false) @map("require_mfa")
+  sessionTtlMinutes Int                @default(10080) @map("session_ttl_minutes")
+  createdByUserId   String             @map("created_by_user_id")
+  createdAt         DateTime           @default(now()) @map("created_at")
+  updatedAt         DateTime           @updatedAt @map("updated_at")
+
+  apiKeys              ApiKey[]
+  endUsers             EndUser[]
+  loginEvents          LoginEvent[]
+  securityFindings     SecurityFinding[]
+
+  @@unique([organizationId, name], map: "uq_projects_org_name")
+  @@index([organizationId])
+  @@map("projects")
+}
+
+model ApiKey {
+  id         String    @id @default(uuid())
+  projectId  String    @map("project_id")
+  name       String
+  keyPrefix  String    @map("key_prefix")
+  keyHash    String    @unique(map: "uq_api_keys_key_hash") @map("key_hash")
+  lastUsedAt DateTime? @map("last_used_at")
+  createdAt  DateTime  @default(now()) @map("created_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+  @@map("api_keys")
+}
+
+model EndUser {
+  id           String   @id @default(uuid())
+  projectId    String   @map("project_id")
+  email        String
+  passwordHash String   @map("password_hash")
+  mfaEnabled   Boolean  @default(false) @map("mfa_enabled")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  project     Project           @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sessions    EndUserSession[]
+  loginEvents LoginEvent[]
+
+  @@unique([projectId, email], map: "uq_end_users_project_email")
+  @@index([projectId])
+  @@map("end_users")
+}
+
+model EndUserSession {
+  id        String    @id @default(uuid())
+  projectId String    @map("project_id")
+  endUserId String    @map("end_user_id")
+  tokenHash String    @unique(map: "uq_end_user_sessions_token_hash") @map("token_hash")
+  createdAt DateTime  @default(now()) @map("created_at")
+  expiresAt DateTime  @map("expires_at")
+  revokedAt DateTime? @map("revoked_at")
+
+  endUser EndUser @relation(fields: [endUserId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, endUserId])
+  @@map("end_user_sessions")
+}
+
+model LoginEvent {
+  id         String   @id @default(uuid())
+  projectId  String   @map("project_id")
+  endUserId  String   @map("end_user_id")
+  success    Boolean
+  occurredAt DateTime @default(now()) @map("occurred_at")
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  endUser EndUser @relation(fields: [endUserId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, endUserId, occurredAt])
+  @@map("login_events")
+}
+
+enum FindingSeverity {
+  low
+  medium
+  high
+
+  @@map("finding_severity")
+}
+
+enum FindingStatus {
+  open
+  resolved
+  dismissed
+
+  @@map("finding_status")
+}
+
+model SecurityFinding {
+  id          String          @id @default(uuid())
+  organizationId String       @map("organization_id")
+  projectId   String          @map("project_id")
+  ruleId      String          @map("rule_id")
+  severity    FindingSeverity
+  title       String
+  description String
+  status      FindingStatus   @default(open)
+  createdAt   DateTime        @default(now()) @map("created_at")
+
+  project        Project              @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  recommendation SecurityRecommendation?
+
+  @@index([organizationId, status])
+  @@index([projectId])
+  @@map("security_findings")
+}
+
+model SecurityRecommendation {
+  id                String   @id @default(uuid())
+  organizationId    String   @map("organization_id")
+  findingId         String   @unique(map: "uq_security_recommendations_finding_id") @map("finding_id")
+  explanation       String
+  recommendedAction String   @map("recommended_action")
+  generatedAt       DateTime @default(now()) @map("generated_at")
+
+  finding SecurityFinding @relation(fields: [findingId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("security_recommendations")
+}
