@@ -71,18 +71,63 @@ async function ensureSharedBuilt(dir) {
   }
 }
 
-// Directories that don't belong in a runtime snapshot of a shared package
-// (source-control metadata, its own dependency tree, tests).
+// Directories that don't belong in a runtime snapshot of a shared package's
+// OWN source tree (source-control metadata, tests). Deliberately NOT applied
+// when copying a node_modules tree itself (see copyDirRaw below) — npm
+// legitimately nests a *second* node_modules folder inside a dependency to
+// resolve version conflicts (e.g. archiver-utils/node_modules/readable-stream
+// alongside a different top-level readable-stream), and a package name can
+// coincidentally collide with any of these words. Applying this skip-list
+// recursively inside node_modules would silently delete those legitimate
+// nested dependency trees and break module resolution for anything that
+// depends on the nested version — which is exactly what happened during
+// testing (a nested lazystream/node_modules/readable-stream was being
+// stripped out, breaking exceljs's Excel export). This list is therefore
+// only for the shared package's own dist/src/package.json/etc., which we
+// author ourselves and know doesn't contain nested folders with these names.
 const SHARED_COPY_SKIP = new Set(["node_modules", "tests", ".git", "coverage"]);
 
+// Copies symlinks as symlinks (e.g. node_modules/.bin/* CLI shims, or a
+// nested dependency's own symlinked sub-dependency) rather than silently
+// dropping them — fs.Dirent.isDirectory()/isFile() are both false for a
+// symlink entry, so without this branch a recursive copy would quietly skip
+// every symlink it encounters. Falls back to skipping (with a warning) only
+// if creating the symlink itself fails, e.g. no symlink privilege.
+function copyEntry(src, dest, entry, recurse) {
+  if (entry.isSymbolicLink()) {
+    try {
+      fs.symlinkSync(fs.readlinkSync(src), dest);
+    } catch (err) {
+      log(`    (skipping symlink ${path.basename(src)}: ${err.message})`);
+    }
+    return;
+  }
+  if (entry.isDirectory()) {
+    recurse(src, dest);
+  } else if (entry.isFile()) {
+    fs.copyFileSync(src, dest);
+  }
+}
+
+// Copies a shared package's own source tree, skipping SHARED_COPY_SKIP
+// entries — safe to apply at every nesting level only because we author
+// this tree ourselves (dist/src/package.json/etc.) and control its shape.
 function copyDirFiltered(src, dest) {
   fs.mkdirSync(dest, { recursive: true });
   for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
     if (SHARED_COPY_SKIP.has(entry.name)) continue;
-    const s = path.join(src, entry.name);
-    const d = path.join(dest, entry.name);
-    if (entry.isDirectory()) copyDirFiltered(s, d);
-    else if (entry.isFile()) fs.copyFileSync(s, d);
+    copyEntry(path.join(src, entry.name), path.join(dest, entry.name), entry, copyDirFiltered);
+  }
+}
+
+// Copies a node_modules tree verbatim — no name-based filtering at any
+// depth, since third-party packages can legitimately have subfolders named
+// "tests", nested "node_modules", etc. that must be preserved exactly as
+// npm laid them out for module resolution to work.
+function copyDirRaw(src, dest) {
+  fs.mkdirSync(dest, { recursive: true });
+  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+    copyEntry(path.join(src, entry.name), path.join(dest, entry.name), entry, copyDirRaw);
   }
 }
 
@@ -102,6 +147,22 @@ function copyDirFiltered(src, dest) {
 // refresh the copy on every bootstrap run so it can never go stale; when npm
 // did symlink, this is a single cheap lstat that no-ops.
 //
+// The copy must also include shared/platform's and shared/ui's OWN
+// node_modules (@anthropic-ai/sdk, openai, otplib, clsx, recharts, ...) —
+// their compiled dist/ code imports those packages directly, and Node's
+// module resolution only finds them "for free" by walking up from the
+// package's *real* location, which only works when @founder-os/<pkg> is a
+// symlink. A real copy with no node_modules of its own fails to resolve
+// them with "Module not found", exactly like the missing dist/theme case
+// above, except it only surfaces during a full `next build` rather than
+// `next dev`. Unlike dist/ (cheap to refresh every run), a shared package's
+// own dependency tree can be hundreds of MB — so it's copied in full only
+// the first time (when the destination has no node_modules yet); every
+// later refresh reuses the already-copied one via a rename instead of
+// re-copying it. Deleting a product's node_modules/@founder-os/<pkg>
+// entirely forces a full fresh copy again, e.g. after shared/platform's or
+// shared/ui's own dependencies change.
+//
 // Builds into a temp sibling directory first and only removes/replaces the
 // real destination once that full copy has succeeded — never delete-then-
 // copy. Deleting first and copying second means any failure partway through
@@ -119,10 +180,21 @@ function syncSharedPackage(sharedDir, pkgName, productDir) {
   }
   if (isSymlink) return;
 
+  const destNodeModules = path.join(dest, "node_modules");
+  const hasOwnDeps = fs.existsSync(destNodeModules);
+
   log(`  refreshing copied dependency @founder-os/${pkgName} in ${path.relative(REPO_ROOT, productDir)}`);
   const tmp = `${dest}.bootstrap-tmp-${process.pid}`;
   fs.rmSync(tmp, { recursive: true, force: true });
   copyDirFiltered(sharedDir, tmp);
+
+  if (hasOwnDeps) {
+    fs.renameSync(destNodeModules, path.join(tmp, "node_modules"));
+  } else {
+    log(`  copying ${pkgName}'s own dependencies into ${path.relative(REPO_ROOT, productDir)} (first time only — this can take a minute)`);
+    copyDirRaw(path.join(sharedDir, "node_modules"), path.join(tmp, "node_modules"));
+  }
+
   fs.rmSync(dest, { recursive: true, force: true });
   fs.renameSync(tmp, dest);
 }

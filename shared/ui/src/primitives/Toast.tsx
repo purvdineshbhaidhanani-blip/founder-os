@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "../utils/cn.js";
 
@@ -29,6 +29,20 @@ const AUTO_DISMISS_MS = 5000;
  */
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
+  // `typeof document !== "undefined"` is true on the client's very first
+  // render pass too (the one React reconciles against the server-rendered
+  // HTML during hydration), not just after mount, so gating the portal on it
+  // directly rendered a toast-region <div> into <body> on that first client
+  // render while the server had rendered nothing there — a hydration
+  // mismatch on every page. `mounted` starts false on both server and the
+  // client's first render, and only flips true inside useEffect, which runs
+  // strictly after hydration completes, so the portal is a safe post-
+  // hydration DOM update instead of a mismatch.
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const show = useCallback((toast: Omit<ToastItem, "id">) => {
     const id = crypto.randomUUID();
@@ -41,7 +55,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={{ show }}>
       {children}
-      {typeof document !== "undefined" &&
+      {mounted &&
         createPortal(
           <div className="fos-toast-region">
             {toasts.map((toast) => (

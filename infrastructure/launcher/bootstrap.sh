@@ -89,17 +89,38 @@ ensure_shared_built() {
 # Windows with Developer Mode / symlink privilege enabled) - in that case a
 # product always resolves straight through to the live, freshly-built shared
 # package, and ensure_shared_built above is all that's needed. Without that
-# privilege - the common case on a stock Windows machine - npm silently falls
-# back to COPYING the shared package into the product's node_modules at
-# install time instead of linking it. That copy is a one-time snapshot: it
-# never updates again, even after ensure_shared_built later rebuilds dist/,
-# or after any shared/platform or shared/ui source change. A copy taken
-# before dist/ existed (or before a later change) is exactly what produces
-# "Module not found: Can't resolve '@founder-os/ui/theme'" (or any other
-# subpath export) while the real, current dist/theme sits right there in
-# shared/ui, untouched. Detect the non-symlink case and refresh the copy on
-# every bootstrap run so it can never go stale; when npm did symlink, this is
-# a single cheap -L test that no-ops.
+# privilege - the common case on a stock Windows machine, and possible under
+# WSL/Git Bash too - npm silently falls back to COPYING the shared package
+# into the product's node_modules at install time instead of linking it.
+# That copy is a one-time snapshot: it never updates again, even after
+# ensure_shared_built later rebuilds dist/, or after any shared/platform or
+# shared/ui source change. A copy taken before dist/ existed (or before a
+# later change) is exactly what produces "Module not found: Can't resolve
+# '@founder-os/ui/theme'" (or any other subpath export) while the real,
+# current dist/theme sits right there in shared/ui, untouched. Detect the
+# non-symlink case and refresh the copy on every bootstrap run so it can
+# never go stale; when npm did symlink, this is a single cheap -L test that
+# no-ops.
+#
+# The copy must also include shared/platform's and shared/ui's OWN
+# node_modules (@anthropic-ai/sdk, openai, otplib, clsx, recharts, ...) -
+# their compiled dist/ code imports those packages directly, and Node's
+# module resolution only finds them "for free" by walking up from the
+# package's *real* location, which only works when @founder-os/<pkg> is a
+# symlink. A real copy with no node_modules of its own fails to resolve them
+# with "Module not found", exactly like the missing dist/theme case above,
+# except it only surfaces during a full `next build` rather than `next dev`.
+# Unlike dist/ (cheap to refresh every run), a shared package's own
+# dependency tree can be hundreds of MB - so it's copied in full only the
+# first time (when the destination has no node_modules yet); every later
+# refresh reuses the already-copied one via `mv` instead of re-copying it.
+# Deleting a product's node_modules/@founder-os/<pkg> entirely forces a full
+# fresh copy again, e.g. after shared/platform's or shared/ui's own
+# dependencies change. The node_modules copy uses plain `cp -r` with no
+# name-based filtering (unlike the dist/src copy below), since third-party
+# packages can legitimately nest a second node_modules inside themselves to
+# resolve version conflicts (e.g. archiver-utils/node_modules/readable-stream)
+# and filtering by name would silently strip those out, breaking resolution.
 #
 # Builds into a temp sibling directory first and only removes/replaces the
 # real destination once that full copy has succeeded - never delete-then-
@@ -118,8 +139,16 @@ sync_shared_package() {
   echo "  refreshing copied dependency @founder-os/$pkg_name in $product_dir"
   rm -rf "$tmp"
   mkdir -p "$tmp"
+  # Copy the package's own source tree (dist/src/package.json/etc.), never its
+  # own node_modules - that's handled separately below.
   cp -r "$shared_dir"/. "$tmp"/
   rm -rf "$tmp/node_modules" "$tmp/tests" "$tmp/.git" "$tmp/coverage"
+  if [ -d "$dest/node_modules" ]; then
+    mv "$dest/node_modules" "$tmp/node_modules"
+  else
+    echo "  copying $pkg_name's own dependencies into $product_dir (first time only — this can take a minute)"
+    cp -r "$shared_dir/node_modules" "$tmp/node_modules"
+  fi
   rm -rf "$dest"
   mv "$tmp" "$dest"
 }
