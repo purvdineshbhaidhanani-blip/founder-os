@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Founder OS — Portfolio Launcher</title>
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --card-bg: #ffffff;
+    --border: #e2e5ea;
+    --text: #14181f;
+    --muted: #5b6472;
+    --accent: #0ea5e9;
+    --success: #16a34a;
+    --danger: #dc2626;
+    --radius: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0f14;
+      --card-bg: #131a22;
+      --border: #232c37;
+      --text: #e6edf3;
+      --muted: #93a1b0;
+      --accent: #38bdf8;
+      --success: #4ade80;
+      --danger: #f87171;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+  }
+  header {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2.5rem 1.5rem 1rem;
+  }
+  header h1 { font-size: 1.75rem; margin: 0 0 0.4rem; }
+  header p { color: var(--muted); margin: 0; max-width: 700px; }
+  .summary {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1.25rem;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+  .summary strong { color: var(--text); }
+  main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem 4rem;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+  .card-header h2 { font-size: 1.05rem; margin: 0; }
+  .badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .badge.online { background: color-mix(in srgb, var(--success) 18%, transparent); color: var(--success); }
+  .badge.offline { background: color-mix(in srgb, var(--danger) 18%, transparent); color: var(--danger); }
+  .badge.checking { background: color-mix(in srgb, var(--muted) 18%, transparent); color: var(--muted); }
+  .desc { color: var(--muted); font-size: 0.88rem; line-height: 1.5; min-height: 3.6em; }
+  .git-health { font-size: 0.78rem; color: var(--muted); font-family: ui-monospace, monospace; }
+  .actions { display: flex; gap: 0.5rem; margin-top: 0.25rem; flex-wrap: wrap; }
+  .btn {
+    display: inline-block;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 0.45rem 0.8rem;
+    border-radius: 8px;
+    text-decoration: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    background: transparent;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn.primary:hover { opacity: 0.9; color: #fff; }
+  .port { font-family: ui-monospace, monospace; color: var(--muted); font-size: 0.8rem; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Founder OS — Portfolio Launcher</h1>
+  <p>All 12 SaaS products in this portfolio, their local status, and one click to open each. Start Postgres/Redis and the products you want, then refresh this page.</p>
+  <div class="summary" id="summary">Checking product status…</div>
+</header>
+<main>
+  <div class="grid" id="grid"></div>
+</main>
+
+<script>
+async function load() {
+  const grid = document.getElementById("grid");
+  const summary = document.getElementById("summary");
+
+  const products = await fetch("/api/products").then((r) => r.json());
+  grid.innerHTML = products
+    .map(
+      (p) => `
+    <div class="card" id="card-${p.id}">
+      <div class="card-header">
+        <h2>${p.name}</h2>
+        <span class="badge checking" id="badge-${p.id}">checking…</span>
+      </div>
+      <div class="desc">${p.description}</div>
+      <div class="port">localhost:${p.port}</div>
+      <div class="git-health" id="git-${p.id}">&nbsp;</div>
+      <div class="actions">
+        <a class="btn primary" href="http://localhost:${p.port}" target="_blank" rel="noopener">Open Product</a>
+        <a class="btn" href="/docs/${p.id}" target="_blank" rel="noopener">Documentation</a>
+      </div>
+    </div>`,
+    )
+    .join("");
+
+  const statuses = await fetch("/api/status").then((r) => r.json());
+  let onlineCount = 0;
+  for (const s of statuses) {
+    const badge = document.getElementById(`badge-${s.id}`);
+    if (s.online) {
+      onlineCount++;
+      badge.textContent = "online";
+      badge.className = "badge online";
+    } else {
+      badge.textContent = "offline";
+      badge.className = "badge offline";
+    }
+    const gitEl = document.getElementById(`git-${s.id}`);
+    gitEl.textContent = s.git ? `${s.git.hash} · ${s.git.message} · ${s.git.when}` : "no git history";
+  }
+  summary.innerHTML = `<span><strong>${onlineCount}</strong> / ${statuses.length} products online</span>`;
+}
+
+load().catch((err) => {
+  document.getElementById("summary").textContent = "Failed to load status: " + err.message;
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "name": "@founder-os/launcher",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Portfolio launcher — a single local dashboard listing all 12 Founder OS SaaS products, their live status, and one-command startup for the whole portfolio.",
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "portfolio:dev": "concurrently -n launcher,spendgov,seccorrelate,codeaudit,crmcapture,incidenttriage,authstartup,erpaudit,contactverify,characterconsistency,payrollaudit,transcriptionqa,schemalint -c \"#999,#0ea5e9,#0ea5e9,#0ea5e9,#0ea5e9,#0ea5e9,#0ea5e9,#0ea5e9,#0ea5e9,#0ea5e9,#0ea5e9,#0ea5e9,#0ea5e9\" --kill-others-on-fail=false \"npm start\" \"npm run dev --prefix ../../products/spendgov\" \"npm run dev --prefix ../../products/seccorrelate\" \"npm run dev --prefix ../../products/codeaudit\" \"npm run dev --prefix ../../products/crmcapture\" \"npm run dev --prefix ../../products/incidenttriage\" \"npm run dev --prefix ../../products/authstartup\" \"npm run dev --prefix ../../products/erpaudit\" \"npm run dev --prefix ../../products/contactverify\" \"npm run dev --prefix ../../products/characterconsistency\" \"npm run dev --prefix ../../products/payrollaudit\" \"npm run dev --prefix ../../products/transcriptionqa\" \"npm run dev --prefix ../../products/schemalint\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}
