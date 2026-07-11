@@ -100,17 +100,28 @@ ensure_shared_built() {
 # shared/ui, untouched. Detect the non-symlink case and refresh the copy on
 # every bootstrap run so it can never go stale; when npm did symlink, this is
 # a single cheap -L test that no-ops.
+#
+# Builds into a temp sibling directory first and only removes/replaces the
+# real destination once that full copy has succeeded - never delete-then-
+# copy. Deleting first and copying second means any failure partway through
+# (a locked file, a permission error, anything) leaves the destination
+# missing entirely, which is worse than the stale copy this function exists
+# to fix, and is indistinguishable from the dependency never having been
+# installed at all.
 sync_shared_package() {
   local shared_dir="$1" pkg_name="$2" product_dir="$3"
   local dest="$product_dir/node_modules/@founder-os/$pkg_name"
+  local tmp="${dest}.bootstrap-tmp-$$"
   if [ -L "$dest" ]; then
     return
   fi
   echo "  refreshing copied dependency @founder-os/$pkg_name in $product_dir"
+  rm -rf "$tmp"
+  mkdir -p "$tmp"
+  cp -r "$shared_dir"/. "$tmp"/
+  rm -rf "$tmp/node_modules" "$tmp/tests" "$tmp/.git" "$tmp/coverage"
   rm -rf "$dest"
-  mkdir -p "$dest"
-  cp -r "$shared_dir"/. "$dest"/
-  rm -rf "$dest/node_modules" "$dest/tests" "$dest/.git" "$dest/coverage"
+  mv "$tmp" "$dest"
 }
 
 echo
@@ -120,9 +131,28 @@ install_if_needed "$REPO_ROOT/shared/ui"
 ensure_shared_built "$REPO_ROOT/shared/platform"
 ensure_shared_built "$REPO_ROOT/shared/ui"
 
-for name in "${PRODUCTS[@]}"; do
-  echo
-  echo "############ $name ############"
+# Every product is independent - its dependencies, database, and migrations
+# don't interact with any other product's. A failure in ONE product's setup
+# (a transient npm/network error, a locked file, anything) must never
+# prevent the other 11 from being bootstrapped. `set -e` at the top of this
+# script would normally abort the WHOLE script the instant any command
+# anywhere fails - so each product's setup is wrapped in this function and
+# called as the tested command of an `if`, which is the standard bash idiom
+# for suspending errexit for exactly the duration of that call: a failure
+# inside bootstrap_product returns non-zero to the `if` below instead of
+# killing the script, and the loop moves on to the next product. Every run
+# always attempts all 12.
+# Runs entirely in its own subshell with errexit explicitly turned back on:
+# testing this function's exit status via `if bootstrap_product ...` (below)
+# suspends -e for the whole function body, which would otherwise let a failure
+# in, say, install_if_needed silently fall through to every later step instead
+# of stopping this product's setup and correctly reporting failure - the
+# subshell's own `set -e` restores fail-fast behavior *within* one product's
+# setup, while the outer `if` still isolates that failure from every other
+# product.
+bootstrap_product() (
+  set -e
+  name="$1"
   product_dir="$REPO_ROOT/products/$name"
   env_file="$product_dir/.env"
 
@@ -134,7 +164,6 @@ for name in "${PRODUCTS[@]}"; do
     echo "  writing $env_file"
     session_secret="$(node -e 'console.log(require("crypto").randomBytes(32).toString("hex"))')"
     encryption_key="$(node -e 'console.log(require("crypto").randomBytes(32).toString("hex"))')"
-    upper_name="$(echo "$name" | tr '[:lower:]' '[:upper:]')"
     sed \
       -e "s#^PLATFORM_SESSION_SECRET=.*#PLATFORM_SESSION_SECRET=${session_secret}#" \
       -e "s#^PLATFORM_ENCRYPTION_KEY=.*#PLATFORM_ENCRYPTION_KEY=${encryption_key}#" \
@@ -159,11 +188,30 @@ for name in "${PRODUCTS[@]}"; do
 
   echo "  seeding billing plans"
   (cd "$product_dir" && npm run prisma:seed >/dev/null 2>&1)
+)
 
-  echo "  done: $name"
+failed=()
+for name in "${PRODUCTS[@]}"; do
+  echo
+  echo "############ $name ############"
+  if bootstrap_product "$name"; then
+    echo "  done: $name"
+  else
+    failed+=("$name")
+    echo "  FAILED: $name"
+    echo "  (continuing with the remaining products; re-run bootstrap afterward to retry $name)"
+  fi
 done
 
 echo
 echo "== Bootstrap complete =="
-echo "All 12 databases exist, are migrated, and are seeded."
+if [ "${#failed[@]}" -eq 0 ]; then
+  echo "All ${#PRODUCTS[@]} databases exist, are migrated, and are seeded."
+else
+  echo "$((${#PRODUCTS[@]} - ${#failed[@]}))/${#PRODUCTS[@]} products bootstrapped successfully."
+  echo "Failed: ${failed[*]} — see the FAILED lines above for why. Re-run bootstrap to retry just those (already-successful products are skipped instantly)."
+fi
 echo "Next: cd infrastructure/launcher && npm install && npm run portfolio:dev"
+if [ "${#failed[@]}" -ne 0 ]; then
+  exit 1
+fi

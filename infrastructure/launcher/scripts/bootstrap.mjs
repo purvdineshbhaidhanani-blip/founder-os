@@ -101,6 +101,14 @@ function copyDirFiltered(src, dest) {
 // sits right there in shared/ui, untouched. Detect the non-symlink case and
 // refresh the copy on every bootstrap run so it can never go stale; when npm
 // did symlink, this is a single cheap lstat that no-ops.
+//
+// Builds into a temp sibling directory first and only removes/replaces the
+// real destination once that full copy has succeeded — never delete-then-
+// copy. Deleting first and copying second means any failure partway through
+// the copy (a locked file, a permission error, anything) leaves `dest`
+// missing entirely, which is worse than the stale copy this function exists
+// to fix in the first place, and is indistinguishable from the dependency
+// never having been installed at all.
 function syncSharedPackage(sharedDir, pkgName, productDir) {
   const dest = path.join(productDir, "node_modules", "@founder-os", pkgName);
   let isSymlink = false;
@@ -112,8 +120,11 @@ function syncSharedPackage(sharedDir, pkgName, productDir) {
   if (isSymlink) return;
 
   log(`  refreshing copied dependency @founder-os/${pkgName} in ${path.relative(REPO_ROOT, productDir)}`);
+  const tmp = `${dest}.bootstrap-tmp-${process.pid}`;
+  fs.rmSync(tmp, { recursive: true, force: true });
+  copyDirFiltered(sharedDir, tmp);
   fs.rmSync(dest, { recursive: true, force: true });
-  copyDirFiltered(sharedDir, dest);
+  fs.renameSync(tmp, dest);
 }
 
 async function checkServices() {
@@ -183,41 +194,60 @@ async function main() {
   await ensureSharedBuilt(sharedPlatformDir);
   await ensureSharedBuilt(sharedUiDir);
 
+  // Every product is independent — its dependencies, database, and
+  // migrations don't interact with any other product's. A failure in ONE
+  // product's setup (a transient npm/network error, a locked file, anything)
+  // must never prevent the other 11 from being bootstrapped: each product is
+  // isolated in its own try/catch so one failure can't silently skip
+  // everything after it in the loop. Every run always attempts all 12.
+  const failed = [];
   for (const { id: name } of PRODUCTS) {
     log(`\n############ ${name} ############`);
     const productDir = path.join(REPO_ROOT, "products", name);
 
-    await installIfNeeded(productDir, [NEXT_REQUIRE_HOOK]);
-    syncSharedPackage(sharedPlatformDir, "platform", productDir);
-    syncSharedPackage(sharedUiDir, "ui", productDir);
-    writeEnvIfMissing(productDir, name);
-    await ensureDatabase(name);
-
-    const dbUrl = `postgresql://${pg.user}:${pg.password}@${pg.host}:${pg.port}/${name}`;
-
-    log("  applying shared platform migrations (public schema)");
-    await run("npx", ["prisma", "migrate", "deploy"], {
-      cwd: path.join(REPO_ROOT, "shared", "platform"),
-      env: { PLATFORM_DATABASE_URL: dbUrl },
-      quiet: true,
-    });
-
-    log(`  applying ${name} migrations + generating Prisma client`);
-    await run("npx", ["prisma", "migrate", "deploy"], { cwd: productDir, quiet: true });
-    await run("npx", ["prisma", "generate"], { cwd: productDir, quiet: true });
-
-    log("  seeding billing plans");
     try {
-      await run("npm", ["run", "prisma:seed"], { cwd: productDir, quiet: true });
-    } catch {
-      log("  (seed skipped or already applied)");
-    }
+      await installIfNeeded(productDir, [NEXT_REQUIRE_HOOK]);
+      syncSharedPackage(sharedPlatformDir, "platform", productDir);
+      syncSharedPackage(sharedUiDir, "ui", productDir);
+      writeEnvIfMissing(productDir, name);
+      await ensureDatabase(name);
 
-    log(`  done: ${name}`);
+      const dbUrl = `postgresql://${pg.user}:${pg.password}@${pg.host}:${pg.port}/${name}`;
+
+      log("  applying shared platform migrations (public schema)");
+      await run("npx", ["prisma", "migrate", "deploy"], {
+        cwd: path.join(REPO_ROOT, "shared", "platform"),
+        env: { PLATFORM_DATABASE_URL: dbUrl },
+        quiet: true,
+      });
+
+      log(`  applying ${name} migrations + generating Prisma client`);
+      await run("npx", ["prisma", "migrate", "deploy"], { cwd: productDir, quiet: true });
+      await run("npx", ["prisma", "generate"], { cwd: productDir, quiet: true });
+
+      log("  seeding billing plans");
+      try {
+        await run("npm", ["run", "prisma:seed"], { cwd: productDir, quiet: true });
+      } catch {
+        log("  (seed skipped or already applied)");
+      }
+
+      log(`  done: ${name}`);
+    } catch (err) {
+      failed.push(name);
+      log(`  FAILED: ${name} — ${err.message}`);
+      log(`  (continuing with the remaining products; re-run bootstrap afterward to retry ${name})`);
+    }
   }
 
   log("\n== Bootstrap complete ==");
-  log(`All ${PRODUCTS.length} databases exist, are migrated, and are seeded.`);
+  if (failed.length === 0) {
+    log(`All ${PRODUCTS.length} databases exist, are migrated, and are seeded.`);
+  } else {
+    log(`${PRODUCTS.length - failed.length}/${PRODUCTS.length} products bootstrapped successfully.`);
+    log(`Failed: ${failed.join(", ")} — see the FAILED lines above for why. Re-run bootstrap to retry just those (already-successful products are skipped instantly).`);
+    process.exitCode = 1;
+  }
 }
 
 main().catch((err) => {
