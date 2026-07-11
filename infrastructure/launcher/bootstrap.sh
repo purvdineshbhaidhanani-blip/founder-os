@@ -38,11 +38,31 @@ redis-cli -u "$REDIS_URL" ping >/dev/null 2>&1 \
   || { echo "Cannot reach Redis at $REDIS_URL. Start it first."; exit 1; }
 echo "Postgres and Redis are up."
 
+# npm writes node_modules/.package-lock.json only once an `npm install` has
+# finished successfully, so its absence reliably means the install is missing
+# or incomplete (interrupted by Ctrl+C, a crashed process, a disk-full error,
+# etc.) — checking only for the node_modules directory is not enough, since a
+# broken partial install still leaves that directory behind and would
+# otherwise be silently treated as "already installed" forever.
 install_if_needed() {
   local dir="$1"
-  if [ ! -d "$dir/node_modules" ]; then
+  if [ ! -f "$dir/node_modules/.package-lock.json" ]; then
     echo "  installing dependencies in $dir"
     (cd "$dir" && npm install)
+  fi
+}
+
+# shared/platform and shared/ui are consumed by every product via a
+# file:../../shared/<name> dependency, which resolves to their built dist/
+# output. npm builds dist/ during EACH package's own `npm install` (via its
+# "prepare" script) but does not reliably re-run that when the package is
+# merely linked in as another project's local file: dependency, so dist/ can
+# be stale or missing even though node_modules looks fully installed.
+ensure_shared_built() {
+  local dir="$1"
+  if [ ! -d "$dir/dist" ]; then
+    echo "  building $dir (dist/ missing)"
+    (cd "$dir" && npm run build)
   fi
 }
 
@@ -50,6 +70,8 @@ echo
 echo "== Installing shared packages =="
 install_if_needed "$REPO_ROOT/shared/platform"
 install_if_needed "$REPO_ROOT/shared/ui"
+ensure_shared_built "$REPO_ROOT/shared/platform"
+ensure_shared_built "$REPO_ROOT/shared/ui"
 
 for name in "${PRODUCTS[@]}"; do
   echo

@@ -17,12 +17,35 @@ const pg = pgEnv();
 const pgBaseArgs = ["-h", pg.host, "-p", pg.port, "-U", pg.user];
 const pgRunEnv = { PGPASSWORD: pg.password };
 
-function installIfNeeded(dir) {
-  if (!fs.existsSync(path.join(dir, "node_modules"))) {
+// npm writes node_modules/.package-lock.json only once an `npm install` has
+// finished successfully, so its absence reliably means the install is
+// missing or incomplete (interrupted by Ctrl+C, a crashed process, antivirus
+// quarantine, a disk-full error, etc.) — checking only for the node_modules
+// directory itself is not enough, since a broken partial install still
+// leaves that directory behind and would otherwise be silently treated as
+// "already installed" forever, which is exactly what produces errors like
+// `'next' is not recognized as an internal or external command` on a later
+// `npm run dev`.
+async function installIfNeeded(dir) {
+  const marker = path.join(dir, "node_modules", ".package-lock.json");
+  if (!fs.existsSync(marker)) {
     log(`  installing dependencies in ${path.relative(REPO_ROOT, dir)}`);
-    return run("npm", ["install"], { cwd: dir });
+    await run("npm", ["install"], { cwd: dir });
   }
-  return Promise.resolve();
+}
+
+// shared/platform and shared/ui are consumed by every product via a
+// `file:../../shared/<name>` dependency, which resolves to their built
+// `dist/` output. npm runs each package's own "prepare" script (which builds
+// dist/) during ITS OWN `npm install`, but does not reliably re-run it when
+// the package is merely linked in as another project's local file:
+// dependency — so dist/ can be stale or missing even though node_modules
+// looks fully installed. Verify it separately and rebuild if absent.
+async function ensureSharedBuilt(dir) {
+  if (!fs.existsSync(path.join(dir, "dist"))) {
+    log(`  building ${path.relative(REPO_ROOT, dir)} (dist/ missing)`);
+    await run("npm", ["run", "build"], { cwd: dir, quiet: true });
+  }
 }
 
 async function checkServices() {
@@ -85,8 +108,12 @@ async function main() {
   await checkServices();
 
   log("== Installing shared packages ==");
-  await installIfNeeded(path.join(REPO_ROOT, "shared", "platform"));
-  await installIfNeeded(path.join(REPO_ROOT, "shared", "ui"));
+  const sharedPlatformDir = path.join(REPO_ROOT, "shared", "platform");
+  const sharedUiDir = path.join(REPO_ROOT, "shared", "ui");
+  await installIfNeeded(sharedPlatformDir);
+  await installIfNeeded(sharedUiDir);
+  await ensureSharedBuilt(sharedPlatformDir);
+  await ensureSharedBuilt(sharedUiDir);
 
   for (const { id: name } of PRODUCTS) {
     log(`\n############ ${name} ############`);
