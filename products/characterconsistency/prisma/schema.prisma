@@ -1,0 +1,79 @@
+// CharacterConsistency product-specific schema. See products/spendgov/prisma/schema.prisma
+// for the documented rationale on why organizationId/userId columns here
+// are plain indexed strings rather than Prisma relations, and why this
+// schema lives in its own Postgres namespace alongside
+// @founder-os/platform's tables.
+//
+// Phase 1 has no image-generation provider wired (that requires a
+// Phase 2 credential — Stability/DALL-E/Midjourney). This product's real
+// Phase 1 deliverable is the locked, reusable, consistency-checked
+// prompt specification a creator pastes into their image generator of
+// choice — not rendered pixels — per products/characterconsistency/docs/
+// PRODUCT_IDENTITY.md §7's "no external distribution integrations
+// required to run Phase 1" note.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/characterconsistency-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("CHARACTERCONSISTENCY_DATABASE_URL")
+}
+
+model Character {
+  id              String   @id @default(uuid())
+  organizationId  String   @map("organization_id")
+  name            String
+  description     String
+  faceDescription String   @map("face_description")
+  hairDescription String   @map("hair_description")
+  outfitDescription String @map("outfit_description")
+  artStyle        String   @map("art_style")
+  createdByUserId String   @map("created_by_user_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  dna         CharacterDNA?
+  generations GenerationRequest[]
+
+  @@unique([organizationId, name], map: "uq_characters_org_name")
+  @@index([organizationId])
+  @@map("characters")
+}
+
+model CharacterDNA {
+  id                    String   @id @default(uuid())
+  organizationId        String   @map("organization_id")
+  characterId           String   @unique(map: "uq_character_dna_character_id") @map("character_id")
+  detailedPromptTemplate String  @map("detailed_prompt_template")
+  negativePrompt        String   @map("negative_prompt")
+  lockedAttributes       Json    @map("locked_attributes")
+  distinguishingFeatures String[] @map("distinguishing_features")
+  generatedAt            DateTime @default(now()) @map("generated_at")
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@map("character_dna")
+}
+
+model GenerationRequest {
+  id                String   @id @default(uuid())
+  organizationId    String   @map("organization_id")
+  characterId       String   @map("character_id")
+  requestedByUserId String   @map("requested_by_user_id")
+  poseDescription   String   @map("pose_description")
+  sceneDescription  String?  @map("scene_description")
+  assembledPrompt   String   @map("assembled_prompt")
+  consistencyScore  Int      @map("consistency_score")
+  driftWarnings     String[] @map("drift_warnings")
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, characterId])
+  @@index([organizationId, createdAt])
+  @@map("generation_requests")
+}
