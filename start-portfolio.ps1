@@ -1,4 +1,4 @@
-# Founder OS — one-command portfolio startup for Windows (PowerShell).
+# Founder OS - one-command portfolio startup for Windows (PowerShell).
 #
 #   Right-click > Run with PowerShell, or:  ./start-portfolio.ps1
 #   For a lighter, much more stable run (recommended if dev mode struggles
@@ -52,13 +52,13 @@ Write-Host ("Node {0} detected." -f (node --version))
 if (Test-Port 5432) {
   Write-Host "PostgreSQL already running on 5432."
 } else {
-  Write-Host "PostgreSQL not reachable on 5432 — attempting to start it…"
+  Write-Host "PostgreSQL not reachable on 5432 - attempting to start it..."
   $pgSvc = Get-Service -Name "postgresql*" -ErrorAction SilentlyContinue | Select-Object -First 1
   if ($pgSvc) {
-    Write-Host ("  starting Windows service {0}…" -f $pgSvc.Name)
+    Write-Host ("  starting Windows service {0}..." -f $pgSvc.Name)
     Start-Service $pgSvc.Name -ErrorAction SilentlyContinue
   } elseif (Get-Command docker -ErrorAction SilentlyContinue) {
-    Write-Host "  no Postgres service found — starting a Docker container (founderos-pg)…"
+    Write-Host "  no Postgres service found - starting a Docker container (founderos-pg)..."
     docker start founderos-pg 2>$null | Out-Null
     if (-not (Test-Port 5432)) {
       docker run -d --name founderos-pg -e POSTGRES_PASSWORD=postgres -p 5432:5432 postgres:16 | Out-Null
@@ -75,13 +75,13 @@ if (Test-Port 5432) {
 if (Test-Port 6379) {
   Write-Host "Redis already running on 6379."
 } else {
-  Write-Host "Redis not reachable on 6379 — attempting to start it…"
+  Write-Host "Redis not reachable on 6379 - attempting to start it..."
   $redisSvc = Get-Service -Name "Redis","Memurai" -ErrorAction SilentlyContinue | Select-Object -First 1
   if ($redisSvc) {
-    Write-Host ("  starting Windows service {0}…" -f $redisSvc.Name)
+    Write-Host ("  starting Windows service {0}..." -f $redisSvc.Name)
     Start-Service $redisSvc.Name -ErrorAction SilentlyContinue
   } elseif (Get-Command docker -ErrorAction SilentlyContinue) {
-    Write-Host "  no Redis service found — starting a Docker container (founderos-redis)…"
+    Write-Host "  no Redis service found - starting a Docker container (founderos-redis)..."
     docker start founderos-redis 2>$null | Out-Null
     if (-not (Test-Port 6379)) {
       docker run -d --name founderos-redis -p 6379:6379 redis:7 | Out-Null
@@ -97,11 +97,11 @@ if (Test-Port 6379) {
 # 4. Launcher deps + orchestrator (bootstrap + start + wait + open browser)
 Set-Location -Path (Join-Path $PSScriptRoot "infrastructure\launcher")
 if (-not (Test-Path "node_modules")) {
-  Write-Host "Installing launcher dependencies…"
+  Write-Host "Installing launcher dependencies..."
   npm install
 }
 
-Write-Host "Handing off to the cross-platform orchestrator…" -ForegroundColor Cyan
+Write-Host "Handing off to the cross-platform orchestrator..." -ForegroundColor Cyan
 if ($Production) {
   node scripts/start-portfolio.mjs --production
 } else {
