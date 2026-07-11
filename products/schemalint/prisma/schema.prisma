@@ -1,0 +1,115 @@
+// SchemaLint product-specific schema. See products/spendgov/prisma/schema.prisma
+// for the documented rationale on why organizationId/userId columns here
+// are plain indexed strings rather than Prisma relations, and why this
+// schema lives in its own Postgres namespace alongside
+// @founder-os/platform's tables.
+//
+// Phase 1 is read-only schema introspection/import only — no live
+// database write access. Callers submit a schema snapshot (tables,
+// columns, foreign keys, indexes) as exported/introspected from their
+// own database rather than granting SchemaLint a live connection; a
+// live-connector integration is built and wired but disabled until
+// Phase 2 credentials, per products/schemalint/docs/PRODUCT_IDENTITY.md
+// §7's "No live database write access required in Phase 1."
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/schemalint-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("SCHEMALINT_DATABASE_URL")
+}
+
+model DatabaseSchema {
+  id              String   @id @default(uuid())
+  organizationId  String   @map("organization_id")
+  createdByUserId String   @map("created_by_user_id")
+  name            String
+  engine          String
+  healthScore     Int      @default(100) @map("health_score")
+  summary         String?
+  copilotRiskLevel      String?   @map("copilot_risk_level")
+  copilotRecommendations String[] @map("copilot_recommendations")
+  copilotGeneratedAt   DateTime? @map("copilot_generated_at")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  tables   SchemaTable[]
+  findings Finding[]
+
+  @@unique([organizationId, name], map: "uq_database_schemas_org_name")
+  @@index([organizationId])
+  @@map("database_schemas")
+}
+
+model SchemaTable {
+  id             String  @id @default(uuid())
+  organizationId String  @map("organization_id")
+  schemaId       String  @map("schema_id")
+  name           String
+  hasPrimaryKey  Boolean @default(true) @map("has_primary_key")
+
+  schema  DatabaseSchema  @relation(fields: [schemaId], references: [id], onDelete: Cascade)
+  columns SchemaColumn[]
+  indexes SchemaIndex[]
+  findings Finding[]
+
+  @@unique([schemaId, name], map: "uq_schema_tables_schema_name")
+  @@index([organizationId])
+  @@map("schema_tables")
+}
+
+model SchemaColumn {
+  id               String  @id @default(uuid())
+  organizationId   String  @map("organization_id")
+  tableId          String  @map("table_id")
+  name             String
+  dataType         String  @map("data_type")
+  isNullable       Boolean @default(true) @map("is_nullable")
+  referencesTable  String? @map("references_table")
+  referencesColumn String? @map("references_column")
+
+  table SchemaTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
+
+  @@unique([tableId, name], map: "uq_schema_columns_table_name")
+  @@index([organizationId])
+  @@map("schema_columns")
+}
+
+model SchemaIndex {
+  id             String   @id @default(uuid())
+  organizationId String   @map("organization_id")
+  tableId        String   @map("table_id")
+  name           String
+  columnNames    String[] @map("column_names")
+  isUnique       Boolean  @default(false) @map("is_unique")
+
+  table SchemaTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, tableId])
+  @@map("schema_indexes")
+}
+
+model Finding {
+  id             String    @id @default(uuid())
+  organizationId String    @map("organization_id")
+  schemaId       String    @map("schema_id")
+  tableId        String    @map("table_id")
+  ruleId         String    @map("rule_id")
+  category       String
+  severity       String
+  title          String
+  description    String
+  status         String    @default("open")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  resolvedAt     DateTime? @map("resolved_at")
+
+  schema DatabaseSchema @relation(fields: [schemaId], references: [id], onDelete: Cascade)
+  table  SchemaTable    @relation(fields: [tableId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, schemaId])
+  @@index([organizationId, status])
+  @@map("findings")
+}
