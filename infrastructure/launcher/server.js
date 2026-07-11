@@ -1,4 +1,5 @@
 import http from "node:http";
+import net from "node:net";
 import { readFileSync, existsSync } from "node:fs";
 import { execFileSync } from "node:child_process";
 import path from "node:path";
@@ -41,16 +42,41 @@ function getGitHealth(productId) {
   }
 }
 
+// Is a server actually listening on this port? A plain TCP connect is the
+// reliable signal that the app is up and "Open Product" will work — it does
+// not depend on a route finishing its (sometimes multi-second) first-time
+// dev-mode compile, which is why a short HTTP timeout produced false OFFLINEs.
+function tcpListening(port, timeout = 2000) {
+  return new Promise((resolve) => {
+    const socket = new net.Socket();
+    const done = (ok) => {
+      socket.destroy();
+      resolve(ok);
+    };
+    socket.setTimeout(timeout);
+    socket.once("connect", () => done(true));
+    socket.once("timeout", () => done(false));
+    socket.once("error", () => done(false));
+    socket.connect(port, "127.0.0.1");
+  });
+}
+
+// A running Next.js server accepts the HTTP request immediately and only then
+// compiles the route, so we consider the product ONLINE as soon as the server
+// responds with headers (any status < 500) OR the port is accepting TCP
+// connections. Generous 4s timeout tolerates first-hit dev compilation.
 function checkPort(port) {
   return new Promise((resolve) => {
-    const req = http.get({ host: "127.0.0.1", port, path: "/", timeout: 900 }, (res) => {
-      resolve(res.statusCode !== undefined && res.statusCode < 500);
+    const req = http.get({ host: "127.0.0.1", port, path: "/", timeout: 4000 }, (res) => {
       res.resume();
+      resolve(res.statusCode !== undefined && res.statusCode < 500);
     });
     req.on("error", () => resolve(false));
     req.on("timeout", () => {
       req.destroy();
-      resolve(false);
+      // HTTP response was slow (compiling), but if the port is listening the
+      // server is up and openable — report ONLINE rather than a false OFFLINE.
+      tcpListening(port).then(resolve);
     });
   });
 }

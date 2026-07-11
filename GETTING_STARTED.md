@@ -98,6 +98,11 @@ redis-cli ping                                # should print "PONG"
 
 ## 4. One-time bootstrap (databases, env, migrations, seeds)
 
+> **This step runs automatically** as part of `start-portfolio.sh` /
+> `start-portfolio.cmd` in step 5 below — most people can skip straight
+> there. Run it manually only if you want to bootstrap without starting the
+> servers, or you're using the `portfolio:dev` alternative.
+
 From the repository root, run the bootstrap script. It is **idempotent** —
 safe to re-run any time.
 
@@ -134,8 +139,40 @@ When it finishes you'll see: `== Bootstrap complete ==`.
 
 ## 5. Start everything — one command
 
-Once the databases are bootstrapped (step 4) and Postgres + Redis are
-running (step 3):
+The true one-command path — no separate bootstrap step, no separate
+`npm install`, nothing to remember. It starts Postgres/Redis if they aren't
+already running, bootstraps every database, launches the launcher (3000) and
+all 12 products (3001–3012), waits until every one of the 13 servers is
+actually reachable, and opens **http://localhost:3000** in your browser.
+
+**Windows** — double-click, or from a terminal:
+```powershell
+start-portfolio.cmd
+```
+
+**macOS / Linux:**
+```bash
+./start-portfolio.sh
+```
+
+Leave the window open; press `Ctrl+C` (or run `stop-portfolio.sh` /
+`stop-portfolio.cmd`) to stop everything.
+
+If dev mode is slow or unstable on your machine — running 12 concurrent
+Next.js dev servers is CPU/RAM-heavy — add `--production` (macOS/Linux) or
+`-Production` (Windows: `start-portfolio.cmd --production`). It builds each
+product once, then serves the optimized build. Slower to first paint, far
+lighter once running, and every page loads instantly with no on-demand
+compilation:
+```bash
+./start-portfolio.sh --production
+```
+
+### Alternative: `portfolio:dev` (manual, dev mode only)
+
+If you've already run `bootstrap.sh` yourself and just want the raw
+`concurrently`-based dev-mode startup without the OS wrapper's
+Postgres/Redis auto-start or reachability wait:
 
 ```bash
 cd founder-os/infrastructure/launcher
@@ -143,20 +180,9 @@ npm install          # first time only — installs the launcher's one dev depen
 npm run portfolio:dev
 ```
 
-This starts **all 13 processes in one terminal** with labeled, color-coded
-logs:
-
-- the **launcher** on port **3000**
-- all **12 products** on ports **3001–3012**
-
-Press `Ctrl+C` once to stop all of them together.
-
-Then open **http://localhost:3000** — the launcher lists every product with
-its live status, a link to open it, and a link to its documentation.
-
 > First launch compiles each Next.js app on demand, so a product's first
 > page load takes a few seconds. Subsequent loads are instant. If you have
-> limited RAM, prefer the per-product approach below.
+> limited RAM, prefer `--production` above or the per-product approach below.
 
 ---
 
@@ -295,6 +321,15 @@ Every gate below was run and passed across the whole portfolio:
 - ✅ **bootstrap.sh** — validated end-to-end against all 12 products
 - ✅ **`portfolio:dev`** — confirmed launching all 13 processes on the
   correct ports
+- ✅ **`start-portfolio.sh`/`.cmd`/`.ps1`** — cross-platform one-command
+  startup (auto-starts Postgres/Redis, bootstraps, launches all 13, waits
+  for every server to answer HTTP, opens the browser); verified end-to-end
+  in both dev mode and `--production` mode, with all 13 URLs (3000–3012)
+  independently confirmed returning HTTP 200
+- ✅ **Launcher live-status detection** — uses a real HTTP/TCP probe per
+  product with a generous timeout, so a product that is up but still
+  compiling its first request is correctly reported ONLINE, not a false
+  OFFLINE
 
 ---
 
@@ -307,10 +342,14 @@ Every gate below was run and passed across the whole portfolio:
 - **Billing checkout/portal are disabled by default** (no Stripe keys) —
   also intentional. Plans are seeded; checkout requires `STRIPE_*` keys.
 - **First page load per product is slow** in dev mode (on-demand Next.js
-  compilation). Use `npm run build && npm start` for fast production-mode
-  serving, or just wait a few seconds on first load.
+  compilation). Use `--production` (section 5) or `npm run build && npm start`
+  per product for fast production-mode serving, or just wait a few seconds on
+  first load.
 - **Running all 13 dev servers at once is RAM-heavy.** On a constrained
-  machine, start only the products you need (section 6).
+  machine, use `./start-portfolio.sh --production` (section 5) — it builds
+  once and serves the optimized build, using dramatically less CPU/RAM than
+  12 concurrent dev compilers — or start only the products you need
+  (section 6).
 - **Phase 2 integrations** (live OAuth, live ERP/CRM/payroll/ASR
   connectors, image generation, Stripe, email delivery) are **built and
   wired but disabled** until credentials are provided — per each product's
