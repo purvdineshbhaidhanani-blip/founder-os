@@ -1,4 +1,24 @@
-# AI Founder OS — Agent Factory
+# Founder OS
+
+> **New here? Start with [`GETTING_STARTED.md`](GETTING_STARTED.md).**
+> That guide walks you from a fresh clone to all 12 SaaS products running
+> in your browser, with every command in order.
+>
+> The current project is a **portfolio of 12 production-quality SaaS
+> products** built on a shared platform. Its foundation is
+> [`MASTER_PROJECT_CONTEXT.md`](MASTER_PROJECT_CONTEXT.md); working rules
+> are in [`CLAUDE.md`](CLAUDE.md); products live under `products/`, the
+> shared platform under `shared/`, and the local launcher under
+> `infrastructure/launcher/`.
+>
+> **The rest of this README describes a previous, unrelated project (the
+> "Agent Factory") that predates the current portfolio and is retained for
+> reference only.** It does not describe how to run the SaaS portfolio —
+> use `GETTING_STARTED.md` for that.
+
+---
+
+## Legacy: AI Founder OS — Agent Factory
 
 The internal platform that designs, generates, validates, and registers every
 Claude Code agent used across AI Founder OS. This repository builds the
