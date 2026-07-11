@@ -1,0 +1,127 @@
+// PayrollAudit product-specific schema. See products/spendgov/prisma/schema.prisma
+// for the documented rationale on why organizationId/userId columns here
+// are plain indexed strings rather than Prisma relations, and why this
+// schema lives in its own Postgres namespace alongside
+// @founder-os/platform's tables.
+//
+// Phase 1 has no live payroll-system write access — validation is
+// import-based only (a payroll run's payslip lines are supplied by the
+// caller, mirroring an export from existing payroll software), per
+// products/payrollaudit/docs/PRODUCT_IDENTITY.md §7's "No live
+// payroll-system write access requested in Phase 1." Tax/compliance
+// validation uses a single, illustrative progressive tax-bracket table
+// (see lib/services/payroll-engine.ts) standing in for one
+// well-validated jurisdiction per §27; additional jurisdictions and a
+// live payroll-system connector are Phase 2.
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/payrollaudit-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("PAYROLLAUDIT_DATABASE_URL")
+}
+
+model Company {
+  id             String   @id @default(uuid())
+  organizationId String   @map("organization_id")
+  name           String
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  employees   Employee[]
+  payrollRuns PayrollRun[]
+
+  @@unique([organizationId, name], map: "uq_companies_org_name")
+  @@index([organizationId])
+  @@map("companies")
+}
+
+model Employee {
+  id                String   @id @default(uuid())
+  organizationId    String   @map("organization_id")
+  companyId         String   @map("company_id")
+  employeeCode      String   @map("employee_code")
+  fullName          String   @map("full_name")
+  payType           String   @map("pay_type")
+  hourlyRateCents   Int?     @map("hourly_rate_cents")
+  annualSalaryCents Int?     @map("annual_salary_cents")
+  payPeriodsPerYear Int      @default(26) @map("pay_periods_per_year")
+  active            Boolean  @default(true)
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  company      Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  payslipLines PayslipLine[]
+  findings     Finding[]
+
+  @@unique([companyId, employeeCode], map: "uq_employees_company_code")
+  @@index([organizationId])
+  @@map("employees")
+}
+
+model PayrollRun {
+  id                String    @id @default(uuid())
+  organizationId    String    @map("organization_id")
+  companyId         String    @map("company_id")
+  triggeredByUserId String    @map("triggered_by_user_id")
+  periodStart       DateTime  @map("period_start")
+  periodEnd         DateTime  @map("period_end")
+  status            String    @default("completed")
+  complianceScore   Int       @default(100) @map("compliance_score")
+  startedAt         DateTime  @default(now()) @map("started_at")
+  completedAt       DateTime? @map("completed_at")
+  copilotSummary         String?   @map("copilot_summary")
+  copilotRecommendedFixes String[] @map("copilot_recommended_fixes")
+  copilotRiskLevel       String?   @map("copilot_risk_level")
+  copilotGeneratedAt     DateTime? @map("copilot_generated_at")
+
+  company      Company       @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  payslipLines PayslipLine[]
+  findings     Finding[]
+
+  @@index([organizationId, companyId])
+  @@index([organizationId, startedAt])
+  @@map("payroll_runs")
+}
+
+model PayslipLine {
+  id                       String  @id @default(uuid())
+  organizationId           String  @map("organization_id")
+  payrollRunId             String  @map("payroll_run_id")
+  employeeId               String  @map("employee_id")
+  regularHours             Float   @map("regular_hours")
+  overtimeHours            Float   @default(0) @map("overtime_hours")
+  grossPayCents            Int     @map("gross_pay_cents")
+  taxWithheldCents         Int     @map("tax_withheld_cents")
+  netPayCents              Int     @map("net_pay_cents")
+  attendanceHoursReported  Float?  @map("attendance_hours_reported")
+
+  payrollRun PayrollRun @relation(fields: [payrollRunId], references: [id], onDelete: Cascade)
+  employee   Employee   @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, payrollRunId])
+  @@map("payslip_lines")
+}
+
+model Finding {
+  id             String    @id @default(uuid())
+  organizationId String    @map("organization_id")
+  payrollRunId   String    @map("payroll_run_id")
+  employeeId     String    @map("employee_id")
+  ruleId         String    @map("rule_id")
+  category       String
+  severity       String
+  title          String
+  description    String
+  status         String    @default("open")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  resolvedAt     DateTime? @map("resolved_at")
+
+  payrollRun PayrollRun @relation(fields: [payrollRunId], references: [id], onDelete: Cascade)
+  employee   Employee   @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, payrollRunId])
+  @@index([organizationId, status])
+  @@map("findings")
+}
