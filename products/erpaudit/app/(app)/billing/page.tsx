@@ -1,13 +1,67 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent, Button, useToast } from "@founder-os/ui/primitives";
+import { Button, useToast } from "@founder-os/ui/primitives";
+import { PricingGrid, type PricingPlan } from "@founder-os/ui/billing";
 
-const PLANS = [
-  { code: "free", name: "Free", price: "$0", features: ["1 ERP instance", "2 users", "5 scans/month", "AI summary"] },
-  { code: "starter", name: "Starter", price: "$49/mo", features: ["5 instances, 10 users", "Unlimited scans", "AI risk detection", "SoD & process checks"] },
-  { code: "pro", name: "Pro", price: "$149/mo", features: ["Unlimited instances & users", "AI Compliance Copilot + root cause", "Approval workflows & multi-company", "API access"] },
-  { code: "enterprise", name: "Enterprise", price: "Custom", features: ["Everything in Pro", "SSO & SCIM", "Custom ERP connectors", "Dedicated support & SLA"] },
+const PLANS: PricingPlan[] = [
+  {
+    code: "free",
+    name: "Free",
+    price: "$0",
+    features: ["1 ERP instance", "2 users", "5 configuration scans/month", "7 days of history"],
+    isCheckoutable: false,
+  },
+  {
+    code: "starter",
+    name: "Starter",
+    price: "$49/mo",
+    features: [
+      "5 ERP instances, 10 users",
+      "100 configuration scans/month",
+      "AI ERP Auditor (10 AI credits/mo)",
+      "AI risk detection",
+      "SoD & process checks",
+      "90 days of history",
+    ],
+    isCheckoutable: true,
+  },
+  {
+    code: "pro",
+    name: "Pro",
+    price: "$149/mo",
+    features: [
+      "25 ERP instances, 50 users",
+      "500 configuration scans/month",
+      "AI ERP Auditor (80 AI credits/mo)",
+      "Approval workflows & multi-company",
+      "API access",
+      "2 years of history",
+    ],
+    isCheckoutable: true,
+    highlighted: true,
+  },
+  {
+    code: "business",
+    name: "Business",
+    price: "$349/mo",
+    features: [
+      "100 ERP instances, 200 users",
+      "2,000 configuration scans/month",
+      "AI ERP Auditor (240 AI credits/mo)",
+      "Approval workflows & multi-company",
+      "API access",
+      "5 years of history",
+    ],
+    isCheckoutable: true,
+  },
+  {
+    code: "enterprise",
+    name: "Enterprise",
+    price: "Custom",
+    features: ["Everything in Business", "SSO & SCIM", "Unlimited AI credits (fair-use)", "Custom ERP connectors", "Dedicated support & SLA"],
+    isCheckoutable: false,
+  },
 ];
 
 export default function BillingPage() {
@@ -60,28 +114,7 @@ export default function BillingPage() {
         </Button>
       </div>
 
-      <div className="ea-plan-grid">
-        {PLANS.map((plan) => (
-          <Card key={plan.code}>
-            <CardHeader>
-              <CardTitle>{plan.name}</CardTitle>
-              <p className="ea-plan-price">{plan.price}</p>
-            </CardHeader>
-            <CardContent>
-              <ul className="ea-plan-features">
-                {plan.features.map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
-              </ul>
-              {(plan.code === "starter" || plan.code === "pro") && (
-                <Button onClick={() => startCheckout(plan.code)} isLoading={loadingPlan === plan.code}>
-                  Upgrade to {plan.name}
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <PricingGrid plans={PLANS} onSelect={startCheckout} loadingPlanCode={loadingPlan} />
     </div>
   );
 }

@@ -1,13 +1,64 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent, Button, useToast } from "@founder-os/ui/primitives";
+import { Button, useToast } from "@founder-os/ui/primitives";
+import { PricingGrid, type PricingPlan } from "@founder-os/ui/billing";
 
-const PLANS = [
-  { code: "free", name: "Free (No Card)", price: "$0", features: ["1 developer", "1 private + 3 public repos", "500 files / 20 PR scans monthly", "OWASP Top 10 detection"] },
-  { code: "starter", name: "Starter", price: "$19/dev/mo", features: ["10 private repos, unlimited public", "5,000 files / 300 PR scans monthly", "CI/CD integration", "AI explanations"] },
-  { code: "pro", name: "Pro", price: "$49/dev/mo", features: ["Unlimited repos, files, and scans", "AI Fix Engine", "Secret, dependency & container scanning", "Custom rules & team dashboard", "API access"] },
-  { code: "enterprise", name: "Enterprise", price: "Custom", features: ["Everything in Pro", "SSO & SCIM", "Compliance rule packs", "Private deployment", "Dedicated support & SLA"] },
+const PLANS: PricingPlan[] = [
+  {
+    code: "free",
+    name: "Free (No Card)",
+    price: "$0",
+    features: ["1 developer", "1 private + 3 public repos", "500 files / 20 PR scans monthly", "OWASP Top 10 detection"],
+    isCheckoutable: false,
+  },
+  {
+    code: "starter",
+    name: "Starter",
+    price: "$19/dev/mo",
+    features: [
+      "10 private repos, 50 public repos",
+      "5,000 files / 300 PR scans monthly",
+      "CI/CD integration",
+      "AI explanations",
+      "AI Fix Engine — 25 AI credits/mo",
+    ],
+    isCheckoutable: true,
+  },
+  {
+    code: "pro",
+    name: "Pro",
+    price: "$49/dev/mo",
+    features: [
+      "50 private repos, 200 public repos",
+      "25,000 files / 1,500 PR scans monthly",
+      "AI Fix Engine — 150 AI credits/mo",
+      "Secret, dependency & container scanning",
+      "Custom rules & team dashboard",
+      "API access",
+    ],
+    isCheckoutable: true,
+    highlighted: true,
+  },
+  {
+    code: "business",
+    name: "Business",
+    price: "$89/dev/mo",
+    features: [
+      "200 private repos, 1,000 public repos",
+      "100,000 files / 6,000 PR scans monthly",
+      "AI Fix Engine — 320 AI credits/mo",
+      "Everything in Pro",
+    ],
+    isCheckoutable: true,
+  },
+  {
+    code: "enterprise",
+    name: "Enterprise",
+    price: "Custom",
+    features: ["Everything in Business", "Unlimited AI credits (fair use)", "SSO & SCIM", "Compliance rule packs", "Private deployment", "Dedicated support & SLA"],
+    isCheckoutable: false,
+  },
 ];
 
 export default function BillingPage() {
@@ -60,28 +111,7 @@ export default function BillingPage() {
         </Button>
       </div>
 
-      <div className="ca-plan-grid">
-        {PLANS.map((plan) => (
-          <Card key={plan.code}>
-            <CardHeader>
-              <CardTitle>{plan.name}</CardTitle>
-              <p className="ca-plan-price">{plan.price}</p>
-            </CardHeader>
-            <CardContent>
-              <ul className="ca-plan-features">
-                {plan.features.map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
-              </ul>
-              {(plan.code === "starter" || plan.code === "pro") && (
-                <Button onClick={() => startCheckout(plan.code)} isLoading={loadingPlan === plan.code}>
-                  Upgrade to {plan.name}
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <PricingGrid plans={PLANS} onSelect={startCheckout} loadingPlanCode={loadingPlan} />
     </div>
   );
 }

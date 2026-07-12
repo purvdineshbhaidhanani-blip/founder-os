@@ -6,7 +6,7 @@ import { requireOrganizationContext } from "../../../../lib/organization-context
 import { resolveStripePriceId } from "../../../../lib/services/stripe-price-map.js";
 
 const checkoutRequestSchema = z.object({
-  planCode: z.enum(["starter", "pro"]),
+  planCode: z.enum(["starter", "pro", "business"]),
 });
 
 export async function POST(request: Request) {

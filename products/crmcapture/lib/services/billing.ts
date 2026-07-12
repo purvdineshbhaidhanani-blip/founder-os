@@ -3,11 +3,14 @@ import { createSubscription as createBillingSubscription, getSubscriptionForOrga
 import { can, withinLimit } from "@founder-os/platform/billing";
 
 /**
- * Pricing tiers per products/crmcapture/docs/PRODUCT_IDENTITY.md §21-22 —
- * Free/Starter/Pro/Enterprise, entitlements transcribed verbatim from the
- * "Entitlements Logic (Pricing Engine)" table. Per-user/seat pricing
- * (§21) is a Phase 2 metering/invoicing concern; Phase 1 tracks a single
- * org-level subscription per the universal billing pattern.
+ * Pricing tiers per products/crmcapture/docs/PRODUCT_IDENTITY.md §21-22 and
+ * COMMERCIAL_FREEZE.md (Loop 2) — Free/Starter/Pro/Business/Enterprise,
+ * entitlements transcribed verbatim from the "Entitlements Logic (Pricing
+ * Engine)" table plus the shared `ai_credits_monthly` AI credit pool
+ * (COMMERCIAL_FREEZE.md §Section 1, superseding the old per-product
+ * `ai_summaries_monthly` limit). Per-user/seat pricing (§21) is a Phase 2
+ * metering/invoicing concern; Phase 1 tracks a single org-level
+ * subscription per the universal billing pattern.
  */
 export const PLAN_DEFINITIONS = [
   {
@@ -25,7 +28,7 @@ export const PLAN_DEFINITIONS = [
       use_api: false,
       use_sso: false,
     },
-    limits: { contacts: 100, leads: 100, ai_summaries_monthly: 20 },
+    limits: { contacts: 100, leads: 100, ai_credits_monthly: 0 },
   },
   {
     code: "starter",
@@ -42,7 +45,7 @@ export const PLAN_DEFINITIONS = [
       use_api: false,
       use_sso: false,
     },
-    limits: { contacts: 10_000, leads: null, ai_summaries_monthly: null },
+    limits: { contacts: 10_000, leads: 10_000, ai_credits_monthly: 30 },
   },
   {
     code: "pro",
@@ -59,7 +62,24 @@ export const PLAN_DEFINITIONS = [
       use_api: true,
       use_sso: false,
     },
-    limits: { contacts: null, leads: null, ai_summaries_monthly: null },
+    limits: { contacts: 50_000, leads: 50_000, ai_credits_monthly: 150 },
+  },
+  {
+    code: "business",
+    name: "Business",
+    priceCents: 14900,
+    booleans: {
+      capture_web_lead: true,
+      use_ai_lead_extraction: true,
+      use_ai_call_summary: true,
+      use_ai_followup_email: true,
+      use_ai_lead_scoring: true,
+      use_ai_opportunity_detection: true,
+      use_workflow_automation: true,
+      use_api: true,
+      use_sso: false,
+    },
+    limits: { contacts: 200_000, leads: 200_000, ai_credits_monthly: 450 },
   },
   {
     code: "enterprise",
@@ -76,7 +96,7 @@ export const PLAN_DEFINITIONS = [
       use_api: true,
       use_sso: true,
     },
-    limits: { contacts: null, leads: null, ai_summaries_monthly: null },
+    limits: { contacts: null, leads: null, ai_credits_monthly: null },
   },
 ] as const;
 

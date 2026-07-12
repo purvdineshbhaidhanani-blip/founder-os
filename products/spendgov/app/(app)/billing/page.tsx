@@ -1,13 +1,80 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent, Button, useToast } from "@founder-os/ui/primitives";
+import { Button, useToast } from "@founder-os/ui/primitives";
+import { PricingGrid, type PricingPlan } from "@founder-os/ui/billing";
 
-const PLANS = [
-  { code: "free", name: "Free (14-Day Trial)", price: "$0", features: ["1 organization", "25 SaaS apps tracked", "10 AI tools tracked", "14 days of history"] },
-  { code: "starter", name: "Starter", price: "$29/mo", features: ["3 organizations", "100 SaaS apps tracked", "Duplicate detection", "Slack alerts", "90 days of history"] },
-  { code: "pro", name: "Pro", price: "$99/mo", features: ["Unlimited organizations", "AI CFO Copilot", "AI spend optimization", "API access", "3 years of history"] },
-  { code: "enterprise", name: "Enterprise", price: "Custom", features: ["Everything in Pro", "SSO & SCIM", "Custom retention", "Dedicated support"] },
+const PLANS: PricingPlan[] = [
+  {
+    code: "free",
+    name: "Free (14-Day Trial)",
+    price: "$0",
+    features: ["1 organization", "25 SaaS apps tracked", "10 AI tools tracked", "14 days of history"],
+    isCheckoutable: false,
+  },
+  {
+    code: "starter",
+    name: "Starter",
+    price: "$29/mo",
+    features: [
+      "3 organizations",
+      "100 SaaS apps tracked",
+      "50 AI tools tracked",
+      "AI CFO Copilot",
+      "AI spend optimization",
+      "15 AI credits/mo",
+      "Duplicate detection",
+      "Slack alerts",
+      "90 days of history",
+    ],
+    isCheckoutable: true,
+  },
+  {
+    code: "pro",
+    name: "Pro",
+    price: "$99/mo",
+    features: [
+      "10 organizations",
+      "500 SaaS apps tracked",
+      "250 AI tools tracked",
+      "AI CFO Copilot",
+      "AI spend optimization",
+      "80 AI credits/mo",
+      "License optimization",
+      "Approval workflows",
+      "API access",
+      "Forecasting",
+      "3 years of history",
+    ],
+    isCheckoutable: true,
+    highlighted: true,
+  },
+  {
+    code: "business",
+    name: "Business",
+    price: "$249/mo",
+    features: [
+      "25 organizations",
+      "2,000 SaaS apps tracked",
+      "1,000 AI tools tracked",
+      "AI CFO Copilot",
+      "AI spend optimization",
+      "240 AI credits/mo",
+      "License optimization",
+      "Approval workflows",
+      "API access",
+      "Forecasting",
+      "5 years of history",
+    ],
+    isCheckoutable: true,
+  },
+  {
+    code: "enterprise",
+    name: "Enterprise",
+    price: "Custom",
+    features: ["Everything in Business", "SSO & SCIM", "Unlimited AI credits (fair-use)", "Custom retention", "Dedicated support"],
+    isCheckoutable: false,
+  },
 ];
 
 export default function BillingPage() {
@@ -60,28 +127,7 @@ export default function BillingPage() {
         </Button>
       </div>
 
-      <div className="sg-plan-grid">
-        {PLANS.map((plan) => (
-          <Card key={plan.code}>
-            <CardHeader>
-              <CardTitle>{plan.name}</CardTitle>
-              <p className="sg-plan-price">{plan.price}</p>
-            </CardHeader>
-            <CardContent>
-              <ul className="sg-plan-features">
-                {plan.features.map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
-              </ul>
-              {(plan.code === "starter" || plan.code === "pro") && (
-                <Button onClick={() => startCheckout(plan.code)} isLoading={loadingPlan === plan.code}>
-                  Upgrade to {plan.name}
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <PricingGrid plans={PLANS} onSelect={startCheckout} loadingPlanCode={loadingPlan} />
     </div>
   );
 }

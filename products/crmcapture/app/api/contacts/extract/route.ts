@@ -1,5 +1,5 @@
 import { parseJsonBodyOrThrow } from "@founder-os/platform/api";
-import { can } from "@founder-os/platform/billing";
+import { can, consumeAiCredit } from "@founder-os/platform/billing";
 import { PlatformError } from "@founder-os/platform/errors";
 import { withRouteHandler } from "../../../../lib/api-helpers.js";
 import { requireOrganizationContext } from "../../../../lib/organization-context.js";
@@ -13,6 +13,6 @@ export async function POST(request: Request) {
       throw new PlatformError("UNAUTHORIZED", "AI lead extraction requires the Starter plan or higher.");
     }
     const input = await parseJsonBodyOrThrow(extractContactSchema, request);
-    return extractContactFromText({ organizationId, input });
+    return consumeAiCredit(organizationId, () => extractContactFromText({ organizationId, input }));
   });
 }

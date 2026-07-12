@@ -4,8 +4,13 @@ import { can, withinLimit } from "@founder-os/platform/billing";
 
 /**
  * Pricing tiers per products/contactverify/docs/PRODUCT_IDENTITY.md
- * §21-22 — Free/Starter/Pro/Enterprise, entitlements transcribed
- * verbatim from the "Entitlements Logic (Pricing Engine)" table.
+ * §21-22 — Free/Starter/Pro/Business/Enterprise, entitlements transcribed
+ * verbatim from the "Entitlements Logic (Pricing Engine)" table, updated
+ * per COMMERCIAL_FREEZE.md (Loop 2) §Section 1 & §Section 2: a `business`
+ * tier is inserted between `pro` and `enterprise`, the AI Contact Health
+ * Engine (`use_health_score`) moves Pro-only → Starter+ and is now
+ * credit-metered via `ai_credits_monthly`, and the previously-unbounded
+ * Pro `verifications_monthly` limit is capped.
  */
 export const PLAN_DEFINITIONS = [
   {
@@ -24,7 +29,7 @@ export const PLAN_DEFINITIONS = [
       use_sso: false,
       use_scim: false,
     },
-    limits: { verifications_monthly: 500 },
+    limits: { verifications_monthly: 500, ai_credits_monthly: 0 },
   },
   {
     code: "starter",
@@ -35,14 +40,14 @@ export const PLAN_DEFINITIONS = [
       validate_phone: true,
       detect_duplicates: true,
       enrich_contact: true,
-      use_health_score: false,
+      use_health_score: true,
       sync_to_crm: true,
       use_workflow_automation: false,
       use_api: true,
       use_sso: false,
       use_scim: false,
     },
-    limits: { verifications_monthly: 10_000 },
+    limits: { verifications_monthly: 10_000, ai_credits_monthly: 20 },
   },
   {
     code: "pro",
@@ -60,7 +65,25 @@ export const PLAN_DEFINITIONS = [
       use_sso: false,
       use_scim: false,
     },
-    limits: { verifications_monthly: null },
+    limits: { verifications_monthly: 50_000, ai_credits_monthly: 150 },
+  },
+  {
+    code: "business",
+    name: "Business",
+    priceCents: 22900,
+    booleans: {
+      validate_email: true,
+      validate_phone: true,
+      detect_duplicates: true,
+      enrich_contact: true,
+      use_health_score: true,
+      sync_to_crm: true,
+      use_workflow_automation: true,
+      use_api: true,
+      use_sso: false,
+      use_scim: false,
+    },
+    limits: { verifications_monthly: 200_000, ai_credits_monthly: 450 },
   },
   {
     code: "enterprise",
@@ -78,7 +101,7 @@ export const PLAN_DEFINITIONS = [
       use_sso: true,
       use_scim: true,
     },
-    limits: { verifications_monthly: null },
+    limits: { verifications_monthly: null, ai_credits_monthly: null },
   },
 ] as const;
 

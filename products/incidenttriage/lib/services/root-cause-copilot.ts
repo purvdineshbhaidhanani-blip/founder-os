@@ -3,8 +3,6 @@ import { completeStructured } from "@founder-os/platform/ai";
 import { createNotification } from "@founder-os/platform/notifications";
 import { trackEventAsync } from "@founder-os/platform/analytics";
 import { captureError } from "@founder-os/platform/monitoring";
-import { incrementUsage, withinLimit } from "@founder-os/platform/billing";
-import { PlatformError } from "@founder-os/platform/errors";
 import { getIncidentTriageDb } from "../db.js";
 import { getIncident } from "./incidents-repo.js";
 
@@ -24,11 +22,6 @@ const rootCauseOutputSchema = z.object({
  * of an incident with a 60-second AI-generated brief."
  */
 export async function generateRootCauseAnalysis(params: { organizationId: string; incidentId: string; requestedByUserId: string }) {
-  const limitCheck = await withinLimit(params.organizationId, "ai_root_cause_analyses_monthly");
-  if (!limitCheck.allowed) {
-    throw new PlatformError("UNAUTHORIZED", `You've reached your plan's limit of ${limitCheck.limit} AI root cause analyses this billing period. Upgrade your plan for unlimited analyses.`);
-  }
-
   const incident = await getIncident({ organizationId: params.organizationId, incidentId: params.incidentId });
   if (!incident) {
     throw new Error("Incident not found");
@@ -77,8 +70,6 @@ export async function generateRootCauseAnalysis(params: { organizationId: string
       generatedAt: new Date(),
     },
   });
-
-  await incrementUsage({ organizationId: params.organizationId, metricKey: "ai_root_cause_analyses_monthly", amount: 1 });
 
   trackEventAsync(
     { organizationId: params.organizationId, userId: params.requestedByUserId, eventName: "incidenttriage.root_cause_generated", properties: { incidentId: params.incidentId } },

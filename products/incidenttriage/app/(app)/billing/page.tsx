@@ -1,13 +1,60 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent, Button, useToast } from "@founder-os/ui/primitives";
+import { Button, useToast } from "@founder-os/ui/primitives";
+import { PricingGrid, type PricingPlan } from "@founder-os/ui/billing";
 
-const PLANS = [
-  { code: "free", name: "Free", price: "$0", features: ["1 project", "2 team members", "100 incidents/mo", "5 AI root cause analyses/mo"] },
-  { code: "starter", name: "Starter", price: "$39/mo", features: ["5 projects, 10 members", "1,000 incidents/mo", "Unlimited AI root cause analyses", "Slack & Jira"] },
-  { code: "pro", name: "Pro", price: "$149/mo", features: ["Unlimited everything", "AI Incident Copilot & recovery suggestions", "Advanced analytics & custom dashboards", "API access"] },
-  { code: "enterprise", name: "Enterprise", price: "Custom", features: ["Everything in Pro", "SSO & SCIM", "Custom history retention", "Dedicated support & SLA"] },
+const PLANS: PricingPlan[] = [
+  {
+    code: "free",
+    name: "Free",
+    price: "$0",
+    features: ["1 project", "2 team members", "100 incidents/mo", "AI Root Cause Copilot (5 AI credits/mo)", "7-day history"],
+    isCheckoutable: false,
+  },
+  {
+    code: "starter",
+    name: "Starter",
+    price: "$39/mo",
+    features: ["5 projects, 10 members", "1,000 incidents/mo", "AI Root Cause Copilot (8 AI credits/mo)", "90-day history", "Slack & Jira"],
+    isCheckoutable: true,
+  },
+  {
+    code: "pro",
+    name: "Pro",
+    price: "$149/mo",
+    features: [
+      "25 projects, 50 members",
+      "5,000 incidents/mo",
+      "AI Incident Copilot & recovery suggestions (60 AI credits/mo)",
+      "Advanced analytics & custom dashboards",
+      "API access",
+      "730-day history",
+    ],
+    isCheckoutable: true,
+    highlighted: true,
+  },
+  {
+    code: "business",
+    name: "Business",
+    price: "$349/mo",
+    features: [
+      "100 projects, 200 members",
+      "20,000 incidents/mo",
+      "AI Incident Copilot & recovery suggestions (180 AI credits/mo)",
+      "Advanced analytics & custom dashboards",
+      "API access",
+      "5-year history",
+    ],
+    isCheckoutable: true,
+  },
+  {
+    code: "enterprise",
+    name: "Enterprise",
+    price: "Custom",
+    features: ["Everything in Business", "SSO & SCIM", "Unlimited AI credits (fair use)", "Custom history retention", "Dedicated support & SLA"],
+    isCheckoutable: false,
+  },
 ];
 
 export default function BillingPage() {
@@ -60,28 +107,7 @@ export default function BillingPage() {
         </Button>
       </div>
 
-      <div className="it-plan-grid">
-        {PLANS.map((plan) => (
-          <Card key={plan.code}>
-            <CardHeader>
-              <CardTitle>{plan.name}</CardTitle>
-              <p className="it-plan-price">{plan.price}</p>
-            </CardHeader>
-            <CardContent>
-              <ul className="it-plan-features">
-                {plan.features.map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
-              </ul>
-              {(plan.code === "starter" || plan.code === "pro") && (
-                <Button onClick={() => startCheckout(plan.code)} isLoading={loadingPlan === plan.code}>
-                  Upgrade to {plan.name}
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <PricingGrid plans={PLANS} onSelect={startCheckout} loadingPlanCode={loadingPlan} />
     </div>
   );
 }

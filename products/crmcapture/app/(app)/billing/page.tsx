@@ -1,13 +1,46 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent, Button, useToast } from "@founder-os/ui/primitives";
+import { Button, useToast } from "@founder-os/ui/primitives";
+import { PricingGrid, type PricingPlan } from "@founder-os/ui/billing";
 
-const PLANS = [
-  { code: "free", name: "Free (14-Day Trial)", price: "$0", features: ["1 user", "100 contacts & leads", "20 AI summaries/mo", "Gmail & Outlook sync"] },
-  { code: "starter", name: "Starter", price: "$29/user/mo", features: ["Unlimited leads, 10,000 contacts", "AI lead extraction", "HubSpot, Salesforce, Zoho sync", "Basic automation"] },
-  { code: "pro", name: "Pro", price: "$79/user/mo", features: ["Unlimited everything", "Full AI Sales Assistant", "Call summaries & follow-up emails", "Lead scoring & opportunity detection", "API access"] },
-  { code: "enterprise", name: "Enterprise", price: "Custom", features: ["Everything in Pro", "SSO & audit logs", "Custom CRM connectors", "Dedicated support & SLA"] },
+const PLANS: PricingPlan[] = [
+  {
+    code: "free",
+    name: "Free (14-Day Trial)",
+    price: "$0",
+    features: ["1 user", "100 contacts & leads", "No AI credits", "Gmail & Outlook sync"],
+    isCheckoutable: false,
+  },
+  {
+    code: "starter",
+    name: "Starter",
+    price: "$29/user/mo",
+    features: ["Up to 10,000 contacts & leads", "AI Lead Extraction", "30 AI credits/mo", "HubSpot, Salesforce, Zoho sync", "Basic automation"],
+    isCheckoutable: true,
+  },
+  {
+    code: "pro",
+    name: "Pro",
+    price: "$79/user/mo",
+    features: ["Up to 50,000 contacts & leads", "Full AI Sales Assistant", "150 AI credits/mo", "Call summaries & follow-up emails", "Lead scoring & opportunity detection", "API access"],
+    isCheckoutable: true,
+    highlighted: true,
+  },
+  {
+    code: "business",
+    name: "Business",
+    price: "$149/user/mo",
+    features: ["Up to 200,000 contacts & leads", "Full AI Sales Assistant", "450 AI credits/mo", "Call summaries & follow-up emails", "Lead scoring & opportunity detection", "API access"],
+    isCheckoutable: true,
+  },
+  {
+    code: "enterprise",
+    name: "Enterprise",
+    price: "Custom",
+    features: ["Everything in Business", "Unlimited AI credits", "SSO & audit logs", "Custom CRM connectors", "Dedicated support & SLA"],
+    isCheckoutable: false,
+  },
 ];
 
 export default function BillingPage() {
@@ -60,28 +93,7 @@ export default function BillingPage() {
         </Button>
       </div>
 
-      <div className="cc-plan-grid">
-        {PLANS.map((plan) => (
-          <Card key={plan.code}>
-            <CardHeader>
-              <CardTitle>{plan.name}</CardTitle>
-              <p className="cc-plan-price">{plan.price}</p>
-            </CardHeader>
-            <CardContent>
-              <ul className="cc-plan-features">
-                {plan.features.map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
-              </ul>
-              {(plan.code === "starter" || plan.code === "pro") && (
-                <Button onClick={() => startCheckout(plan.code)} isLoading={loadingPlan === plan.code}>
-                  Upgrade to {plan.name}
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <PricingGrid plans={PLANS} onSelect={startCheckout} loadingPlanCode={loadingPlan} />
     </div>
   );
 }

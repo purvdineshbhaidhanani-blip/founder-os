@@ -1,13 +1,67 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent, Button, useToast } from "@founder-os/ui/primitives";
+import { Button, useToast } from "@founder-os/ui/primitives";
+import { PricingGrid, type PricingPlan } from "@founder-os/ui/billing";
 
-const PLANS = [
-  { code: "free", name: "Free", price: "$0", features: ["500 verifications/month", "Email & phone validation", "Basic duplicate detection"] },
-  { code: "starter", name: "Starter", price: "$29/mo", features: ["10,000 verifications/month", "AI-assisted duplicate detection", "Basic enrichment", "CRM sync"] },
-  { code: "pro", name: "Pro", price: "$99/mo", features: ["Unlimited verifications", "AI Contact Health Engine", "AI data enrichment & duplicate merge", "Workflow automation", "Unlimited API"] },
-  { code: "enterprise", name: "Enterprise", price: "Custom", features: ["Everything in Pro", "SSO & SCIM", "Custom integrations", "Dedicated support & SLA"] },
+const PLANS: PricingPlan[] = [
+  {
+    code: "free",
+    name: "Free",
+    price: "$0",
+    features: ["500 verifications/month", "Email & phone validation", "Basic duplicate detection", "No AI credits"],
+    isCheckoutable: false,
+  },
+  {
+    code: "starter",
+    name: "Starter",
+    price: "$29/mo",
+    features: [
+      "10,000 verifications/month",
+      "AI Contact Health Engine",
+      "20 AI credits/mo",
+      "AI-assisted duplicate detection",
+      "Basic enrichment",
+      "CRM sync",
+    ],
+    isCheckoutable: true,
+  },
+  {
+    code: "pro",
+    name: "Pro",
+    price: "$99/mo",
+    features: [
+      "50,000 verifications/month",
+      "AI Contact Health Engine",
+      "150 AI credits/mo",
+      "AI data enrichment & duplicate merge",
+      "Workflow automation",
+      "Unlimited API",
+    ],
+    isCheckoutable: true,
+    highlighted: true,
+  },
+  {
+    code: "business",
+    name: "Business",
+    price: "$229/mo",
+    features: [
+      "200,000 verifications/month",
+      "AI Contact Health Engine",
+      "450 AI credits/mo",
+      "AI data enrichment & duplicate merge",
+      "Workflow automation",
+      "Unlimited API",
+    ],
+    isCheckoutable: true,
+  },
+  {
+    code: "enterprise",
+    name: "Enterprise",
+    price: "Custom",
+    features: ["Everything in Business", "Unlimited AI credits (fair-use)", "SSO & SCIM", "Custom integrations", "Dedicated support & SLA"],
+    isCheckoutable: false,
+  },
 ];
 
 export default function BillingPage() {
@@ -60,28 +114,7 @@ export default function BillingPage() {
         </Button>
       </div>
 
-      <div className="cv-plan-grid">
-        {PLANS.map((plan) => (
-          <Card key={plan.code}>
-            <CardHeader>
-              <CardTitle>{plan.name}</CardTitle>
-              <p className="cv-plan-price">{plan.price}</p>
-            </CardHeader>
-            <CardContent>
-              <ul className="cv-plan-features">
-                {plan.features.map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
-              </ul>
-              {(plan.code === "starter" || plan.code === "pro") && (
-                <Button onClick={() => startCheckout(plan.code)} isLoading={loadingPlan === plan.code}>
-                  Upgrade to {plan.name}
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <PricingGrid plans={PLANS} onSelect={startCheckout} loadingPlanCode={loadingPlan} />
     </div>
   );
 }

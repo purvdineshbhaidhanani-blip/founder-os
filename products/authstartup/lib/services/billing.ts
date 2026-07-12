@@ -24,7 +24,7 @@ export const PLAN_DEFINITIONS = [
       use_ai_security_advisor: false,
       use_dedicated_cluster: false,
     },
-    limits: { projects: 1, monthly_active_users: 1000 },
+    limits: { projects: 1, monthly_active_users: 1000, ai_credits_monthly: 0 },
   },
   {
     code: "starter",
@@ -39,10 +39,13 @@ export const PLAN_DEFINITIONS = [
       use_webhooks: false,
       use_saml: false,
       use_scim: false,
-      use_ai_security_advisor: false,
+      // COMMERCIAL_FREEZE.md Loop 2: AI Security Advisor moves from Pro-only
+      // to Starter+, now credit-metered via ai_credits_monthly below.
+      use_ai_security_advisor: true,
       use_dedicated_cluster: false,
     },
-    limits: { projects: 1, monthly_active_users: 10_000 },
+    // Loop 2 flagged the Loop-1 `projects: 1` (same as Free) as a gap; bumped to 3.
+    limits: { projects: 3, monthly_active_users: 10_000, ai_credits_monthly: 5 },
   },
   {
     code: "pro",
@@ -60,7 +63,27 @@ export const PLAN_DEFINITIONS = [
       use_ai_security_advisor: true,
       use_dedicated_cluster: false,
     },
-    limits: { projects: null, monthly_active_users: 100_000 },
+    limits: { projects: 25, monthly_active_users: 100_000, ai_credits_monthly: 40 },
+  },
+  {
+    code: "business",
+    name: "Business",
+    priceCents: 19900,
+    booleans: {
+      use_oauth: true,
+      use_magic_links: true,
+      use_mfa: true,
+      use_organizations: true,
+      use_custom_domains: true,
+      use_webhooks: true,
+      // SAML/SSO/SCIM stay Enterprise-only (marketing-tier — not actually
+      // implemented in code yet per Loop 2 audit).
+      use_saml: false,
+      use_scim: false,
+      use_ai_security_advisor: true,
+      use_dedicated_cluster: false,
+    },
+    limits: { projects: 100, monthly_active_users: 500_000, ai_credits_monthly: 120 },
   },
   {
     code: "enterprise",
@@ -78,7 +101,8 @@ export const PLAN_DEFINITIONS = [
       use_ai_security_advisor: true,
       use_dedicated_cluster: true,
     },
-    limits: { projects: null, monthly_active_users: null },
+    // Unlimited / fair-use.
+    limits: { projects: null, monthly_active_users: null, ai_credits_monthly: null },
   },
 ] as const;
 

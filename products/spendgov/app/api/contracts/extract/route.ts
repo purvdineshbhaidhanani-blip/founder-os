@@ -1,5 +1,5 @@
 import { PlatformError } from "@founder-os/platform/errors";
-import { can } from "@founder-os/platform/billing";
+import { can, consumeAiCredit } from "@founder-os/platform/billing";
 import { parseJsonBodyOrThrow } from "@founder-os/platform/api";
 import { withRouteHandler } from "../../../../lib/api-helpers.js";
 import { requireOrganizationContext } from "../../../../lib/organization-context.js";
@@ -10,10 +10,10 @@ export async function POST(request: Request) {
   return withRouteHandler(async () => {
     const { userId, organizationId } = await requireOrganizationContext();
     if (!(await can(organizationId, "use_spend_optimization_ai"))) {
-      throw new PlatformError("UNAUTHORIZED", "AI contract parsing requires the Pro plan or higher.");
+      throw new PlatformError("UNAUTHORIZED", "AI contract parsing requires the Starter plan or higher.");
     }
     const input = await parseJsonBodyOrThrow(contractExtractionRequestSchema, request);
-    return extractContractTerms({ organizationId, extractedByUserId: userId, ...input });
+    return consumeAiCredit(organizationId, () => extractContractTerms({ organizationId, extractedByUserId: userId, ...input }));
   });
 }
 

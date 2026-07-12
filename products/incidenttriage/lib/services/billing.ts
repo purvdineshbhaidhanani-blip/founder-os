@@ -4,8 +4,10 @@ import { can, withinLimit } from "@founder-os/platform/billing";
 
 /**
  * Pricing tiers per products/incidenttriage/docs/PRODUCT_IDENTITY.md
- * §21-22 — Free/Starter/Pro/Enterprise, entitlements transcribed
- * verbatim from the "Entitlements Logic (Pricing Engine)" table.
+ * §21-22 — Free/Starter/Pro/Business/Enterprise, entitlements transcribed
+ * verbatim from the "Entitlements Logic (Pricing Engine)" table, updated
+ * per COMMERCIAL_FREEZE.md Loop 2/3 (Business tier + shared
+ * `ai_credits_monthly` metric replacing the old per-product AI limit key).
  */
 export const PLAN_DEFINITIONS = [
   {
@@ -22,7 +24,7 @@ export const PLAN_DEFINITIONS = [
       use_sso: false,
       use_scim: false,
     },
-    limits: { projects: 1, team_members: 2, incidents_monthly: 100, ai_root_cause_analyses_monthly: 5, history_days: 7 },
+    limits: { projects: 1, team_members: 2, incidents_monthly: 100, ai_credits_monthly: 5, history_days: 7 },
   },
   {
     code: "starter",
@@ -38,7 +40,7 @@ export const PLAN_DEFINITIONS = [
       use_sso: false,
       use_scim: false,
     },
-    limits: { projects: 5, team_members: 10, incidents_monthly: 1000, ai_root_cause_analyses_monthly: null, history_days: 90 },
+    limits: { projects: 5, team_members: 10, incidents_monthly: 1000, ai_credits_monthly: 8, history_days: 90 },
   },
   {
     code: "pro",
@@ -54,7 +56,23 @@ export const PLAN_DEFINITIONS = [
       use_sso: false,
       use_scim: false,
     },
-    limits: { projects: null, team_members: null, incidents_monthly: null, ai_root_cause_analyses_monthly: null, history_days: 730 },
+    limits: { projects: 25, team_members: 50, incidents_monthly: 5000, ai_credits_monthly: 60, history_days: 730 },
+  },
+  {
+    code: "business",
+    name: "Business",
+    priceCents: 34900,
+    booleans: {
+      use_ai_incident_copilot: true,
+      use_ai_recovery_suggestions: true,
+      use_advanced_analytics: true,
+      use_custom_dashboards: true,
+      use_api: true,
+      use_status_page_integration: true,
+      use_sso: false,
+      use_scim: false,
+    },
+    limits: { projects: 100, team_members: 200, incidents_monthly: 20000, ai_credits_monthly: 180, history_days: 1825 },
   },
   {
     code: "enterprise",
@@ -70,7 +88,7 @@ export const PLAN_DEFINITIONS = [
       use_sso: true,
       use_scim: true,
     },
-    limits: { projects: null, team_members: null, incidents_monthly: null, ai_root_cause_analyses_monthly: null, history_days: null },
+    limits: { projects: null, team_members: null, incidents_monthly: null, ai_credits_monthly: null, history_days: null },
   },
 ] as const;
 

@@ -4,8 +4,10 @@ import { can, withinLimit } from "@founder-os/platform/billing";
 
 /**
  * Pricing tiers per products/erpaudit/docs/PRODUCT_IDENTITY.md §21-22 —
- * Free/Starter/Pro/Enterprise, entitlements transcribed verbatim from the
- * "Entitlements Logic (Pricing Engine)" table.
+ * Free/Starter/Pro/Business/Enterprise, entitlements transcribed verbatim from
+ * the "Entitlements Logic (Pricing Engine)" table, updated per the portfolio-wide
+ * COMMERCIAL_FREEZE.md (Business tier inserted, Pro-tier `null` limits capped,
+ * AI ERP Auditor moved Pro-only → Starter+ and metered via `ai_credits_monthly`).
  */
 export const PLAN_DEFINITIONS = [
   {
@@ -13,7 +15,7 @@ export const PLAN_DEFINITIONS = [
     name: "Free",
     priceCents: 0,
     booleans: {
-      use_ai_summary: true,
+      use_ai_summary: false,
       use_ai_risk_detection: false,
       use_sod_checks: false,
       use_process_validation: false,
@@ -23,7 +25,7 @@ export const PLAN_DEFINITIONS = [
       use_sso: false,
       use_scim: false,
     },
-    limits: { erp_instances: 1, users: 2, configuration_scans_monthly: 5, history_days: 7 },
+    limits: { erp_instances: 1, users: 2, configuration_scans_monthly: 5, history_days: 7, ai_credits_monthly: 0 },
   },
   {
     code: "starter",
@@ -40,7 +42,7 @@ export const PLAN_DEFINITIONS = [
       use_sso: false,
       use_scim: false,
     },
-    limits: { erp_instances: 5, users: 10, configuration_scans_monthly: null, history_days: 90 },
+    limits: { erp_instances: 5, users: 10, configuration_scans_monthly: 100, history_days: 90, ai_credits_monthly: 10 },
   },
   {
     code: "pro",
@@ -57,7 +59,24 @@ export const PLAN_DEFINITIONS = [
       use_sso: false,
       use_scim: false,
     },
-    limits: { erp_instances: null, users: null, configuration_scans_monthly: null, history_days: 730 },
+    limits: { erp_instances: 25, users: 50, configuration_scans_monthly: 500, history_days: 730, ai_credits_monthly: 80 },
+  },
+  {
+    code: "business",
+    name: "Business",
+    priceCents: 34900,
+    booleans: {
+      use_ai_summary: true,
+      use_ai_risk_detection: true,
+      use_sod_checks: true,
+      use_process_validation: true,
+      use_approval_workflows: true,
+      use_multi_company: true,
+      use_api: true,
+      use_sso: false,
+      use_scim: false,
+    },
+    limits: { erp_instances: 100, users: 200, configuration_scans_monthly: 2000, history_days: 1825, ai_credits_monthly: 240 },
   },
   {
     code: "enterprise",
@@ -74,7 +93,7 @@ export const PLAN_DEFINITIONS = [
       use_sso: true,
       use_scim: true,
     },
-    limits: { erp_instances: null, users: null, configuration_scans_monthly: null, history_days: null },
+    limits: { erp_instances: null, users: null, configuration_scans_monthly: null, history_days: null, ai_credits_monthly: null },
   },
 ] as const;
 

@@ -1,13 +1,62 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent, Button, useToast } from "@founder-os/ui/primitives";
+import { Button, useToast } from "@founder-os/ui/primitives";
+import { PricingGrid, type PricingPlan } from "@founder-os/ui/billing";
 
-const PLANS = [
-  { code: "free", name: "Free", price: "$0", features: ["1 project", "1,000 MAU", "Email + OAuth login", "Password reset"] },
-  { code: "starter", name: "Starter", price: "$25/mo", features: ["1 project, 10,000 MAU", "Magic links & MFA", "Team management", "Basic audit logs"] },
-  { code: "pro", name: "Pro", price: "$79/mo", features: ["Unlimited projects, 100,000 MAU", "Organizations, SAML & SCIM", "Custom domains & webhooks", "AI Security Advisor"] },
-  { code: "enterprise", name: "Enterprise", price: "Custom", features: ["Everything in Pro", "Unlimited MAU", "Dedicated cluster", "Dedicated support & SLA"] },
+const PLANS: PricingPlan[] = [
+  {
+    code: "free",
+    name: "Free",
+    price: "$0",
+    features: ["1 project", "1,000 MAU", "Public auth API (register/login)", "Email + OAuth login", "Password reset"],
+    isCheckoutable: false,
+  },
+  {
+    code: "starter",
+    name: "Starter",
+    price: "$25/mo",
+    features: [
+      "3 projects, 10,000 MAU",
+      "Magic links & MFA",
+      "Team management",
+      "Basic audit logs",
+      "AI Security Advisor (5 credits/mo)",
+    ],
+    isCheckoutable: true,
+  },
+  {
+    code: "pro",
+    name: "Pro",
+    price: "$79/mo",
+    features: [
+      "25 projects, 100,000 MAU",
+      "Organizations, SAML & SCIM",
+      "Custom domains & webhooks",
+      "AI Security Advisor (40 credits/mo)",
+    ],
+    isCheckoutable: true,
+    highlighted: true,
+  },
+  {
+    code: "business",
+    name: "Business",
+    price: "$199/mo",
+    features: [
+      "100 projects, 500,000 MAU",
+      "Team seats & roles",
+      "Organizations, custom domains & webhooks",
+      "AI Security Advisor (120 credits/mo)",
+    ],
+    isCheckoutable: true,
+  },
+  {
+    code: "enterprise",
+    name: "Enterprise",
+    price: "Custom",
+    features: ["Everything in Business", "Unlimited projects & MAU", "Dedicated cluster", "Unlimited AI credits (fair-use)", "Dedicated support & SLA"],
+    isCheckoutable: false,
+  },
 ];
 
 export default function BillingPage() {
@@ -60,28 +109,7 @@ export default function BillingPage() {
         </Button>
       </div>
 
-      <div className="au-plan-grid">
-        {PLANS.map((plan) => (
-          <Card key={plan.code}>
-            <CardHeader>
-              <CardTitle>{plan.name}</CardTitle>
-              <p className="au-plan-price">{plan.price}</p>
-            </CardHeader>
-            <CardContent>
-              <ul className="au-plan-features">
-                {plan.features.map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
-              </ul>
-              {(plan.code === "starter" || plan.code === "pro") && (
-                <Button onClick={() => startCheckout(plan.code)} isLoading={loadingPlan === plan.code}>
-                  Upgrade to {plan.name}
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <PricingGrid plans={PLANS} onSelect={startCheckout} loadingPlanCode={loadingPlan} />
     </div>
   );
 }

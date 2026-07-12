@@ -3,12 +3,16 @@ import { createSubscription as createBillingSubscription, getSubscriptionForOrga
 import { can, withinLimit } from "@founder-os/platform/billing";
 
 /**
- * Pricing tiers per products/spendgov/docs/PRODUCT_IDENTITY.md §21-22 —
- * Free/Starter/Pro/Enterprise, entitlements transcribed verbatim from the
- * "Entitlements Logic (Pricing Engine)" table. Enterprise has no
- * self-serve price (sold custom, per §21) so priceCents is 0 here; actual
- * Enterprise billing is a manually-provisioned subscription + custom
- * Stripe contract, never a self-serve checkout price.
+ * Pricing tiers per products/spendgov/docs/PRODUCT_IDENTITY.md §21-22 and
+ * COMMERCIAL_FREEZE.md (Loop 2) — Free/Starter/Pro/Business/Enterprise,
+ * entitlements transcribed verbatim from the "Entitlements Logic (Pricing
+ * Engine)" table plus the Loop 2 commercial-model updates (a Business tier
+ * inserted between Pro and Enterprise, the `ai_credits_monthly` metric
+ * added to every tier, and previously-unlimited Pro limits capped).
+ * Enterprise has no self-serve price (sold custom, per §21) so priceCents
+ * is 0 here; actual Enterprise billing is a manually-provisioned
+ * subscription + custom Stripe contract, never a self-serve checkout
+ * price.
  */
 export const PLAN_DEFINITIONS = [
   {
@@ -27,7 +31,7 @@ export const PLAN_DEFINITIONS = [
       use_sso: false,
       use_scim: false,
     },
-    limits: { organizations: 1, saas_apps_tracked: 25, ai_tools_tracked: 10, history_days: 14 },
+    limits: { organizations: 1, saas_apps_tracked: 25, ai_tools_tracked: 10, history_days: 14, ai_credits_monthly: 0 },
   },
   {
     code: "starter",
@@ -35,8 +39,8 @@ export const PLAN_DEFINITIONS = [
     priceCents: 2900,
     booleans: {
       detect_duplicates: true,
-      use_ai_cfo_copilot: false,
-      use_spend_optimization_ai: false,
+      use_ai_cfo_copilot: true,
+      use_spend_optimization_ai: true,
       use_license_optimization: false,
       use_approval_workflows: false,
       use_api: false,
@@ -45,7 +49,7 @@ export const PLAN_DEFINITIONS = [
       use_sso: false,
       use_scim: false,
     },
-    limits: { organizations: 3, saas_apps_tracked: 100, ai_tools_tracked: null, history_days: 90 },
+    limits: { organizations: 3, saas_apps_tracked: 100, ai_tools_tracked: 50, history_days: 90, ai_credits_monthly: 15 },
   },
   {
     code: "pro",
@@ -63,7 +67,25 @@ export const PLAN_DEFINITIONS = [
       use_sso: false,
       use_scim: false,
     },
-    limits: { organizations: null, saas_apps_tracked: null, ai_tools_tracked: null, history_days: 1095 },
+    limits: { organizations: 10, saas_apps_tracked: 500, ai_tools_tracked: 250, history_days: 1095, ai_credits_monthly: 80 },
+  },
+  {
+    code: "business",
+    name: "Business",
+    priceCents: 24900,
+    booleans: {
+      detect_duplicates: true,
+      use_ai_cfo_copilot: true,
+      use_spend_optimization_ai: true,
+      use_license_optimization: true,
+      use_approval_workflows: true,
+      use_api: true,
+      use_forecasting: true,
+      send_slack_alerts: true,
+      use_sso: false,
+      use_scim: false,
+    },
+    limits: { organizations: 25, saas_apps_tracked: 2000, ai_tools_tracked: 1000, history_days: 1825, ai_credits_monthly: 240 },
   },
   {
     code: "enterprise",
@@ -81,7 +103,7 @@ export const PLAN_DEFINITIONS = [
       use_sso: true,
       use_scim: true,
     },
-    limits: { organizations: null, saas_apps_tracked: null, ai_tools_tracked: null, history_days: null },
+    limits: { organizations: null, saas_apps_tracked: null, ai_tools_tracked: null, history_days: null, ai_credits_monthly: null },
   },
 ] as const;
 

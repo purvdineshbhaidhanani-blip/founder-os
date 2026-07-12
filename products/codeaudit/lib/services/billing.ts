@@ -3,11 +3,16 @@ import { createSubscription as createBillingSubscription, getSubscriptionForOrga
 import { can, withinLimit } from "@founder-os/platform/billing";
 
 /**
- * Pricing tiers per products/codeaudit/docs/PRODUCT_IDENTITY.md §21-22 —
- * Free/Starter/Pro/Enterprise, entitlements transcribed verbatim from the
- * "Entitlements Logic (Pricing Engine)" table. Per-developer/seat pricing
- * (§21) is a Phase 2 metering/invoicing concern; Phase 1 tracks a single
- * org-level subscription per the universal billing pattern.
+ * Pricing tiers per products/codeaudit/docs/PRODUCT_IDENTITY.md §21-22 and
+ * COMMERCIAL_FREEZE.md (CodeAudit section, Loop 2 completion) —
+ * Free/Starter/Pro/Business/Enterprise, entitlements transcribed verbatim
+ * from the locked "Entitlements Logic (Pricing Engine)" table plus the
+ * Loop 2 AI Credits allotments (`ai_credits_monthly`). The AI Fix Engine
+ * now unlocks starting at Starter (credit-metered) rather than Pro-only —
+ * an approved Loop 2 pricing-model decision, not a feature-set change.
+ * Per-developer/seat pricing (§21) is a Phase 2 metering/invoicing concern;
+ * Phase 1 tracks a single org-level subscription per the universal billing
+ * pattern.
  */
 export const PLAN_DEFINITIONS = [
   {
@@ -26,7 +31,7 @@ export const PLAN_DEFINITIONS = [
       use_api: false,
       use_sso: false,
     },
-    limits: { private_repos: 1, public_repos: 3, files_scanned_monthly: 500, pr_scans_monthly: 20 },
+    limits: { private_repos: 1, public_repos: 3, files_scanned_monthly: 500, pr_scans_monthly: 20, ai_credits_monthly: 0 },
   },
   {
     code: "starter",
@@ -36,7 +41,7 @@ export const PLAN_DEFINITIONS = [
       scan_pr: true,
       use_ci_cd: true,
       use_ai_explanations: true,
-      use_ai_fix_engine: false,
+      use_ai_fix_engine: true,
       use_secret_detection: false,
       use_dependency_scan: false,
       use_container_scan: false,
@@ -44,7 +49,7 @@ export const PLAN_DEFINITIONS = [
       use_api: false,
       use_sso: false,
     },
-    limits: { private_repos: 10, public_repos: null, files_scanned_monthly: 5000, pr_scans_monthly: 300 },
+    limits: { private_repos: 10, public_repos: 50, files_scanned_monthly: 5000, pr_scans_monthly: 300, ai_credits_monthly: 25 },
   },
   {
     code: "pro",
@@ -62,7 +67,25 @@ export const PLAN_DEFINITIONS = [
       use_api: true,
       use_sso: false,
     },
-    limits: { private_repos: null, public_repos: null, files_scanned_monthly: null, pr_scans_monthly: null },
+    limits: { private_repos: 50, public_repos: 200, files_scanned_monthly: 25000, pr_scans_monthly: 1500, ai_credits_monthly: 150 },
+  },
+  {
+    code: "business",
+    name: "Business",
+    priceCents: 8900,
+    booleans: {
+      scan_pr: true,
+      use_ci_cd: true,
+      use_ai_explanations: true,
+      use_ai_fix_engine: true,
+      use_secret_detection: true,
+      use_dependency_scan: true,
+      use_container_scan: true,
+      use_custom_rules: true,
+      use_api: true,
+      use_sso: false,
+    },
+    limits: { private_repos: 200, public_repos: 1000, files_scanned_monthly: 100000, pr_scans_monthly: 6000, ai_credits_monthly: 320 },
   },
   {
     code: "enterprise",
@@ -80,7 +103,7 @@ export const PLAN_DEFINITIONS = [
       use_api: true,
       use_sso: true,
     },
-    limits: { private_repos: null, public_repos: null, files_scanned_monthly: null, pr_scans_monthly: null },
+    limits: { private_repos: null, public_repos: null, files_scanned_monthly: null, pr_scans_monthly: null, ai_credits_monthly: null },
   },
 ] as const;
 
