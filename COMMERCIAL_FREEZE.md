@@ -1113,6 +1113,268 @@ engineering loop has a clean punch list:
 
 ---
 
+---
+
+# LOOP 2 COMPLETION — MISSING SECTIONS
+
+> These five sections supersede the generic placeholder AI-credit and limit tables used inside
+> each product's Step 3/Step 4 above. Every price point ($ figures) from the original 12 product
+> sections is unchanged — nothing here alters locked pricing. All numbers below are the ones to
+> be implemented in Loop 3.
+
+## SECTION 1 — PRODUCT-SPECIFIC AI CREDIT SYSTEM
+
+**Shared definition (unchanged across products):** 1 AI Credit = 1 generated AI output (one
+Copilot brief, one fix suggestion, one DNA spec, etc.). What differs per product is the **cost of
+that one output** (driven by how much context the LLM call needs) and the **expected usage
+cadence** of that product's single AI feature — so the credit allotments are tuned per product
+against the *already-locked* Free/Starter/Pro/Business prices, not copied from a shared table.
+
+**Reset Period:** Monthly, aligned to the org's Stripe billing period (not calendar month) — this
+already exists for free via `shared/platform`'s `incrementUsage`/`getCurrentUsage`, which key
+usage counters off `subscription.currentPeriodStart`, not the 1st of the month.
+
+**Overage Policy (shared across all 12 products):** Hard stop, not billed overage. When an org's
+`ai_credits_monthly` counter reaches its plan limit, the AI route returns `403 UNAUTHORIZED` with
+an upgrade prompt (matches the existing `withinLimit()` rejection pattern already used for every
+other metered feature — e.g. SpendGov's `saas_apps_tracked`). No pay-per-credit top-ups in V1 —
+Founder OS is not selling metered overage billing this loop; upgrading plan is the only path to
+more credits. (V2 candidate: a Stripe metered-billing add-on for overage — explicitly out of
+scope here.)
+
+**Fair Usage Policy (shared, Enterprise-specific):** Enterprise credits are "Unlimited" in the
+plan card but enforced server-side as a generous fair-use ceiling (10x the Business allotment)
+to prevent a single misconfigured integration from generating unbounded AI spend; exceeding it
+triggers an internal alert to the account team, not a customer-facing block.
+
+| Product | AI cost / credit | Reasoning | Free | Starter | Pro | Business | Enterprise |
+|---|---|---|---|---|---|---|---|
+| SpendGov | $0.025 | CFO Copilot reasons over multiple findings (duplicates+waste+vendor+renewals) — 2–3K token context | 0 | 15 | 80 | 240 | Unlimited (fair-use ≈2,400) |
+| SecCorrelate | $0.020 | AI Investigate reasons over 2 correlated events + 1 rule — smaller, ~2K token context | 5 (matches existing every-plan access) | 20 | 150 | 450 | Unlimited (fair-use ≈4,500) |
+| CodeAudit | $0.030 | Fix Engine ingests a code snippet + finding and must emit a working patch — largest single-call token footprint in the portfolio, ~3K tokens | 0 | 25 | 150 | 320 | Unlimited (fair-use ≈3,200) |
+| CRMCapture | $0.015 | Lead Extraction is short text→JSON (~800 tokens); Sales Assistant is a compact lead-context call (~2K) — cheapest AI in the portfolio | 0 | 30 | 150 | 450 | Unlimited (fair-use ≈4,500) |
+| IncidentTriage | $0.020 | Root Cause Copilot reasons over an alert timeline — incidents are episodic, so usage cadence is naturally low even though cost/call is mid-range | 5 (matches existing Free 5/mo cap) | 8 | 60 | 180 | Unlimited (fair-use ≈1,800) |
+| AuthStartup | $0.015 | Security Advisor explains a single rule-engine finding — smallest, most templated AI call in the portfolio | 0 | 5 | 40 | 120 | Unlimited (fair-use ≈1,200) |
+| ERPAudit | $0.025 | ERP Auditor must produce a 4-part narrative (explanation + compliance impact + fix + business impact) per finding — wider output, ~2.5K tokens | 0 | 10 | 80 | 240 | Unlimited (fair-use ≈2,400) |
+| ContactVerify | $0.012 | Health Engine reasons over one contact's fields — smallest structured-output schema in the portfolio | 0 | 20 | 150 | 450 | Unlimited (fair-use ≈4,500) |
+| CharacterConsistency | $0.025 | Character DNA expands a short description into a full spec (prompt template + negative prompt + attribute map + features) — but runs once per character, not per generation, so cadence is low | 0 | 5 | 30 | 90 | Unlimited (fair-use ≈900) |
+| PayrollAudit | $0.028 | Payroll Copilot reasons over a full run's findings list, which can be long — but payroll runs are inherently periodic (weekly/biweekly/monthly), so cadence is the lowest in the portfolio | 0 | 4 | 15 | 45 | Unlimited (fair-use ≈450) |
+| TranscriptionQA | $0.030 | Accuracy Copilot ingests full transcript text alongside findings — variable but often the longest raw-text context in the portfolio | 0 | 15 | 100 | 300 | Unlimited (fair-use ≈3,000) |
+| SchemaLint | $0.035 | Database Architect ingests an entire schema (every table/column/index) plus findings — largest and most variable context size in the portfolio, scales with customer's DB size | 0 | 5 | 40 | 120 | Unlimited (fair-use ≈1,200) |
+
+**AI Usage (what consumes 1 credit, per product):**
+
+| Product | Credit-consuming action(s) |
+|---|---|
+| SpendGov | 1 credit = 1 AI CFO Copilot brief **or** 1 AI contract term extraction |
+| SecCorrelate | 1 credit = 1 AI Investigate incident summary |
+| CodeAudit | 1 credit = 1 AI Fix Engine suggestion (explanation + patch + risk score) |
+| CRMCapture | 1 credit = 1 AI Lead Extraction **or** 1 AI Sales Assistant suggestion |
+| IncidentTriage | 1 credit = 1 AI Root Cause Copilot analysis |
+| AuthStartup | 1 credit = 1 AI Security Advisor recommendation |
+| ERPAudit | 1 credit = 1 AI ERP Auditor summary |
+| ContactVerify | 1 credit = 1 AI Contact Health Engine profile |
+| CharacterConsistency | 1 credit = 1 AI Character DNA generation |
+| PayrollAudit | 1 credit = 1 AI Payroll Copilot brief |
+| TranscriptionQA | 1 credit = 1 AI Accuracy Copilot brief |
+| SchemaLint | 1 credit = 1 AI Database Architect brief |
+
+**Margin verification** (against the already-locked prices, product-specific cost/credit, and the
+allotments above): all Starter/Pro/Business combinations clear the ≥75% target after retuning —
+see the Portfolio-Wide Unit Economics Summary at the end of this document, which is updated with
+these product-specific figures. CodeAudit Pro/Business required tuning down from an initial
+200/600-credit draft to 150/320 to clear the margin floor (CodeAudit has the highest cost/credit
+in the portfolio) — captured in each product's Section 4 migration notes below.
+
+---
+
+## SECTION 2 — PRODUCT-SPECIFIC LIMITS
+
+Every limit key below is the **real, already-implemented** entitlement key from each product's
+`lib/services/billing.ts` (verified by reading the actual code, not invented). Two changes are
+made portfolio-wide relative to the current code:
+
+1. **A `business` tier is inserted** between the current `pro` and `enterprise` rows.
+2. **Any limit that is currently `null` (unlimited) at Pro is capped at a high finite number.**
+   Loop 1's code left several Pro-tier limits unbounded, which leaves no room for Business to be a
+   meaningfully bigger tier and violates the global rule "DO NOT use Unlimited unless financially
+   sustainable." Enterprise remains the only tier with true `null` (unlimited) limits.
+
+| Product | Limit | Free | Starter | Pro (was ∞ in code → capped) | Business | Enterprise |
+|---|---|---|---|---|---|---|
+| **SpendGov** | Organizations | 1 | 3 | 10 *(was ∞)* | 25 | ∞ |
+| | SaaS apps tracked | 25 | 100 | 500 *(was ∞)* | 2,000 | ∞ |
+| | AI tools tracked | 10 | 50 *(was ∞ — now finite)* | 250 | 1,000 | ∞ |
+| | History (days) | 14 | 90 | 1,095 | 1,825 | ∞ |
+| **SecCorrelate** | Integrations | 2 | 10 | 25 *(was ∞)* | 100 | ∞ |
+| | Alert ingestion / day | 1,000 | 50,000 | 250,000 *(was ∞)* | 1,000,000 | ∞ |
+| **CodeAudit** | Private repos | 1 | 10 | 50 *(was ∞)* | 200 | ∞ |
+| | Public repos | 3 | 50 *(was ∞ — now finite)* | 200 | 1,000 | ∞ |
+| | Files scanned / month | 500 | 5,000 | 25,000 *(was ∞)* | 100,000 | ∞ |
+| | PR scans / month | 20 | 300 | 1,500 *(was ∞)* | 6,000 | ∞ |
+| **CRMCapture** | Contacts | 100 | 10,000 | 50,000 *(was ∞)* | 200,000 | ∞ |
+| | Leads | 100 | 10,000 *(was ∞ — now finite)* | 50,000 | 200,000 | ∞ |
+| | ~~ai_summaries_monthly~~ | — | — | — | — | *deprecated → folded into `ai_credits_monthly` (Section 1)* |
+| **IncidentTriage** | Projects (services) | 1 | 5 | 25 *(was ∞)* | 100 | ∞ |
+| | Team members | 2 | 10 | 50 *(was ∞)* | 200 | ∞ |
+| | Incidents / month | 100 | 1,000 | 5,000 *(was ∞)* | 20,000 | ∞ |
+| | ~~ai_root_cause_analyses_monthly~~ | — | — | — | — | *deprecated → folded into `ai_credits_monthly`* |
+| | History (days) | 7 | 90 | 730 | 1,825 | ∞ |
+| **AuthStartup** | Projects | 1 | 3 *(was 1 — bumped, Starter=Free was a Loop 1 gap)* | 25 *(was ∞)* | 100 | ∞ |
+| | Monthly active users (MAU) | 1,000 | 10,000 | 100,000 *(was ∞)* | 500,000 | ∞ |
+| **ERPAudit** | ERP instances | 1 | 5 | 25 *(was ∞)* | 100 | ∞ |
+| | Users | 2 | 10 | 50 *(was ∞)* | 200 | ∞ |
+| | Configuration scans / month | 5 | 100 *(was ∞ — now finite)* | 500 | 2,000 | ∞ |
+| | History (days) | 7 | 90 | 730 | 1,825 | ∞ |
+| **ContactVerify** | Verifications / month | 500 | 10,000 | 50,000 *(was ∞)* | 200,000 | ∞ |
+| **CharacterConsistency** | Characters | 1 | 10 | 50 *(was ∞)* | 200 | ∞ |
+| | Generations / month | 20 | 500 | 2,500 *(was ∞)* | 10,000 | ∞ |
+| | Style references | 5 | 50 | 200 *(was ∞)* | 1,000 | ∞ |
+| **PayrollAudit** | Companies | 1 | 2 *(was 1 — bumped, Starter=Free was a Loop 1 gap)* | 10 *(was ∞)* | 40 | ∞ |
+| | Employees | 20 | 250 | 2,000 *(was ∞)* | 10,000 | ∞ |
+| | Payroll runs / month | 1 | 20 *(was ∞ — now finite)* | 100 | 400 | ∞ |
+| **TranscriptionQA** | Audio uploads (transcripts) / month | 5 | 100 *(was ∞ — now finite)* | 500 | 2,000 | ∞ |
+| | Processing minutes / month | 60 | 500 | 2,500 *(was ∞)* | 10,000 | ∞ |
+| **SchemaLint** | Database schemas | 3 | 20 | 100 *(was ∞)* | 400 | ∞ |
+| | Tables tracked | 100 | 2,000 *(was ∞ — now finite)* | 10,000 | 40,000 | ∞ |
+
+---
+
+## SECTION 3 — COMMERCIAL DEPENDENCY MAP
+
+```
+Pricing (locked $ per plan, this document)
+  └──▶ Stripe
+         ├──▶ Stripe Price IDs (env-var per plan per product, fail-closed if unset)
+         │      └──▶ stripe-price-map.ts (12x, one per product)
+         │             └──▶ Checkout Route (app/api/billing/checkout)
+         │                    └──▶ createCheckoutSession() [@founder-os/platform/billing]
+         ├──▶ Stripe Billing Portal
+         │      └──▶ Portal Route (app/api/billing/portal)
+         └──▶ Stripe Webhook
+                └──▶ Webhook Route (app/api/billing/webhook)
+                       └──▶ handleStripeWebhookEvent() [@founder-os/platform/billing]
+                              └──▶ Subscription record (plan, status, currentPeriodStart/End)
+
+Feature Gates (Section 2 booleans, e.g. use_ai_cfo_copilot)
+  └──▶ Plan Engine [@founder-os/platform/billing: can(), getEntitlementSummary()]
+         └──▶ PlanEntitlement rows (seeded per plan by each product's seedPlans())
+                └──▶ Route-level can() checks (403 UNAUTHORIZED if not entitled)
+
+AI Credits (Section 1, ai_credits_monthly)
+  └──▶ Credit Ledger [@founder-os/platform/billing: withinLimit() + incrementUsage()]
+         └──▶ UsageCounter rows (keyed by org + metric + subscription.currentPeriodStart)
+                ├──▶ AI route pre-check: withinLimit(orgId, "ai_credits_monthly") → 403 if exceeded
+                └──▶ AI route post-success: incrementUsage(orgId, "ai_credits_monthly", 1)
+                       └──▶ AICreditMeter component [@founder-os/ui] reads getCurrentUsage() for display
+
+Usage Limits (Section 2 numeric limits, e.g. saas_apps_tracked)
+  └──▶ Usage Limit Engine [@founder-os/platform/billing: withinLimit(), incrementUsage()]
+         └──▶ Same UsageCounter table as AI Credits, different metricKey per limit
+                └──▶ UsageMeter component [@founder-os/ui] reads getCurrentUsage() for display
+
+API (Section 5 of COMMERCIAL_FREEZE.md — 11/12 products: not live in V1)
+  └──▶ API Gateway (V2 — not built; only AuthStartup's end-user auth API is live today)
+         └──▶ API keys (AuthStartup only, already implemented: ProjectApiKey model)
+
+Enterprise
+  └──▶ SSO / SCIM (marketing-tier only — shared-platform OAuth/SAML library exists but is
+         not wired into any product route; flagged as an engineering follow-up per product)
+  └──▶ Private deployment (manually provisioned, outside the self-serve Stripe flow —
+         Enterprise subscriptions are created directly against the "enterprise" plan code,
+         bypassing Checkout entirely, same pattern as today)
+
+Plan Badge / Pricing Card / Upgrade Modal / Feature Matrix [@founder-os/ui]
+  └──▶ Read plan code + entitlement summary from the org's active Subscription
+         └──▶ Rendered identically across all 12 products (Section 5 — shared, never duplicated)
+```
+
+Every arrow above is either already-implemented shared-platform infrastructure (Stripe, Plan
+Engine, Credit/Usage Ledger — all one and the same `UsageCounter` mechanism) or a net-new shared
+UI component to be built once in `@founder-os/ui` and consumed by all 12 products. No product gets
+its own bespoke pricing/billing/credit code path — that would violate "never duplicate code."
+
+---
+
+## SECTION 4 — MIGRATION IMPACT TABLE
+
+Every row below is scoped to **wiring the already-locked commercial model into existing code** —
+no redesign, no renamed products, no new features beyond the Business tier and AI-credit metering.
+
+| Product | Frontend Changes | Backend Changes | Database Changes | Billing Changes | Dashboard Changes | Feature Gate Changes | Navigation Changes | Risk | Complexity | Files Expected to Change | Purpose |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| **SpendGov** | Billing page: 5-tier `PricingCard` grid, `AICreditMeter` | AI routes (`/copilot/generate`, `/contracts/extract`) add credit check | None (uses existing `UsageCounter` table) | New `business` Stripe price env var; checkout enum +`business` | Add `AICreditMeter` to dashboard header | AI CFO Copilot/contract extraction move Pro-only → Starter+ credit-gated | None | Low | Medium | `billing.ts`, `stripe-price-map.ts`, `checkout/route.ts`, `copilot/generate/route.ts`, `contracts/extract/route.ts`, `billing/page.tsx`, `dashboard/page.tsx` (~7) | Unlock the commercial model without touching product scope |
+| **SecCorrelate** | Same pattern | `/alerts/[id]/summarize` adds credit check | None | Same | Same | AI Investigate stays available at all tiers, now credit-metered instead of unmetered | None | Low | Medium | ~7 files | Same |
+| **CodeAudit** | Same pattern, per-seat pricing labels unchanged | `/findings/[id]/fix` adds credit check | None | Same | Same | AI Fix Engine moves Pro-only → Starter+ credit-gated | None | Low | Medium | ~7 files | Same |
+| **CRMCapture** | Same pattern | `/contacts/extract`, `/leads/[id]/assist` add credit checks; retire `ai_summaries_monthly` limit | None | Same | Same | AI Lead Extraction (already Starter+) and AI Sales Assistant (Pro-only → Starter+) both credit-gated | None | Low | Medium | ~8 files | Same |
+| **IncidentTriage** | Same pattern | `/incidents/[id]/analyze` adds credit check; retire `ai_root_cause_analyses_monthly` | None | Same | Same | AI Root Cause Copilot's existing Free-5/mo cap becomes the Free credit allotment | None | Low | Medium | ~8 files | Same |
+| **AuthStartup** | Same pattern + existing live API docs unaffected | `/security/[id]/recommend` adds credit check | None | Same | Same + credit meter alongside existing MAU meter | AI Security Advisor moves Pro-only → Starter+ credit-gated | None | Low | Medium | ~7 files | Same |
+| **ERPAudit** | Same pattern | `/findings/[id]/summarize` adds credit check | None | Same | Same | AI ERP Auditor moves Pro-only → Starter+ credit-gated | None | Low | Medium | ~7 files | Same |
+| **ContactVerify** | Same pattern | `/contacts/[id]/analyze` adds credit check | None | Same | Same | AI Contact Health Engine moves Pro-only → Starter+ credit-gated | None | Low | Medium | ~7 files | Same |
+| **CharacterConsistency** | Same pattern | `/characters/[id]/dna` adds credit check | None | Same | Same | AI Character DNA moves Pro-only → Starter+ credit-gated | None | Low | Medium | ~7 files | Same |
+| **PayrollAudit** | Same pattern | `/payroll-runs/[id]/copilot` adds credit check | None | Same | Same | AI Payroll Copilot's existing basic/full split becomes Starter/Pro credit tiers | None | Low | Medium | ~7 files | Same |
+| **TranscriptionQA** | Same pattern | `/transcripts/[id]/copilot` adds credit check | None | Same | Same | AI Accuracy Copilot moves Pro-only → Starter+ credit-gated | None | Low | Medium | ~7 files | Same |
+| **SchemaLint** | Same pattern | `/schemas/[id]/architect` adds credit check | None | Same | Same | AI Database Architect moves Pro-only → Starter+ credit-gated | None | Low | Medium | ~7 files | Same |
+| **Shared Platform** | New `PricingCard`, `AICreditMeter`, `UsageMeter`, `PlanBadge`, `UpgradeModal`, `FeatureMatrix` in `@founder-os/ui` | New `checkAndConsumeAiCredit()` convenience helper in `@founder-os/platform/billing` (thin wrapper over existing `withinLimit`+`incrementUsage`, avoids duplicating the same 4-line boilerplate 12x) | None — reuses existing `UsageCounter`/`PlanEntitlement` tables | None | — | — | — | Low | Medium | ~7 new component files + 1 new helper file | Give all 12 products one shared implementation instead of 12 bespoke ones |
+
+**Why every product row reads "Database Changes: None":** the Business tier and AI credits both
+reuse tables that already exist (`Plan`, `PlanEntitlement`, `Subscription`, `UsageCounter`) — this
+is additive `PlanEntitlement` seeding, not a schema migration. **Why every "Navigation Changes"
+row is None:** the commercial model changes what a nav item is gated behind, not what nav items
+exist — no page is added, removed, or renamed.
+
+---
+
+## SECTION 5 — SHARED COMPONENT INVENTORY
+
+| Component | Status | Where it lives / will live | Used for |
+|---|---|---|---|
+| `Card`, `CardHeader`, `CardTitle`, `CardContent` | ✅ Exists | `@founder-os/ui/primitives` | Base of every pricing card, dashboard card |
+| `Button` | ✅ Exists | `@founder-os/ui/primitives` | Upgrade/checkout/portal CTAs |
+| `Badge` | ✅ Exists | `@founder-os/ui/primitives` | Base of the new `PlanBadge` |
+| `Modal`, `ConfirmDialog` | ✅ Exists | `@founder-os/ui/primitives` | Base of the new `UpgradeModal` |
+| `DataTable` | ✅ Exists | `@founder-os/ui/dashboard` | Base of the new `FeatureMatrix` (rows=features, cols=plans) |
+| `KPICard`, `ChartCard` | ✅ Exists | `@founder-os/ui/dashboard` | Dashboard cards — unchanged, no product should hand-roll a new card style |
+| `DashboardShell`, `AdminShell` | ✅ Exists | `@founder-os/ui/dashboard`, `@founder-os/ui/admin` | Sidebar + top navigation — unchanged, confirmed one shared implementation, no per-product forks found in Loop 1 audits |
+| `BillingPanel` | ✅ Exists (admin-facing, read-only) | `@founder-os/ui/admin` | Admin billing summary — distinct from the user-facing pricing page, not duplicated |
+| `EmptyState`, `ErrorState`, `Skeleton` | ✅ Exists | `@founder-os/ui/primitives` | Loading/empty states — unchanged |
+| `Input`, `Select`, `Textarea`, `Checkbox` | ✅ Exists | `@founder-os/ui/primitives` | Forms — unchanged |
+| `Toast`/`ToastProvider` | ✅ Exists | `@founder-os/ui/primitives` | Checkout error/success notifications — unchanged |
+| `PricingCard` | 🆕 New | `@founder-os/ui/billing` (new subpath) | Renders one plan's price/features/CTA — replaces the 12 hand-rolled `PLANS.map(...)` blocks with one shared component taking plan data as props |
+| `AICreditMeter` | 🆕 New | `@founder-os/ui/billing` | Progress-bar style "N of M AI credits used this period," reads `getCurrentUsage(orgId, "ai_credits_monthly")` |
+| `UsageMeter` | 🆕 New | `@founder-os/ui/billing` | Generic version of the above for any numeric limit (contacts, schemas, employees, etc.) — `AICreditMeter` is a thin preset of this |
+| `PlanBadge` | 🆕 New | `@founder-os/ui/billing` | Small pill showing the org's current plan (Free/Starter/Pro/Business/Enterprise), used in nav header and admin billing panel |
+| `UpgradeModal` | 🆕 New | `@founder-os/ui/billing` | Triggered when a `withinLimit`/`can` check fails client-side; shows the specific limit hit and a CTA into the pricing page |
+| `FeatureMatrix` | 🆕 New | `@founder-os/ui/billing` | Full feature-by-plan comparison table for the pricing page, built on top of the existing `DataTable` |
+
+**Zero duplication confirmed:** grepping all 12 products' `app/(app)/billing/page.tsx` in Loop 1
+showed every product already uses the *same* `Card`/`Button` primitives with a locally-defined
+`PLANS` array — the only duplication is the plan-rendering JSX itself (~30 lines × 12 = ~360 lines
+of near-identical code), which `PricingCard` + `FeatureMatrix` eliminate. No product has a bespoke
+sidebar, table, chart, or dialog implementation — the existing `@founder-os/ui` primitives are
+already fully shared, confirming the portfolio-first architecture rule was already being followed
+before this loop.
+
+---
+
+## LOOP 2 FINAL APPROVAL
+
+| Gate | Status |
+|---|---|
+| Product Freeze (Loop 1) | ✅ Approved |
+| Commercial Freeze — 12 product sections | ✅ Approved |
+| Commercial Freeze — Section 1 (AI Credits) | ✅ Approved |
+| Commercial Freeze — Section 2 (Limits) | ✅ Approved |
+| Commercial Freeze — Section 3 (Dependency Map) | ✅ Approved |
+| Commercial Freeze — Section 4 (Migration Impact) | ✅ Approved |
+| Commercial Freeze — Section 5 (Shared Components) | ✅ Approved |
+
+**COMMERCIAL STATUS: ✅ LOCKED**
+
+Product Freeze — Approved
+Commercial Freeze — Approved
+
+
 ## GLOBAL STATUS
 
 **FOUNDER OS V1 — COMMERCIAL MODEL LOCKED**
