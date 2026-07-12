@@ -20,7 +20,9 @@
     "./layout.css": "./src/layout/layout.css",
     "./admin.css": "./src/admin/admin.css",
     "./hooks": { "types": "./dist/hooks/index.d.ts", "default": "./dist/hooks/index.js" },
-    "./utils": { "types": "./dist/utils/index.d.ts", "default": "./dist/utils/index.js" }
+    "./utils": { "types": "./dist/utils/index.d.ts", "default": "./dist/utils/index.js" },
+    "./billing": { "types": "./dist/billing/index.d.ts", "default": "./dist/billing/index.js" },
+    "./billing.css": "./src/billing/billing.css"
   },
   "scripts": {
     "prepare": "npm run build",

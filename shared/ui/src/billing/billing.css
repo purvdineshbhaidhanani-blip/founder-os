@@ -1,0 +1,34 @@
+/* Billing/Commercial component styles (COMMERCIAL_FREEZE.md Section 5) — consumes tokens.css and primitives.css. */
+
+/* Pricing Card / Grid */
+.fos-pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-4); }
+.fos-pricing-card { display: flex; flex-direction: column; }
+.fos-pricing-card-highlighted { border-color: hsl(var(--primary)); box-shadow: 0 0 0 1px hsl(var(--primary)); }
+.fos-pricing-card-header-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); }
+.fos-pricing-card-price { font-size: var(--font-size-2xl); font-weight: var(--font-weight-heading); color: hsl(var(--foreground)); margin-top: var(--space-1); }
+.fos-pricing-card-features { display: flex; flex-direction: column; gap: var(--space-2); list-style: none; padding: 0; margin: 0 0 var(--space-4) 0; font-size: var(--font-size-sm); color: hsl(var(--muted-foreground)); }
+.fos-pricing-card-cta { width: 100%; }
+
+/* Usage Meter / AI Credit Meter */
+.fos-usage-meter { display: flex; flex-direction: column; gap: var(--space-2); }
+.fos-usage-meter-header { display: flex; align-items: baseline; justify-content: space-between; }
+.fos-usage-meter-label { font-size: var(--font-size-sm); font-weight: var(--font-weight-emphasis); color: hsl(var(--foreground)); }
+.fos-usage-meter-value { font-size: var(--font-size-xs); color: hsl(var(--muted-foreground)); }
+.fos-usage-meter-track { width: 100%; height: 8px; border-radius: var(--radius-full); background: hsl(var(--muted)); overflow: hidden; }
+.fos-usage-meter-fill { height: 100%; border-radius: var(--radius-full); transition: width 0.2s ease; }
+.fos-usage-meter-fill-normal { background: hsl(var(--primary)); }
+.fos-usage-meter-fill-warning { background: hsl(var(--warning)); }
+.fos-usage-meter-fill-limit { background: hsl(var(--destructive)); }
+.fos-usage-meter-limit-message { font-size: var(--font-size-xs); color: hsl(var(--destructive)); margin: 0; }
+.fos-usage-meter-skeleton-label { width: 96px; height: 14px; }
+.fos-usage-meter-skeleton-bar { width: 100%; height: 8px; }
+
+/* Upgrade Modal */
+.fos-upgrade-modal-actions { display: flex; justify-content: flex-end; gap: var(--space-3); margin-top: var(--space-4); }
+
+/* Feature Matrix */
+.fos-feature-matrix-label-col { text-align: left; }
+.fos-feature-matrix-plan-col { text-align: center; }
+.fos-feature-matrix-check { color: hsl(var(--success)); font-weight: var(--font-weight-emphasis); }
+.fos-feature-matrix-dash { color: hsl(var(--muted-foreground)); }
+.fos-feature-matrix-value { font-size: var(--font-size-sm); color: hsl(var(--foreground)); }
