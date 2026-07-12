@@ -1,13 +1,46 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent, Button, useToast } from "@founder-os/ui/primitives";
+import { Button, useToast } from "@founder-os/ui/primitives";
+import { PricingGrid, type PricingPlan } from "@founder-os/ui/billing";
 
-const PLANS = [
-  { code: "free", name: "Free", price: "$0", features: ["3 schemas, 100 tables", "Basic schema analysis"] },
-  { code: "starter", name: "Starter", price: "$19/mo", features: ["20 schemas, unlimited tables", "AI optimization suggestions", "Index recommendations"] },
-  { code: "pro", name: "Pro", price: "$59/mo", features: ["Unlimited schemas", "AI Database Architect", "Migration planning, security audit, API access"] },
-  { code: "enterprise", name: "Enterprise", price: "Custom", features: ["Everything in Pro", "Oracle, Snowflake, MongoDB, BigQuery", "SSO, dedicated support & SLA"] },
+const PLANS: PricingPlan[] = [
+  {
+    code: "free",
+    name: "Free",
+    price: "$0",
+    features: ["3 schemas, 100 tables tracked", "Basic schema analysis"],
+    isCheckoutable: false,
+  },
+  {
+    code: "starter",
+    name: "Starter",
+    price: "$19/mo",
+    features: ["20 schemas, 2,000 tables tracked", "AI Database Architect (5 AI credits/mo)", "AI optimization suggestions", "Index recommendations"],
+    isCheckoutable: true,
+  },
+  {
+    code: "pro",
+    name: "Pro",
+    price: "$59/mo",
+    features: ["100 schemas, 10,000 tables tracked", "AI Database Architect (40 AI credits/mo)", "Migration planning, security audit, API access"],
+    isCheckoutable: true,
+    highlighted: true,
+  },
+  {
+    code: "business",
+    name: "Business",
+    price: "$129/mo",
+    features: ["400 schemas, 40,000 tables tracked", "AI Database Architect (120 AI credits/mo)", "Everything in Pro"],
+    isCheckoutable: true,
+  },
+  {
+    code: "enterprise",
+    name: "Enterprise",
+    price: "Custom",
+    features: ["Unlimited schemas & tables tracked", "Unlimited AI credits (fair-use)", "Oracle, Snowflake, MongoDB, BigQuery", "SSO, dedicated support & SLA"],
+    isCheckoutable: false,
+  },
 ];
 
 export default function BillingPage() {
@@ -60,28 +93,7 @@ export default function BillingPage() {
         </Button>
       </div>
 
-      <div className="sl-plan-grid">
-        {PLANS.map((plan) => (
-          <Card key={plan.code}>
-            <CardHeader>
-              <CardTitle>{plan.name}</CardTitle>
-              <p className="sl-plan-price">{plan.price}</p>
-            </CardHeader>
-            <CardContent>
-              <ul className="sl-plan-features">
-                {plan.features.map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
-              </ul>
-              {(plan.code === "starter" || plan.code === "pro") && (
-                <Button onClick={() => startCheckout(plan.code)} isLoading={loadingPlan === plan.code}>
-                  Upgrade to {plan.name}
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <PricingGrid plans={PLANS} onSelect={startCheckout} loadingPlanCode={loadingPlan} />
     </div>
   );
 }
