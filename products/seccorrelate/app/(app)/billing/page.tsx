@@ -1,13 +1,46 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent, Button, useToast } from "@founder-os/ui/primitives";
+import { Button, useToast } from "@founder-os/ui/primitives";
+import { PricingGrid, type PricingPlan } from "@founder-os/ui/billing";
 
-const PLANS = [
-  { code: "free", name: "Free (14-Day Trial)", price: "$0", features: ["2 security integrations", "1,000 alerts/day", "AI incident summaries", "Basic dashboard"] },
-  { code: "starter", name: "Starter", price: "$49/mo", features: ["10 integrations", "50,000 alerts/day", "AI correlation", "Incident timeline", "Email + Slack alerts"] },
-  { code: "pro", name: "Pro", price: "$199/mo", features: ["Unlimited integrations & alerts", "AI threat hunting", "MITRE ATT&CK mapping", "Root cause analysis", "Playbooks", "API access"] },
-  { code: "enterprise", name: "Enterprise", price: "Custom", features: ["Everything in Pro", "Multi-tenant / MSSP", "SSO & SOC2 support", "SIEM integrations", "Dedicated support & SLA"] },
+const PLANS: PricingPlan[] = [
+  {
+    code: "free",
+    name: "Free (14-Day Trial)",
+    price: "$0",
+    isCheckoutable: false,
+    features: ["2 security integrations", "1,000 alerts/day", "AI Investigate (5 AI credits/mo)", "Basic dashboard"],
+  },
+  {
+    code: "starter",
+    name: "Starter",
+    price: "$49/mo",
+    isCheckoutable: true,
+    features: ["10 integrations", "50,000 alerts/day", "AI correlation", "Incident timeline", "AI Investigate (20 AI credits/mo)", "Email + Slack alerts"],
+  },
+  {
+    code: "pro",
+    name: "Pro",
+    price: "$199/mo",
+    isCheckoutable: true,
+    highlighted: true,
+    features: ["25 integrations", "250,000 alerts/day", "AI threat hunting", "MITRE ATT&CK mapping", "Root cause analysis", "Playbooks", "API access", "AI Investigate (150 AI credits/mo)"],
+  },
+  {
+    code: "business",
+    name: "Business",
+    price: "$449/mo",
+    isCheckoutable: true,
+    features: ["100 integrations", "1,000,000 alerts/day", "Everything in Pro", "Team seats", "AI Investigate (450 AI credits/mo)"],
+  },
+  {
+    code: "enterprise",
+    name: "Enterprise",
+    price: "Custom",
+    isCheckoutable: false,
+    features: ["Everything in Business", "Multi-tenant / MSSP", "SSO & SOC2 support", "SIEM integrations", "Unlimited AI Investigate (fair-use)", "Dedicated support & SLA"],
+  },
 ];
 
 export default function BillingPage() {
@@ -60,28 +93,7 @@ export default function BillingPage() {
         </Button>
       </div>
 
-      <div className="sc-plan-grid">
-        {PLANS.map((plan) => (
-          <Card key={plan.code}>
-            <CardHeader>
-              <CardTitle>{plan.name}</CardTitle>
-              <p className="sc-plan-price">{plan.price}</p>
-            </CardHeader>
-            <CardContent>
-              <ul className="sc-plan-features">
-                {plan.features.map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
-              </ul>
-              {(plan.code === "starter" || plan.code === "pro") && (
-                <Button onClick={() => startCheckout(plan.code)} isLoading={loadingPlan === plan.code}>
-                  Upgrade to {plan.name}
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <PricingGrid plans={PLANS} onSelect={startCheckout} loadingPlanCode={loadingPlan} />
     </div>
   );
 }

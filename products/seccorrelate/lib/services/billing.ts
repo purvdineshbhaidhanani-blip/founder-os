@@ -4,8 +4,13 @@ import { can, withinLimit } from "@founder-os/platform/billing";
 
 /**
  * Pricing tiers per products/seccorrelate/docs/PRODUCT_IDENTITY.md §21-22 —
- * Free/Starter/Pro/Enterprise, entitlements transcribed verbatim from the
- * "Entitlements Logic (Pricing Engine)" table.
+ * Free/Starter/Pro/Business/Enterprise, entitlements transcribed verbatim
+ * from the "Entitlements Logic (Pricing Engine)" table, extended per
+ * COMMERCIAL_FREEZE.md §2 SECCORRELATE (Loop 2 commercial lock) with the
+ * `business` tier and the `ai_credits_monthly` metering limit. AI
+ * Investigate (`use_ai_incident_summary`) remains true on every plan
+ * including Free, per Loop 1's "every plan" access — only the credit
+ * allotment behind it changes.
  */
 export const PLAN_DEFINITIONS = [
   {
@@ -24,7 +29,7 @@ export const PLAN_DEFINITIONS = [
       use_sso: false,
       multi_tenant: false,
     },
-    limits: { integrations: 2, alert_ingestion_daily: 1000 },
+    limits: { integrations: 2, alert_ingestion_daily: 1000, ai_credits_monthly: 5 },
   },
   {
     code: "starter",
@@ -42,7 +47,7 @@ export const PLAN_DEFINITIONS = [
       use_sso: false,
       multi_tenant: false,
     },
-    limits: { integrations: 10, alert_ingestion_daily: 50_000 },
+    limits: { integrations: 10, alert_ingestion_daily: 50_000, ai_credits_monthly: 20 },
   },
   {
     code: "pro",
@@ -60,7 +65,25 @@ export const PLAN_DEFINITIONS = [
       use_sso: false,
       multi_tenant: false,
     },
-    limits: { integrations: null, alert_ingestion_daily: null },
+    limits: { integrations: 25, alert_ingestion_daily: 250_000, ai_credits_monthly: 150 },
+  },
+  {
+    code: "business",
+    name: "Business",
+    priceCents: 44900,
+    booleans: {
+      use_ai_incident_summary: true,
+      use_ai_correlation: true,
+      view_incident_timeline: true,
+      use_ai_threat_hunting: true,
+      use_mitre_mapping: true,
+      use_root_cause_analysis: true,
+      use_playbooks: true,
+      use_api: true,
+      use_sso: false,
+      multi_tenant: false,
+    },
+    limits: { integrations: 100, alert_ingestion_daily: 1_000_000, ai_credits_monthly: 450 },
   },
   {
     code: "enterprise",
@@ -78,7 +101,7 @@ export const PLAN_DEFINITIONS = [
       use_sso: true,
       multi_tenant: true,
     },
-    limits: { integrations: null, alert_ingestion_daily: null },
+    limits: { integrations: null, alert_ingestion_daily: null, ai_credits_monthly: null },
   },
 ] as const;
 

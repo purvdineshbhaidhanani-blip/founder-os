@@ -24,7 +24,7 @@ export const PLAN_DEFINITIONS = [
       use_sso: false,
       use_scim: false,
     },
-    limits: { companies: 1, employees: 20, payroll_runs_monthly: 1 },
+    limits: { companies: 1, employees: 20, payroll_runs_monthly: 1, ai_credits_monthly: 0 },
   },
   {
     code: "starter",
@@ -42,7 +42,7 @@ export const PLAN_DEFINITIONS = [
       use_sso: false,
       use_scim: false,
     },
-    limits: { companies: 1, employees: 250, payroll_runs_monthly: null },
+    limits: { companies: 2, employees: 250, payroll_runs_monthly: 20, ai_credits_monthly: 4 },
   },
   {
     code: "pro",
@@ -60,7 +60,25 @@ export const PLAN_DEFINITIONS = [
       use_sso: false,
       use_scim: false,
     },
-    limits: { companies: null, employees: null, payroll_runs_monthly: null },
+    limits: { companies: 10, employees: 2000, payroll_runs_monthly: 100, ai_credits_monthly: 15 },
+  },
+  {
+    code: "business",
+    name: "Business",
+    priceCents: 29900,
+    booleans: {
+      validate_tax: true,
+      validate_overtime: true,
+      use_ai_error_detection: true,
+      import_attendance: true,
+      forecast_salary: true,
+      use_workflow_approvals: true,
+      use_api: true,
+      view_audit_log: true,
+      use_sso: false,
+      use_scim: false,
+    },
+    limits: { companies: 40, employees: 10000, payroll_runs_monthly: 400, ai_credits_monthly: 45 },
   },
   {
     code: "enterprise",
@@ -78,7 +96,7 @@ export const PLAN_DEFINITIONS = [
       use_sso: true,
       use_scim: true,
     },
-    limits: { companies: null, employees: null, payroll_runs_monthly: null },
+    limits: { companies: null, employees: null, payroll_runs_monthly: null, ai_credits_monthly: null },
   },
 ] as const;
 

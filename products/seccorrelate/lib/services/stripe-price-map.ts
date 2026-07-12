@@ -3,6 +3,7 @@ import { PlatformError } from "@founder-os/platform/errors";
 const PRICE_ID_ENV_VARS: Record<string, string | undefined> = {
   starter: process.env.STRIPE_PRICE_ID_STARTER_MONTHLY,
   pro: process.env.STRIPE_PRICE_ID_PRO_MONTHLY,
+  business: process.env.STRIPE_PRICE_ID_BUSINESS_MONTHLY,
 };
 
 export function resolveStripePriceId(planCode: string): string {

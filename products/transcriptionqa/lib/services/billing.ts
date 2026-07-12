@@ -4,12 +4,16 @@ import { can, withinLimit } from "@founder-os/platform/billing";
 
 /**
  * Pricing tiers per products/transcriptionqa/docs/PRODUCT_IDENTITY.md
- * §21-22 — Free/Starter/Pro/Enterprise, entitlements transcribed
- * verbatim from the "Entitlements Logic (Pricing Engine)" table.
- * `use_accuracy_score` gates the AI Accuracy Copilot specifically (the
- * killer feature) — the deterministic "Basic" accuracy score in the
- * table runs unconditionally in code for every tier, matching the
- * pattern used for CharacterConsistency's AI Character DNA gate.
+ * §21-22 — Free/Starter/Pro/Business/Enterprise, entitlements transcribed
+ * verbatim from the "Entitlements Logic (Pricing Engine)" table, updated
+ * per the Loop 2 commercial freeze (COMMERCIAL_FREEZE.md, TranscriptionQA
+ * section). `use_domain_dictionary` gates domain terminology validation
+ * (Starter+, not an AI feature — unchanged since Loop 1). `use_accuracy_score`
+ * gates the AI Accuracy Copilot specifically (the killer feature) — now
+ * credit-metered via `ai_credits_monthly` and unlocked from Starter instead
+ * of Pro, per the Loop 2 pricing-model decision. The deterministic "Basic"
+ * accuracy score in the table runs unconditionally in code for every tier,
+ * matching the pattern used for CharacterConsistency's AI Character DNA gate.
  */
 export const PLAN_DEFINITIONS = [
   {
@@ -29,14 +33,14 @@ export const PLAN_DEFINITIONS = [
       use_hipaa_deployment: false,
       use_sso: false,
     },
-    limits: { audio_uploads_monthly: 5, processing_minutes_monthly: 60 },
+    limits: { audio_uploads_monthly: 5, processing_minutes_monthly: 60, ai_credits_monthly: 0 },
   },
   {
     code: "starter",
     name: "Starter",
     priceCents: 2900,
     booleans: {
-      use_accuracy_score: false,
+      use_accuracy_score: true,
       use_speaker_detection: true,
       use_grammar_check: true,
       use_domain_dictionary: true,
@@ -48,7 +52,7 @@ export const PLAN_DEFINITIONS = [
       use_hipaa_deployment: false,
       use_sso: false,
     },
-    limits: { audio_uploads_monthly: null, processing_minutes_monthly: 500 },
+    limits: { audio_uploads_monthly: 100, processing_minutes_monthly: 500, ai_credits_monthly: 15 },
   },
   {
     code: "pro",
@@ -67,7 +71,26 @@ export const PLAN_DEFINITIONS = [
       use_hipaa_deployment: false,
       use_sso: false,
     },
-    limits: { audio_uploads_monthly: null, processing_minutes_monthly: null },
+    limits: { audio_uploads_monthly: 500, processing_minutes_monthly: 2500, ai_credits_monthly: 100 },
+  },
+  {
+    code: "business",
+    name: "Business",
+    priceCents: 22900,
+    booleans: {
+      use_accuracy_score: true,
+      use_speaker_detection: true,
+      use_grammar_check: true,
+      use_domain_dictionary: true,
+      use_translation: true,
+      use_compliance_detection: true,
+      use_sentiment_analysis: true,
+      use_api: true,
+      use_webhooks: true,
+      use_hipaa_deployment: false,
+      use_sso: false,
+    },
+    limits: { audio_uploads_monthly: 2000, processing_minutes_monthly: 10000, ai_credits_monthly: 300 },
   },
   {
     code: "enterprise",
@@ -86,7 +109,7 @@ export const PLAN_DEFINITIONS = [
       use_hipaa_deployment: true,
       use_sso: true,
     },
-    limits: { audio_uploads_monthly: null, processing_minutes_monthly: null },
+    limits: { audio_uploads_monthly: null, processing_minutes_monthly: null, ai_credits_monthly: null },
   },
 ] as const;
 

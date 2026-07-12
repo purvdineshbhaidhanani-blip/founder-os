@@ -1,13 +1,66 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardHeader, CardTitle, CardContent, Button, useToast } from "@founder-os/ui/primitives";
+import { Button, useToast } from "@founder-os/ui/primitives";
+import { PricingGrid, type PricingPlan } from "@founder-os/ui/billing";
 
-const PLANS = [
-  { code: "free", name: "Free", price: "$0", features: ["1 character", "20 generations/month", "5 style references"] },
-  { code: "starter", name: "Starter", price: "$19/mo", features: ["10 characters, 500 generations/month", "Outfit + pose memory", "HD export"] },
-  { code: "pro", name: "Pro", price: "$59/mo", features: ["Unlimited characters & generations", "AI Character DNA / Story Memory", "Multi-character scenes & video consistency", "Team workspace, full API"] },
-  { code: "enterprise", name: "Enterprise", price: "Custom", features: ["Everything in Pro", "White label & private models", "Dedicated GPU resources", "SSO & audit logs"] },
+const PLANS: PricingPlan[] = [
+  {
+    code: "free",
+    name: "Free",
+    price: "$0",
+    features: ["1 character", "20 generations/month", "5 style references"],
+    isCheckoutable: false,
+  },
+  {
+    code: "starter",
+    name: "Starter",
+    price: "$19/mo",
+    features: [
+      "10 characters, 500 generations/month",
+      "Outfit + pose memory",
+      "HD export",
+      "AI Character DNA (5 AI credits/mo)",
+    ],
+    isCheckoutable: true,
+  },
+  {
+    code: "pro",
+    name: "Pro",
+    price: "$59/mo",
+    features: [
+      "50 characters, 2,500 generations/month",
+      "AI Character DNA (30 AI credits/mo)",
+      "Multi-character scenes & video consistency",
+      "Team workspace, full API",
+    ],
+    isCheckoutable: true,
+    highlighted: true,
+  },
+  {
+    code: "business",
+    name: "Business",
+    price: "$129/mo",
+    features: [
+      "200 characters, 10,000 generations/month",
+      "AI Character DNA (90 AI credits/mo)",
+      "Multi-character scenes & video consistency",
+      "Team workspace, full API",
+    ],
+    isCheckoutable: true,
+  },
+  {
+    code: "enterprise",
+    name: "Enterprise",
+    price: "Custom",
+    features: [
+      "Unlimited characters, generations & AI credits (fair-use)",
+      "White label & private models",
+      "Dedicated GPU resources",
+      "SSO & audit logs",
+    ],
+    isCheckoutable: false,
+  },
 ];
 
 export default function BillingPage() {
@@ -60,28 +113,7 @@ export default function BillingPage() {
         </Button>
       </div>
 
-      <div className="cc-plan-grid">
-        {PLANS.map((plan) => (
-          <Card key={plan.code}>
-            <CardHeader>
-              <CardTitle>{plan.name}</CardTitle>
-              <p className="cc-plan-price">{plan.price}</p>
-            </CardHeader>
-            <CardContent>
-              <ul className="cc-plan-features">
-                {plan.features.map((feature) => (
-                  <li key={feature}>{feature}</li>
-                ))}
-              </ul>
-              {(plan.code === "starter" || plan.code === "pro") && (
-                <Button onClick={() => startCheckout(plan.code)} isLoading={loadingPlan === plan.code}>
-                  Upgrade to {plan.name}
-                </Button>
-              )}
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+      <PricingGrid plans={PLANS} onSelect={startCheckout} loadingPlanCode={loadingPlan} />
     </div>
   );
 }

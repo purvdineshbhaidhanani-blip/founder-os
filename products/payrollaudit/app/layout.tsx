@@ -5,6 +5,7 @@ import "@founder-os/ui/primitives.css";
 import "@founder-os/ui/dashboard.css";
 import "@founder-os/ui/layout.css";
 import "@founder-os/ui/admin.css";
+import "@founder-os/ui/billing.css";
 import "./product.css";
 import { Providers } from "./providers.js";
 

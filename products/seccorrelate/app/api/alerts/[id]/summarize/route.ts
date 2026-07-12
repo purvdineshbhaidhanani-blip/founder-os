@@ -1,4 +1,4 @@
-import { can } from "@founder-os/platform/billing";
+import { can, consumeAiCredit } from "@founder-os/platform/billing";
 import { PlatformError } from "@founder-os/platform/errors";
 import { withRouteHandler } from "../../../../../lib/api-helpers.js";
 import { requireOrganizationContext } from "../../../../../lib/organization-context.js";
@@ -15,6 +15,11 @@ export async function POST(_request: Request, { params }: RouteParams) {
       throw new PlatformError("UNAUTHORIZED", "AI incident summaries require an active plan.");
     }
     const { id } = await params;
-    return generateIncidentSummary({ organizationId, alertId: id, requestedByUserId: userId });
+    // Entitlement gate above stays as-is (AI Investigate is available on every
+    // plan per Loop 1); this is the additive Loop 2 credit meter on top of it —
+    // a credit is only consumed once generateIncidentSummary resolves successfully.
+    return consumeAiCredit(organizationId, () =>
+      generateIncidentSummary({ organizationId, alertId: id, requestedByUserId: userId }),
+    );
   });
 }
