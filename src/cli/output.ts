@@ -5,7 +5,31 @@ import { reportToString } from "../types/validation.js";
  * Tiny output helpers used by every CLI command. Keeping them here means the
  * commands only know how to *do* things; they never reach for `console` or
  * `process.exit` directly, which keeps them straightforward to unit-test.
+ *
+ * EPIPE handling: a very common real-world invocation is piping CLI output
+ * into something that stops reading early (`founder tools list | head`,
+ * `| grep foo`, `| less` then `q`). Without a handler, Node's default
+ * behavior is an unhandled 'error' event that crashes the process with a
+ * raw stack trace — confirmed reproducible on both CLIs in this repo before
+ * this fix. Exiting cleanly (code 0) on EPIPE is the standard Unix
+ * expectation: the reader simply stopped consuming, which is not an
+ * application error.
  */
+let epipeHandlerInstalled = false;
+function installEpipeHandler(): void {
+  if (epipeHandlerInstalled) return;
+  epipeHandlerInstalled = true;
+  const onStreamError = (error: NodeJS.ErrnoException): void => {
+    if (error.code === "EPIPE") {
+      process.exit(0);
+    }
+    throw error;
+  };
+  process.stdout.on("error", onStreamError);
+  process.stderr.on("error", onStreamError);
+}
+installEpipeHandler();
+
 export const stdout = (message: string): void => {
   process.stdout.write(message.endsWith("\n") ? message : `${message}\n`);
 };

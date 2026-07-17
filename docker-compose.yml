@@ -1,0 +1,36 @@
+# Founder OS — local production-shaped stack.
+#
+#   docker compose up            # server + bundled Ollama
+#   docker compose run --rm founder-os node dist/cli/founder.js doctor
+#   docker compose run --rm founder-os node dist/cli/founder.js run market-research-agent "Find me a SaaS idea for dentists." --tools
+#
+# The `ollama` service is optional — point OLLAMA_HOST at an existing daemon
+# (including one running directly on the host) instead if you already have
+# one, and remove/ignore the `ollama` service below.
+
+services:
+  founder-os:
+    build: .
+    ports:
+      - "4173:4173"
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+      - FOUNDER_WORKSPACE=/app
+      - PORT=4173
+    env_file:
+      - .env
+    depends_on:
+      - ollama
+    volumes:
+      - founder-registry:/app/registry
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-models:/root/.ollama
+
+volumes:
+  founder-registry:
+  ollama-models:

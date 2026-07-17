@@ -9,7 +9,8 @@
     "node": ">=18.18.0"
   },
   "bin": {
-    "agent-factory": "./dist/cli/index.js"
+    "agent-factory": "./dist/cli/index.js",
+    "founder": "./dist/cli/founder.js"
   },
   "exports": {
     ".": "./dist/index.js"
@@ -23,6 +24,7 @@
     "start": "node dist/server/index.js",
     "dev": "tsx src/cli/index.ts",
     "factory": "tsx src/cli/index.ts",
+    "founder": "tsx src/cli/founder.ts",
     "generate:engineering": "tsx src/departments/generate.ts",
     "generate:intelligence": "tsx src/intelligence/generate.ts",
     "generate:foundation": "tsx src/departments/foundation-generate.ts",

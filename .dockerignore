@@ -1,0 +1,15 @@
+node_modules
+web/node_modules
+dist
+web/dist
+coverage
+test-results
+playwright-report
+blob-report
+playwright/.cache
+.git
+.env
+.env.*
+!.env.example
+*.log
+.DS_Store
