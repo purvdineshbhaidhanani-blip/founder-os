@@ -11,11 +11,34 @@
  * scoring/decision pipeline.
  */
 
-export type LlmRole = "system" | "user" | "assistant";
+/**
+ * "tool" is additive (Loop 3): the result of a tool call fed back to the
+ * model. Existing callers that never set `tools`/`toolCallId` are wholly
+ * unaffected — "system"/"user"/"assistant" behave exactly as before.
+ */
+export type LlmRole = "system" | "user" | "assistant" | "tool";
 
 export interface LlmMessage {
   role: LlmRole;
   content: string;
+  /** Set on a "tool" message: which tool call (by id) this content answers. */
+  toolCallId?: string;
+  /** Set on an "assistant" message that itself requested tool calls. */
+  toolCalls?: LlmToolCall[];
+}
+
+/** A tool the model may call, described in JSON-Schema form (matches ToolDescriptor.inputJsonSchema from src/runtime/tools). */
+export interface LlmTool {
+  name: string;
+  description: string;
+  parameters: Record<string, unknown>;
+}
+
+/** One tool invocation the model requested. `arguments` is always a parsed object — providers are responsible for parsing a string-encoded form if their backend returns one. */
+export interface LlmToolCall {
+  id: string;
+  name: string;
+  arguments: Record<string, unknown>;
 }
 
 export interface LlmCompletionRequest {
@@ -30,6 +53,8 @@ export interface LlmCompletionRequest {
   stop?: string[];
   /** Abort signal for caller-controlled cancellation. */
   signal?: AbortSignal;
+  /** Tools the model may call. Omit entirely for a plain completion (unchanged Loop 2 behavior). */
+  tools?: LlmTool[];
 }
 
 export interface LlmCompletionResult {
@@ -39,6 +64,8 @@ export interface LlmCompletionResult {
   promptTokens?: number;
   completionTokens?: number;
   finishReason?: string;
+  /** Present only when the model's response requested one or more tool calls. */
+  toolCalls?: LlmToolCall[];
 }
 
 /**

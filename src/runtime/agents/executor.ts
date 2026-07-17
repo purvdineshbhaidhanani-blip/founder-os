@@ -1,6 +1,6 @@
 import { nowIso } from "../../utils/id.js";
 import { createLogger } from "../../utils/logger.js";
-import { LlmError, type LlmClient } from "../../llm/index.js";
+import { LlmError, type LlmClient, type LlmMessage, type LlmTool } from "../../llm/index.js";
 import type { MemoryEngine } from "../memory/engine.js";
 import type { EventBus } from "../events/bus.js";
 import { AgentLoader, type AgentLoaderOptions } from "./loader.js";
@@ -8,9 +8,13 @@ import { buildAgentPrompt } from "./prompt-builder.js";
 import type {
   AgentExecutionContext,
   AgentExecutionResult,
+  AgentToolCallRecord,
   ExecuteAgentOptions,
   ModelSource,
 } from "./execution-types.js";
+
+/** Default cap on the tool-call back-and-forth (see ExecuteAgentOptions.maxToolTurns). */
+const DEFAULT_MAX_TOOL_TURNS = 5;
 
 const logger = createLogger("runtime.agents.executor");
 
@@ -113,17 +117,68 @@ export class AgentExecutor {
       ...(options.memoryContextLimit !== undefined ? { memoryContextLimit: options.memoryContextLimit } : {}),
     });
 
+    // Loop 3 — Tool Execution Engine integration. Reuses ONLY the existing
+    // LLM Adapter's (additive) tool-calling fields; the tool-call loop lives
+    // HERE, not inside the adapter, so LlmClient/OllamaProvider stay generic.
+    const llmTools: LlmTool[] | undefined = options.tools
+      ? options.tools.toolRegistry.describe().map((descriptor) => ({
+          name: descriptor.id,
+          description: descriptor.description,
+          parameters: descriptor.inputJsonSchema,
+        }))
+      : undefined;
+    const toolCallRecords: AgentToolCallRecord[] = [];
+    const maxToolTurns = options.maxToolTurns ?? DEFAULT_MAX_TOOL_TURNS;
+
     try {
-      const result = await this.llm.complete(
-        {
-          model,
-          messages,
-          ...(options.temperature !== undefined ? { temperature: options.temperature } : {}),
-          ...(options.maxTokens !== undefined ? { maxTokens: options.maxTokens } : {}),
-          ...(options.signal ? { signal: options.signal } : {}),
-        },
-        provider,
-      );
+      let result;
+      for (let turn = 0; ; turn += 1) {
+        result = await this.llm.complete(
+          {
+            model,
+            messages,
+            ...(options.temperature !== undefined ? { temperature: options.temperature } : {}),
+            ...(options.maxTokens !== undefined ? { maxTokens: options.maxTokens } : {}),
+            ...(options.signal ? { signal: options.signal } : {}),
+            ...(llmTools ? { tools: llmTools } : {}),
+          },
+          provider,
+        );
+
+        const requestedCalls = result.toolCalls ?? [];
+        if (requestedCalls.length === 0 || !options.tools || turn >= maxToolTurns) {
+          if (requestedCalls.length > 0 && !options.tools) {
+            logger.warn("model requested tool calls but no ToolExecutor was configured; returning text response as-is", {
+              agentId,
+              requestedTools: requestedCalls.map((c) => c.name),
+            });
+          }
+          break;
+        }
+
+        messages.push({ role: "assistant", content: result.text, toolCalls: requestedCalls });
+
+        for (const call of requestedCalls) {
+          const toolResult = await options.tools.execute(call.name, call.arguments, {
+            task,
+            agent: agentId,
+            workingDirectory: options.toolWorkingDirectory ?? ".",
+            ...(options.signal ? { signal: options.signal } : {}),
+          });
+          toolCallRecords.push({
+            name: call.name,
+            arguments: call.arguments,
+            status: toolResult.status,
+            durationMs: toolResult.duration,
+          });
+          const toolMessage: LlmMessage = {
+            role: "tool",
+            toolCallId: call.id,
+            content: JSON.stringify(toolResult.status === "success" ? toolResult.data : { error: toolResult.error }),
+          };
+          messages.push(toolMessage);
+        }
+      }
 
       const completedAt = nowIso();
       const durationMs = Date.parse(completedAt) - Date.parse(startedAt);
@@ -132,6 +187,7 @@ export class AgentExecutor {
         success: true,
         agentId,
         response: result.text,
+        toolCalls: toolCallRecords,
         metadata: {
           agentId,
           ...(agent.frontmatter.model ? { frontmatterModelHint: agent.frontmatter.model } : {}),
@@ -155,10 +211,10 @@ export class AgentExecutor {
       void this.bus?.publish({
         name: "agent.execution.completed",
         source: agentId,
-        payload: { agentId, durationMs, modelUsed: result.model },
+        payload: { agentId, durationMs, modelUsed: result.model, toolCallCount: toolCallRecords.length },
       });
 
-      logger.info("agent execution succeeded", { agentId, model: result.model, durationMs });
+      logger.info("agent execution succeeded", { agentId, model: result.model, durationMs, toolCallCount: toolCallRecords.length });
       return executionResult;
     } catch (error) {
       return this.failure(agentId, startedAt, model, modelSource, provider, "llm-error", error);

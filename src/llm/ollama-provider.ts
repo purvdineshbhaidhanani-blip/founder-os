@@ -1,5 +1,5 @@
 import { createLogger } from "../utils/logger.js";
-import { LlmError, type LlmCompletionRequest, type LlmCompletionResult, type LlmProvider } from "./types.js";
+import { LlmError, type LlmCompletionRequest, type LlmCompletionResult, type LlmProvider, type LlmToolCall } from "./types.js";
 
 const logger = createLogger("llm.ollama");
 
@@ -7,9 +7,13 @@ const logger = createLogger("llm.ollama");
 export const DEFAULT_OLLAMA_HOST = "http://127.0.0.1:11434";
 const DEFAULT_TIMEOUT_MS = 120_000;
 
+interface OllamaToolCall {
+  function?: { name?: string; arguments?: unknown };
+}
+
 interface OllamaChatResponse {
   model?: string;
-  message?: { role?: string; content?: string };
+  message?: { role?: string; content?: string; tool_calls?: OllamaToolCall[] };
   done?: boolean;
   done_reason?: string;
   prompt_eval_count?: number;
@@ -18,6 +22,32 @@ interface OllamaChatResponse {
 
 interface OllamaTagsResponse {
   models?: Array<{ name?: string }>;
+}
+
+/**
+ * Maps Ollama's `message.tool_calls` (no `id` field — Ollama identifies
+ * calls by position, not id) into `LlmToolCall[]`, synthesizing a positional
+ * id (`call_0`, `call_1`, ...) so callers have a stable handle. `arguments`
+ * is normally already a parsed object; a string-encoded form (some models)
+ * is JSON-parsed defensively, and a value that is neither is honestly
+ * reported as `{}` rather than guessed.
+ */
+function parseToolCalls(raw: OllamaToolCall[] | undefined): LlmToolCall[] | undefined {
+  if (!raw || raw.length === 0) return undefined;
+  return raw.map((call, index) => {
+    const name = call.function?.name ?? "";
+    const rawArgs = call.function?.arguments;
+    let args: Record<string, unknown> = {};
+    if (rawArgs && typeof rawArgs === "object") args = rawArgs as Record<string, unknown>;
+    else if (typeof rawArgs === "string") {
+      try {
+        args = JSON.parse(rawArgs) as Record<string, unknown>;
+      } catch {
+        args = {};
+      }
+    }
+    return { id: `call_${index}`, name, arguments: args };
+  });
 }
 
 export interface OllamaProviderOptions {
@@ -64,9 +94,21 @@ export class OllamaProvider implements LlmProvider {
 
     const body: Record<string, unknown> = {
       model: request.model,
-      messages: request.messages.map((m) => ({ role: m.role, content: m.content })),
+      messages: request.messages.map((m) => ({
+        role: m.role,
+        content: m.content,
+        ...(m.toolCalls && m.toolCalls.length > 0
+          ? { tool_calls: m.toolCalls.map((call) => ({ function: { name: call.name, arguments: call.arguments } })) }
+          : {}),
+      })),
       stream: false,
     };
+    if (request.tools && request.tools.length > 0) {
+      body.tools = request.tools.map((tool) => ({
+        type: "function",
+        function: { name: tool.name, description: tool.description, parameters: tool.parameters },
+      }));
+    }
     const options: Record<string, unknown> = {};
     if (request.temperature !== undefined) options.temperature = request.temperature;
     if (request.maxTokens !== undefined) options.num_predict = request.maxTokens;
@@ -105,11 +147,13 @@ export class OllamaProvider implements LlmProvider {
     if (typeof text !== "string") {
       throw new LlmError(this.id, "bad-response", "Ollama response contained no message content.");
     }
+    const toolCalls = parseToolCalls(parsed.message?.tool_calls);
 
     logger.info("ollama completion", {
       model: parsed.model ?? request.model,
       completionTokens: parsed.eval_count,
       finishReason: parsed.done_reason,
+      toolCallCount: toolCalls?.length,
     });
 
     return {
@@ -119,6 +163,7 @@ export class OllamaProvider implements LlmProvider {
       ...(parsed.prompt_eval_count !== undefined ? { promptTokens: parsed.prompt_eval_count } : {}),
       ...(parsed.eval_count !== undefined ? { completionTokens: parsed.eval_count } : {}),
       ...(parsed.done_reason ? { finishReason: parsed.done_reason } : {}),
+      ...(toolCalls ? { toolCalls } : {}),
     };
   }
 

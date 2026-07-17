@@ -33,7 +33,7 @@ const PRICE_PATTERN = /\$\s?\d[\d,]*(?:\.\d{2})?/;
  * socket layer, which this fetch-based provider doesn't do. Flagged here
  * rather than silently treated as solved.
  */
-const BLOCKED_HOSTNAME_PATTERNS = [
+export const BLOCKED_HOSTNAME_PATTERNS = [
   /^localhost$/i,
   /^127\./,
   /^10\./,
@@ -45,7 +45,7 @@ const BLOCKED_HOSTNAME_PATTERNS = [
   /^\[?fe80:/i, // IPv6 link-local
 ];
 
-function validateSnapshotTargetUrl(rawUrl: string): { ok: true; url: URL } | { ok: false; reason: string } {
+export function validateSnapshotTargetUrl(rawUrl: string): { ok: true; url: URL } | { ok: false; reason: string } {
   let parsed: URL;
   try {
     parsed = new URL(rawUrl);

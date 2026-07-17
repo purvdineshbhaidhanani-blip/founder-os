@@ -1,8 +1,11 @@
+import type { ToolExecutor } from "../tools/executor.js";
+
 /**
  * Types for the agent EXECUTION layer (Loop 2) — loading, parsing, prompting,
  * and running a real `.claude/agents/*.md` file against the LLM Adapter.
  * Additive to `types.ts` (the existing blueprint-based descriptor/status
- * types); does not replace or alter anything there.
+ * types); does not replace or alter anything there. Loop 3 adds the optional
+ * `tools`/`toolWorkingDirectory`/`maxToolTurns` fields below for tool-calling.
  */
 
 /** Strongly typed view of a `.claude/agents/*.md` file's YAML frontmatter block. Exactly the fields present in the real files — nothing invented. */
@@ -75,6 +78,27 @@ export interface ExecuteAgentOptions {
   temperature?: number;
   maxTokens?: number;
   signal?: AbortSignal;
+  /**
+   * Loop 3 — Tool Execution Engine integration (additive; omit for the
+   * unchanged Loop 2 plain-completion behavior). When set, the agent's
+   * available tools (from `tools.toolRegistry.describe()`) are offered to
+   * the model; if the model requests a tool call, it is executed via this
+   * `ToolExecutor` and the result is fed back for another turn, up to
+   * `maxToolTurns`. Requires `toolWorkingDirectory` (the sandbox root every
+   * tool call is contained to).
+   */
+  tools?: ToolExecutor;
+  toolWorkingDirectory?: string;
+  /** Safety cap on the tool-call loop (default 5) — prevents an unbounded back-and-forth. */
+  maxToolTurns?: number;
+}
+
+/** One executed tool call, recorded on the result for transparency. */
+export interface AgentToolCallRecord {
+  name: string;
+  arguments: Record<string, unknown>;
+  status: "success" | "failure";
+  durationMs: number;
 }
 
 export type ModelSource = "option" | "env" | "default";
@@ -99,6 +123,8 @@ export interface AgentExecutionSuccess {
   agentId: string;
   response: string;
   metadata: AgentExecutionMetadata;
+  /** Every tool call made during this execution, in order — [] when no tools were configured or the model made none. */
+  toolCalls: AgentToolCallRecord[];
 }
 
 export interface AgentExecutionFailure {
