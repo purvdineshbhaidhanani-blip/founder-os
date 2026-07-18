@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "updatedAt": "2026-07-18T09:00:09.349Z",
+  "updatedAt": "2026-07-18T09:03:21.987Z",
   "agents": [
     {
       "id": "agent_f448d3a8-b4eb-4ee9-985d-e1b5fc75dad2",
@@ -6763,6 +6763,45 @@
         {
           "version": "1.0.0",
           "timestamp": "2026-07-18T09:00:09.349Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_43c938b6-73a8-4750-87ee-492866b20042",
+      "name": "saas-technical-engine-agent",
+      "displayName": "SaaS Technical Engine Agent",
+      "category": "architecture",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Generates the universal, locked 20-section SaaS technical architecture pattern library for any SaaS idea — never domain-specific implementation.",
+      "capabilities": [
+        "Generate the Universal Technical Architecture for the given SaaS idea: Database Architecture, Authentication Architecture, Authorization, Backend Architecture, API Architecture, AI Architecture, Storage Architecture, Search Architecture, Caching, Event Architecture, Integration Architecture, Security, Validation, Error Handling, Monitoring, Performance, Scalability, Deployment, Disaster Recovery, Documentation — in that exact order, every time",
+        "Produce Purpose, Components, Architecture, Best Practices, Common Mistakes and Future Improvements for every section, with zero section skipped, merged, reordered or invented",
+        "Keep every section's content domain-agnostic — never generate the SaaS idea's own domain-specific implementation; that belongs to the downstream architects and developer-agent",
+        "Never generate UI, screens, user flows, pricing, billing, business rules, QA/testing execution or deployment checklists — those remain owned by saas-foundation-agent, saas-business-engine-agent, qa-engineer-app and deployment-agent respectively",
+        "Hand the completed technical architecture to solution-architect-app as the standardized technical-pattern baseline the bespoke architects scope down for the idea-specific System Architecture Document"
+      ],
+      "dependencies": [
+        "solution-architect-app"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "app-generation",
+        "architecture",
+        "saas-technical-engine",
+        "technical-architecture"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/saas-technical-engine-agent.md",
+      "blueprintId": "saas-technical-engine-agent",
+      "blueprintHash": "cb34472f48c0105b",
+      "createdAt": "2026-07-18T09:03:21.987Z",
+      "updatedAt": "2026-07-18T09:03:21.987Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T09:03:21.987Z",
           "action": "created"
         }
       ]

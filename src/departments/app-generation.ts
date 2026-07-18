@@ -1,7 +1,7 @@
 import type { AgentSpec } from "./types.js";
 
 /**
- * App Generation Department — 10 agents that turn a Product Discovery
+ * App Generation Department — 11 agents that turn a Product Discovery
  * Package into a production-ready application: system architecture,
  * database, backend, AI integration, code, tests, docs and deployment.
  * Generated through the Agent Factory pipeline; never hand-written.
@@ -31,6 +31,25 @@ import type { AgentSpec } from "./types.js";
  * numbers on top of. It explicitly never generates database, API, backend,
  * security, testing or deployment concerns — those remain owned by
  * database-architect, backend-architect, ai-architect, developer-agent,
+ * qa-engineer-app and deployment-agent respectively.
+ *
+ * saas-technical-engine-agent completes the trilogy as the technical
+ * sibling of saas-foundation-agent and saas-business-engine-agent, and is
+ * deliberately distinct from solution-architect-app, backend-architect,
+ * database-architect, ai-architect, qa-engineer-app and deployment-agent:
+ * those make bespoke, MVP-scoped technical decisions traceable to one
+ * project's actual Product Discovery Package ("no premature sharding for
+ * MVP-scale data volume", "no enterprise SSO for a 3-feature consumer
+ * MVP"). saas-technical-engine-agent instead outputs the same locked,
+ * domain-agnostic 20-section Universal Technical Architecture (database,
+ * auth, authorization, backend, API, AI, storage, search, caching, events,
+ * integrations, security, validation, error handling, monitoring,
+ * performance, scalability, deployment, disaster recovery, documentation)
+ * for any SaaS idea, every time — the reusable, cloud-native, enterprise-
+ * ready pattern library the bespoke architects then scope down and select
+ * from for the actual project. It explicitly never generates UI, pricing,
+ * business rules, QA/testing execution or deployment checklists — those
+ * remain owned by saas-foundation-agent, saas-business-engine-agent,
  * qa-engineer-app and deployment-agent respectively.
  */
 export const APP_GENERATION_DEPARTMENT: AgentSpec[] = [
@@ -81,6 +100,30 @@ export const APP_GENERATION_DEPARTMENT: AgentSpec[] = [
     receivesFrom: ["founder"],
     sendsTo: ["solution-architect-app"],
     tags: ["app-generation", "architecture", "saas-business-engine", "business-rules"],
+  },
+  {
+    name: "saas-technical-engine-agent",
+    displayName: "SaaS Technical Engine Agent",
+    category: "architecture",
+    department: "app-generation",
+    summary: "Generates the universal, locked 20-section SaaS technical architecture pattern library for any SaaS idea — never domain-specific implementation.",
+    role: "The principal software architect who, given only a SaaS name/idea, generates the complete Universal Technical Architecture: the same 20 technical sections in the same fixed order, every time, each with Purpose, Components, Architecture, Best Practices, Common Mistakes and Future Improvements — production-ready, cloud-native, scalable, secure, AI-ready and enterprise-ready reference patterns, never a bespoke per-project decision.",
+    responsibilities: [
+      "Generate the Universal Technical Architecture for the given SaaS idea: Database Architecture, Authentication Architecture, Authorization, Backend Architecture, API Architecture, AI Architecture, Storage Architecture, Search Architecture, Caching, Event Architecture, Integration Architecture, Security, Validation, Error Handling, Monitoring, Performance, Scalability, Deployment, Disaster Recovery, Documentation — in that exact order, every time",
+      "Produce Purpose, Components, Architecture, Best Practices, Common Mistakes and Future Improvements for every section, with zero section skipped, merged, reordered or invented",
+      "Keep every section's content domain-agnostic — never generate the SaaS idea's own domain-specific implementation; that belongs to the downstream architects and developer-agent",
+      "Never generate UI, screens, user flows, pricing, billing, business rules, QA/testing execution or deployment checklists — those remain owned by saas-foundation-agent, saas-business-engine-agent, qa-engineer-app and deployment-agent respectively",
+      "Hand the completed technical architecture to solution-architect-app as the standardized technical-pattern baseline the bespoke architects scope down for the idea-specific System Architecture Document",
+    ],
+    objectives: [
+      "The same 20 technical sections, in the same order, are generated for every SaaS idea without exception",
+      "No section ever contains UI design, pricing, business rules, or a bespoke per-project decision — only the universal, reusable technical pattern",
+      "Every section is complete: Purpose, Components, Architecture, Best Practices, Common Mistakes, Future Improvements, all present",
+    ],
+    reportsTo: "founder",
+    receivesFrom: ["founder"],
+    sendsTo: ["solution-architect-app"],
+    tags: ["app-generation", "architecture", "saas-technical-engine", "technical-architecture"],
   },
   {
     name: "solution-architect-app",
