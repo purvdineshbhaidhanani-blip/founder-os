@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "updatedAt": "2026-07-18T03:40:43.354Z",
+  "updatedAt": "2026-07-18T03:45:00.792Z",
   "agents": [
     {
       "id": "agent_f448d3a8-b4eb-4ee9-985d-e1b5fc75dad2",
@@ -5698,6 +5698,440 @@
         {
           "version": "1.0.0",
           "timestamp": "2026-07-18T03:40:43.354Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_753677bf-7a50-4dd1-82ea-99a482ab1708",
+      "name": "accounting-agent",
+      "displayName": "Accounting Agent",
+      "category": "documentation",
+      "version": "1.0.0",
+      "owner": "finance-legal-department",
+      "description": "Owns the general ledger: bookkeeping, reconciliation, and financial statements.",
+      "capabilities": [
+        "Maintain the general ledger and keep it current",
+        "Categorize and record transactions accurately",
+        "Reconcile accounts against source records on a fixed cadence",
+        "Produce income statements, balance sheets and cash-flow statements",
+        "Flag discrepancies or anomalies for review before they compound"
+      ],
+      "dependencies": [
+        "budgeting-agent",
+        "financial-planning-agent",
+        "founder-cfo-agent",
+        "tax-compliance-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "finance-legal",
+        "finance",
+        "accounting",
+        "bookkeeping",
+        "financial-statements",
+        "finance-legal-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/accounting-agent.md",
+      "blueprintId": "accounting-agent",
+      "blueprintHash": "b77997518dc799a8",
+      "createdAt": "2026-07-18T03:45:00.350Z",
+      "updatedAt": "2026-07-18T03:45:00.350Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:45:00.350Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_3f4cfe10-9dff-4e70-a0b8-6778e666f999",
+      "name": "financial-planning-agent",
+      "displayName": "Financial Planning Agent",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "finance-legal-department",
+      "description": "Builds detailed financial models, forecasts, and scenario plans (FP&A).",
+      "capabilities": [
+        "Build and maintain detailed financial models by line item",
+        "Produce multi-period revenue, expense and headcount forecasts",
+        "Model scenario variants (best/base/worst case) for planning decisions",
+        "Reconcile model assumptions against actuals from accounting",
+        "Package model output for CFO-level strategic scenario review"
+      ],
+      "dependencies": [
+        "accounting-agent",
+        "budgeting-agent",
+        "cashflow-management-agent",
+        "founder-cfo-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "finance-legal",
+        "finance",
+        "fp&a",
+        "forecasting",
+        "modeling",
+        "finance-legal-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/financial-planning-agent.md",
+      "blueprintId": "financial-planning-agent",
+      "blueprintHash": "5ba90b2e35ff3459",
+      "createdAt": "2026-07-18T03:45:00.416Z",
+      "updatedAt": "2026-07-18T03:45:00.416Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:45:00.416Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_a6691171-fe3d-47fc-93fe-d0cbde1f96b0",
+      "name": "budgeting-agent",
+      "displayName": "Budgeting Agent",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "finance-legal-department",
+      "description": "Maintains the operational budget register and tracks spend against it, line by line.",
+      "capabilities": [
+        "Maintain the operational budget register by department and line item",
+        "Track actual spend against budget continuously",
+        "Flag budget variance beyond threshold with root-cause context",
+        "Process and route budget-line change requests for approval",
+        "Reconcile the budget register against financial-planning forecasts"
+      ],
+      "dependencies": [
+        "accounting-agent",
+        "cashflow-management-agent",
+        "financial-planning-agent",
+        "founder-cfo-agent",
+        "procurement-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "finance-legal",
+        "finance",
+        "budgeting",
+        "variance-tracking",
+        "spend-management",
+        "finance-legal-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/budgeting-agent.md",
+      "blueprintId": "budgeting-agent",
+      "blueprintHash": "0d18dec70e4685b3",
+      "createdAt": "2026-07-18T03:45:00.470Z",
+      "updatedAt": "2026-07-18T03:45:00.470Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:45:00.470Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_daf22841-a15b-4f6e-8c08-f2bf8b29947a",
+      "name": "cashflow-management-agent",
+      "displayName": "Cashflow Management Agent",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "finance-legal-department",
+      "description": "Runs day-to-day cash operations: AP/AR timing, payment scheduling, and liquidity checks.",
+      "capabilities": [
+        "Track accounts-payable and accounts-receivable timing and aging",
+        "Schedule outbound payments against available cash",
+        "Monitor near-term liquidity and flag gaps before they bind",
+        "Chase overdue receivables and reconcile payment timing against forecast",
+        "Feed real cash-position data up to financial planning and the CFO"
+      ],
+      "dependencies": [
+        "accounting-agent",
+        "budgeting-agent",
+        "financial-planning-agent",
+        "founder-cfo-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "finance-legal",
+        "finance",
+        "cashflow",
+        "ap-ar",
+        "liquidity",
+        "finance-legal-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/cashflow-management-agent.md",
+      "blueprintId": "cashflow-management-agent",
+      "blueprintHash": "29233cedcb89c665",
+      "createdAt": "2026-07-18T03:45:00.545Z",
+      "updatedAt": "2026-07-18T03:45:00.545Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:45:00.545Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_962b0cd2-1117-4394-9f16-cf338cfc672c",
+      "name": "tax-compliance-agent",
+      "displayName": "Tax Compliance Agent",
+      "category": "qa",
+      "version": "1.0.0",
+      "owner": "finance-legal-department",
+      "description": "Owns tax filing readiness, obligation tracking, and regulatory tax-compliance checks.",
+      "capabilities": [
+        "Track tax obligations and filing deadlines across applicable jurisdictions",
+        "Prepare filing-ready documentation from ledger and payroll data",
+        "Verify transactions and structures against applicable tax regulations",
+        "Flag tax-risk items to the CFO and Risk Officer before a deadline binds",
+        "Maintain a record of filings and their supporting evidence"
+      ],
+      "dependencies": [
+        "accounting-agent",
+        "compliance-monitor-agent",
+        "founder-cfo-agent",
+        "founder-risk-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "finance-legal",
+        "finance",
+        "tax",
+        "compliance",
+        "regulatory",
+        "finance-legal-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/tax-compliance-agent.md",
+      "blueprintId": "tax-compliance-agent",
+      "blueprintHash": "d5f9b4c15ba967bb",
+      "createdAt": "2026-07-18T03:45:00.617Z",
+      "updatedAt": "2026-07-18T03:45:00.617Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:45:00.617Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_bb9f82bd-161b-439c-9d14-78f496722cf8",
+      "name": "legal-advisor-agent",
+      "displayName": "Legal Advisor Agent",
+      "category": "review",
+      "version": "1.0.0",
+      "owner": "finance-legal-department",
+      "description": "Reviews decisions, structures, and documents for legal risk and gives structured legal opinions.",
+      "capabilities": [
+        "Review proposed decisions and structures for legal risk before commitment",
+        "Give structured legal opinions with explicit risk levels and rationale",
+        "Identify matters that exceed internal capability and need outside counsel",
+        "Support contract management with legal review of key terms",
+        "Track open legal questions to resolution"
+      ],
+      "dependencies": [
+        "compliance-monitor-agent",
+        "contract-management-agent",
+        "founder-risk-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "finance-legal",
+        "legal",
+        "advisory",
+        "risk-review",
+        "finance-legal-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/legal-advisor-agent.md",
+      "blueprintId": "legal-advisor-agent",
+      "blueprintHash": "a442a747bcbbf7e8",
+      "createdAt": "2026-07-18T03:45:00.657Z",
+      "updatedAt": "2026-07-18T03:45:00.657Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:45:00.657Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_5fdc14c5-1820-4b5d-a290-90bb04b5077f",
+      "name": "contract-management-agent",
+      "displayName": "Contract Management Agent",
+      "category": "documentation",
+      "version": "1.0.0",
+      "owner": "finance-legal-department",
+      "description": "Owns the contract lifecycle: drafting, tracking, renewals, and the contract repository.",
+      "capabilities": [
+        "Draft contract terms from standard templates and negotiated inputs",
+        "Track every contract's lifecycle stage from draft through renewal",
+        "Maintain a searchable, current contract repository",
+        "Flag upcoming renewals and expirations before they lapse",
+        "Route non-standard terms to legal advisory for review"
+      ],
+      "dependencies": [
+        "founder-risk-agent",
+        "legal-advisor-agent",
+        "procurement-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "finance-legal",
+        "legal",
+        "contracts",
+        "lifecycle",
+        "repository",
+        "finance-legal-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/contract-management-agent.md",
+      "blueprintId": "contract-management-agent",
+      "blueprintHash": "bd2eb6d0ff65b92d",
+      "createdAt": "2026-07-18T03:45:00.697Z",
+      "updatedAt": "2026-07-18T03:45:00.697Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:45:00.697Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_79821923-e3d2-4d4d-b550-be99c07d8092",
+      "name": "compliance-monitor-agent",
+      "displayName": "Compliance Monitor Agent",
+      "category": "qa",
+      "version": "1.0.0",
+      "owner": "finance-legal-department",
+      "description": "Monitors regulatory compliance obligations and tracks remediation of gaps.",
+      "capabilities": [
+        "Maintain the register of applicable regulatory obligations",
+        "Run periodic compliance checks against that register",
+        "Log every compliance gap found with severity and owner",
+        "Track remediation of open gaps to closure",
+        "Report compliance posture to the Risk Officer on a fixed cadence"
+      ],
+      "dependencies": [
+        "audit-agent",
+        "founder-risk-agent",
+        "legal-advisor-agent",
+        "tax-compliance-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "finance-legal",
+        "legal",
+        "compliance",
+        "regulatory",
+        "monitoring",
+        "finance-legal-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/compliance-monitor-agent.md",
+      "blueprintId": "compliance-monitor-agent",
+      "blueprintHash": "b971cb84ed36b1db",
+      "createdAt": "2026-07-18T03:45:00.730Z",
+      "updatedAt": "2026-07-18T03:45:00.730Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:45:00.730Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_166993e1-79f0-439f-8d5f-f712da652bb5",
+      "name": "audit-agent",
+      "displayName": "Audit Agent",
+      "category": "qa",
+      "version": "1.0.0",
+      "owner": "finance-legal-department",
+      "description": "Runs internal audits across financial and operational controls and tracks findings to closure.",
+      "capabilities": [
+        "Plan an internal audit schedule covering financial and operational controls",
+        "Execute audits and document findings with supporting evidence",
+        "Rate findings by severity and assign a corrective-action owner",
+        "Track corrective actions to verified closure",
+        "Feed audit findings with a compliance dimension to the compliance monitor"
+      ],
+      "dependencies": [
+        "accounting-agent",
+        "compliance-monitor-agent",
+        "founder-risk-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "finance-legal",
+        "legal",
+        "audit",
+        "internal-controls",
+        "finance-legal-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/audit-agent.md",
+      "blueprintId": "audit-agent",
+      "blueprintHash": "b01993e629486868",
+      "createdAt": "2026-07-18T03:45:00.762Z",
+      "updatedAt": "2026-07-18T03:45:00.762Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:45:00.762Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_af2c392d-c9cd-4de7-8f2f-4ea3e48a3c38",
+      "name": "procurement-agent",
+      "displayName": "Procurement Agent",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "finance-legal-department",
+      "description": "Owns vendor sourcing, purchase orders, and procurement spend against budget.",
+      "capabilities": [
+        "Source and evaluate vendors against requirements and cost",
+        "Issue and track purchase orders through fulfillment",
+        "Keep procurement spend within its approved budget line",
+        "Negotiate terms and route contract needs to contract management",
+        "Maintain a vendor performance record for future sourcing decisions"
+      ],
+      "dependencies": [
+        "budgeting-agent",
+        "contract-management-agent",
+        "founder-coo-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "finance-legal",
+        "operations",
+        "procurement",
+        "vendor-management",
+        "finance-legal-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/procurement-agent.md",
+      "blueprintId": "procurement-agent",
+      "blueprintHash": "040edc413ded8efd",
+      "createdAt": "2026-07-18T03:45:00.792Z",
+      "updatedAt": "2026-07-18T03:45:00.792Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:45:00.792Z",
           "action": "created"
         }
       ]
