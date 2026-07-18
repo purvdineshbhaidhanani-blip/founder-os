@@ -9,3 +9,4 @@ export * from "./product-discovery-integration.js";
 export * from "./app-generation.js";
 export * from "./app-generation-integration.js";
 export * from "./executive.js";
+export * from "./sales-marketing.js";
