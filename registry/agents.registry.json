@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "updatedAt": "2026-07-03T18:23:02.873Z",
+  "updatedAt": "2026-07-18T03:16:21.688Z",
   "agents": [
     {
       "id": "agent_f448d3a8-b4eb-4ee9-985d-e1b5fc75dad2",
@@ -4319,6 +4319,446 @@
         {
           "version": "1.0.0",
           "timestamp": "2026-07-03T18:23:02.873Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_0f221b9b-eb36-451e-9719-fdc518e58b28",
+      "name": "founder-ceo-agent",
+      "displayName": "Founder CEO Agent",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "founder",
+      "description": "Chief Executive — sets company strategy, validates business decisions, and holds final authority.",
+      "capabilities": [
+        "Set company strategy and translate founder intent into executive-level goals",
+        "Validate business decisions surfaced by the executive team before they take effect",
+        "Escalate strategic risks to the founder with a clear recommendation",
+        "Approve or deny major initiatives proposed by any executive agent",
+        "Arbitrate conflicting priorities across the CFO, COO, CMO, CPO and CRO"
+      ],
+      "dependencies": [
+        "founder-cfo-agent",
+        "founder-cmo-agent",
+        "founder-coo-agent",
+        "founder-cpo-agent",
+        "founder-cro-agent",
+        "founder-risk-agent",
+        "founder-strategy-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "leadership",
+        "executive",
+        "strategy",
+        "decision-making",
+        "executive-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/founder-ceo-agent.md",
+      "blueprintId": "founder-ceo-agent",
+      "blueprintHash": "1282ee7c376bc6cd",
+      "createdAt": "2026-07-18T03:16:21.414Z",
+      "updatedAt": "2026-07-18T03:16:21.414Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:16:21.414Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_824baf24-637b-4872-b9b5-8bd06f8b1925",
+      "name": "founder-coo-agent",
+      "displayName": "Founder COO Agent",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "founder",
+      "description": "Chief Operating Officer — plans execution, optimizes process, and coordinates departments.",
+      "capabilities": [
+        "Plan operational workflows that turn approved initiatives into executable work",
+        "Optimize recurring processes for cost, speed and reliability",
+        "Track execution metrics against plan and flag deviations early",
+        "Coordinate handoffs across departments so no initiative stalls between owners",
+        "Resolve operational blockers or escalate them to the CEO when they exceed COO authority"
+      ],
+      "dependencies": [
+        "founder-ceo-agent",
+        "founder-cpo-agent",
+        "founder-cro-agent",
+        "founder-executive-assistant-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "leadership",
+        "executive",
+        "operations",
+        "coordination",
+        "execution",
+        "executive-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/founder-coo-agent.md",
+      "blueprintId": "founder-coo-agent",
+      "blueprintHash": "6425065f77a25eb5",
+      "createdAt": "2026-07-18T03:16:21.454Z",
+      "updatedAt": "2026-07-18T03:16:21.454Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:16:21.454Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_03cd7e83-24ae-4df5-8558-2c01fe3760d4",
+      "name": "founder-cfo-agent",
+      "displayName": "Founder CFO Agent",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "founder",
+      "description": "Chief Financial Officer — tracks runway and burn, models scenarios, and allocates capital.",
+      "capabilities": [
+        "Track runway and burn rate on a continuous basis",
+        "Model financial scenarios for proposed initiatives and strategic options",
+        "Approve or reject budget allocation requests within delegated authority",
+        "Forecast cash position and surface shortfalls before they become critical",
+        "Flag financial risks to the CEO and Risk Officer with supporting data"
+      ],
+      "dependencies": [
+        "founder-ceo-agent",
+        "founder-coo-agent",
+        "founder-investor-agent",
+        "founder-risk-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "leadership",
+        "executive",
+        "finance",
+        "budgeting",
+        "capital-allocation",
+        "executive-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/founder-cfo-agent.md",
+      "blueprintId": "founder-cfo-agent",
+      "blueprintHash": "62b3d7c5220e93ef",
+      "createdAt": "2026-07-18T03:16:21.490Z",
+      "updatedAt": "2026-07-18T03:16:21.490Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:16:21.490Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_7b587a58-6098-4e71-9420-994b257fdce2",
+      "name": "founder-cmo-agent",
+      "displayName": "Founder CMO Agent",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "founder",
+      "description": "Chief Marketing Officer — owns go-to-market, brand, and customer acquisition.",
+      "capabilities": [
+        "Define go-to-market strategy for new products and initiatives",
+        "Plan and prioritize marketing campaigns against acquisition goals",
+        "Track customer acquisition cost (CAC) and lifetime value (LTV)",
+        "Own brand voice and positioning consistency across channels",
+        "Analyze customer feedback for messaging and positioning signal"
+      ],
+      "dependencies": [
+        "founder-ceo-agent",
+        "founder-cpo-agent",
+        "founder-cro-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "leadership",
+        "executive",
+        "marketing",
+        "gtm",
+        "customer-acquisition",
+        "executive-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/founder-cmo-agent.md",
+      "blueprintId": "founder-cmo-agent",
+      "blueprintHash": "1c138af7919f8dd2",
+      "createdAt": "2026-07-18T03:16:21.522Z",
+      "updatedAt": "2026-07-18T03:16:21.522Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:16:21.522Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_0621eedf-e434-432c-afcb-7b6c190636f1",
+      "name": "founder-cpo-agent",
+      "displayName": "Founder CPO Agent",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "founder",
+      "description": "Chief Product Officer — owns product strategy, feature prioritization, and product-market fit.",
+      "capabilities": [
+        "Define and maintain the product vision",
+        "Prioritize features against strategic goals and customer impact",
+        "Validate product-market fit with evidence, not assumption",
+        "Own and communicate the product roadmap",
+        "Gather and synthesize customer feedback into actionable product decisions"
+      ],
+      "dependencies": [
+        "founder-ceo-agent",
+        "founder-cmo-agent",
+        "founder-coo-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "leadership",
+        "executive",
+        "product",
+        "strategy",
+        "prioritization",
+        "executive-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/founder-cpo-agent.md",
+      "blueprintId": "founder-cpo-agent",
+      "blueprintHash": "e219ccb07a365fd7",
+      "createdAt": "2026-07-18T03:16:21.549Z",
+      "updatedAt": "2026-07-18T03:16:21.549Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:16:21.549Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_2eeacaa6-bb08-42a8-a59f-930bbfaf90a7",
+      "name": "founder-cro-agent",
+      "displayName": "Founder CRO Agent",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "founder",
+      "description": "Chief Revenue Officer — owns revenue strategy, sales, partnerships, and business development.",
+      "capabilities": [
+        "Own revenue targets and track progress against them",
+        "Develop business development strategy for new revenue channels",
+        "Source and evaluate partnership opportunities",
+        "Manage and forecast the sales pipeline",
+        "Drive customer retention initiatives to reduce churn"
+      ],
+      "dependencies": [
+        "founder-ceo-agent",
+        "founder-cfo-agent",
+        "founder-cmo-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "leadership",
+        "executive",
+        "revenue",
+        "sales",
+        "business-development",
+        "executive-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/founder-cro-agent.md",
+      "blueprintId": "founder-cro-agent",
+      "blueprintHash": "186e4be609c074df",
+      "createdAt": "2026-07-18T03:16:21.574Z",
+      "updatedAt": "2026-07-18T03:16:21.574Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:16:21.574Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_5a5095a0-381c-4351-afc2-2c0b53279661",
+      "name": "founder-strategy-agent",
+      "displayName": "Founder VP Strategy Agent",
+      "category": "architecture",
+      "version": "1.0.0",
+      "owner": "founder",
+      "description": "VP Strategy — models long-term scenarios, competitive threats, and strategic options.",
+      "capabilities": [
+        "Model strategic scenarios across plausible market and competitive futures",
+        "Analyze competitive threats and their likely impact on company position",
+        "Identify market shifts before they materially affect strategy",
+        "Plan contingencies for multiple futures, not a single forecast",
+        "Present strategic options with explicit trade-offs to the CEO"
+      ],
+      "dependencies": [
+        "founder-ceo-agent",
+        "founder-risk-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "leadership",
+        "executive",
+        "strategy",
+        "planning",
+        "foresight",
+        "executive-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/founder-strategy-agent.md",
+      "blueprintId": "founder-strategy-agent",
+      "blueprintHash": "7b9cccc2ee579b67",
+      "createdAt": "2026-07-18T03:16:21.605Z",
+      "updatedAt": "2026-07-18T03:16:21.605Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:16:21.605Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_979b7e29-8816-4788-be1d-ce49be927cbb",
+      "name": "founder-investor-agent",
+      "displayName": "Founder Investor Relations Agent",
+      "category": "documentation",
+      "version": "1.0.0",
+      "owner": "founder",
+      "description": "Investor Relations — manages fundraising, investor updates, and capital strategy.",
+      "capabilities": [
+        "Prepare investor decks and periodic investor updates",
+        "Track investor expectations and commitments against actual progress",
+        "Identify funding needs ahead of the point they become urgent",
+        "Manage the fundraising timeline end to end",
+        "Coordinate with the CFO on capital strategy and use-of-funds narrative"
+      ],
+      "dependencies": [
+        "founder-ceo-agent",
+        "founder-cfo-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "leadership",
+        "executive",
+        "fundraising",
+        "investor-relations",
+        "capital",
+        "executive-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/founder-investor-agent.md",
+      "blueprintId": "founder-investor-agent",
+      "blueprintHash": "5462e87fa8e7d09c",
+      "createdAt": "2026-07-18T03:16:21.641Z",
+      "updatedAt": "2026-07-18T03:16:21.641Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:16:21.641Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_8872061f-0845-48e0-bbfd-83dc39914944",
+      "name": "founder-risk-agent",
+      "displayName": "Founder Chief Risk Officer Agent",
+      "category": "qa",
+      "version": "1.0.0",
+      "owner": "founder",
+      "description": "Chief Risk Officer — identifies existential risk, plans mitigations, and monitors resilience.",
+      "capabilities": [
+        "Identify existential and operational risks across the company",
+        "Plan concrete mitigations for every identified high-severity risk",
+        "Monitor key risk indicators on an ongoing basis",
+        "Escalate emerging threats to the CEO with a recommended response",
+        "Maintain the company risk registry as the single source of risk truth"
+      ],
+      "dependencies": [
+        "founder-ceo-agent",
+        "founder-cfo-agent",
+        "founder-coo-agent",
+        "founder-strategy-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "leadership",
+        "executive",
+        "risk",
+        "resilience",
+        "mitigation",
+        "executive-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/founder-risk-agent.md",
+      "blueprintId": "founder-risk-agent",
+      "blueprintHash": "c2f0df6ac4f0ff8b",
+      "createdAt": "2026-07-18T03:16:21.665Z",
+      "updatedAt": "2026-07-18T03:16:21.665Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:16:21.665Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_b7eb2d93-92ce-427e-aa80-3d53e685451c",
+      "name": "founder-executive-assistant-agent",
+      "displayName": "Founder Executive Assistant Agent",
+      "category": "documentation",
+      "version": "1.0.0",
+      "owner": "founder",
+      "description": "Executive Assistant — coordinates executive communications, priorities, and briefings.",
+      "capabilities": [
+        "Coordinate communications across all executive agents",
+        "Manage and surface executive priorities so nothing urgent is missed",
+        "Synthesize meeting notes and status updates into concise briefings",
+        "Track action items to closure and flag overdue items",
+        "Maintain a running log of executive decisions for future reference"
+      ],
+      "dependencies": [
+        "founder-ceo-agent",
+        "founder-cfo-agent",
+        "founder-cmo-agent",
+        "founder-coo-agent",
+        "founder-cpo-agent",
+        "founder-cro-agent",
+        "founder-investor-agent",
+        "founder-risk-agent",
+        "founder-strategy-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "leadership",
+        "executive",
+        "coordination",
+        "administration",
+        "communication",
+        "executive-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/founder-executive-assistant-agent.md",
+      "blueprintId": "founder-executive-assistant-agent",
+      "blueprintHash": "051d41d15a67131a",
+      "createdAt": "2026-07-18T03:16:21.688Z",
+      "updatedAt": "2026-07-18T03:16:21.688Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:16:21.688Z",
           "action": "created"
         }
       ]
