@@ -33,6 +33,7 @@
     "generate:sales-marketing": "tsx src/departments/sales-marketing-generate.ts",
     "generate:customer-success": "tsx src/departments/customer-success-generate.ts",
     "generate:finance-legal": "tsx src/departments/finance-legal-generate.ts",
+    "generate:growth-analytics-ops": "tsx src/departments/growth-analytics-ops-generate.ts",
     "generate:executive": "tsx src/departments/executive-generate.ts",
     "test": "vitest run",
     "test:watch": "vitest",

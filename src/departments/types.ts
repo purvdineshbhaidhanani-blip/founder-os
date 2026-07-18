@@ -13,7 +13,8 @@ export type DepartmentName =
   | "app-generation"
   | "sales-marketing"
   | "customer-success"
-  | "finance-legal";
+  | "finance-legal"
+  | "growth-analytics-ops";
 
 /**
  * Declarative description of one department agent. The factory turns each

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "updatedAt": "2026-07-18T03:45:00.792Z",
+  "updatedAt": "2026-07-18T03:49:58.098Z",
   "agents": [
     {
       "id": "agent_f448d3a8-b4eb-4ee9-985d-e1b5fc75dad2",
@@ -6132,6 +6132,559 @@
         {
           "version": "1.0.0",
           "timestamp": "2026-07-18T03:45:00.792Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_8b6a637c-ff69-474c-b3db-b54d1d61b479",
+      "name": "growth-strategy-agent",
+      "displayName": "Growth Strategy Agent",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "growth-analytics-ops-department",
+      "description": "Owns the growth-loop strategy: acquisition, activation, retention, and referral prioritization.",
+      "capabilities": [
+        "Maintain a model of the current growth loop and its bottleneck stage",
+        "Prioritize growth levers (acquisition, activation, retention, referral) by expected impact",
+        "Translate growth priorities into a testable experiment backlog",
+        "Reconcile growth strategy against business-intelligence signal on what is actually moving",
+        "Report growth-loop health and priority shifts to the VP of Strategy"
+      ],
+      "dependencies": [
+        "business-intelligence-agent",
+        "founder-strategy-agent",
+        "growth-experiment-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "growth-analytics-ops",
+        "growth",
+        "strategy",
+        "acquisition",
+        "retention",
+        "growth-analytics-ops-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/growth-strategy-agent.md",
+      "blueprintId": "growth-strategy-agent",
+      "blueprintHash": "c7ea91c9b2c38ba5",
+      "createdAt": "2026-07-18T03:49:57.634Z",
+      "updatedAt": "2026-07-18T03:49:57.634Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:49:57.634Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_2c1275ad-fffa-42fb-abcb-b8911004cc11",
+      "name": "growth-experiment-agent",
+      "displayName": "Growth Experiment Agent",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "growth-analytics-ops-department",
+      "description": "Designs, runs, and evaluates growth experiments from the strategy backlog.",
+      "capabilities": [
+        "Design experiments from the growth-strategy backlog with a clear hypothesis",
+        "Size and run experiments to a valid sample before reading results",
+        "Evaluate results for statistical validity, not just directional movement",
+        "Recommend rollout, iterate, or kill for every completed experiment",
+        "Feed clean experiment outcomes to analytics for the historical record"
+      ],
+      "dependencies": [
+        "analytics-agent",
+        "founder-strategy-agent",
+        "growth-strategy-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "growth-analytics-ops",
+        "growth",
+        "experimentation",
+        "testing",
+        "growth-analytics-ops-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/growth-experiment-agent.md",
+      "blueprintId": "growth-experiment-agent",
+      "blueprintHash": "28e3995cb14bc061",
+      "createdAt": "2026-07-18T03:49:57.680Z",
+      "updatedAt": "2026-07-18T03:49:57.680Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:49:57.680Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_19dbdd0c-0b54-4531-9acb-a28eba1429a1",
+      "name": "analytics-agent",
+      "displayName": "Analytics Agent",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "growth-analytics-ops-department",
+      "description": "Runs the underlying data analysis engine: event tracking, querying, and ad hoc analysis.",
+      "capabilities": [
+        "Maintain event tracking and instrumentation definitions",
+        "Run ad hoc analysis requests from across the department",
+        "Validate data quality before analysis is trusted downstream",
+        "Maintain recurring queries and datasets other agents depend on",
+        "Archive experiment and growth-loop data for historical analysis"
+      ],
+      "dependencies": [
+        "business-intelligence-agent",
+        "founder-strategy-agent",
+        "growth-experiment-agent",
+        "kpi-monitor-agent",
+        "revenue-analytics-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "growth-analytics-ops",
+        "analytics",
+        "data",
+        "instrumentation",
+        "growth-analytics-ops-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/analytics-agent.md",
+      "blueprintId": "analytics-agent",
+      "blueprintHash": "e35b91c13cb6f18b",
+      "createdAt": "2026-07-18T03:49:57.727Z",
+      "updatedAt": "2026-07-18T03:49:57.727Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:49:57.727Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_7cc87fc8-8cfb-46a7-a198-f394a1416a00",
+      "name": "business-intelligence-agent",
+      "displayName": "Business Intelligence Agent",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "growth-analytics-ops-department",
+      "description": "Synthesizes cross-functional data into strategic dashboards and executive reporting.",
+      "capabilities": [
+        "Build and maintain cross-functional dashboards spanning growth, revenue and operations",
+        "Synthesize raw analysis into strategic, decision-ready reporting",
+        "Reconcile data across departments into a single trusted view",
+        "Surface signal that should change strategy, not just describe the past",
+        "Feed synthesized insight to the knowledge base for durable reference"
+      ],
+      "dependencies": [
+        "analytics-agent",
+        "founder-strategy-agent",
+        "growth-strategy-agent",
+        "knowledge-manager-agent",
+        "revenue-analytics-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "growth-analytics-ops",
+        "analytics",
+        "business-intelligence",
+        "dashboards",
+        "growth-analytics-ops-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/business-intelligence-agent.md",
+      "blueprintId": "business-intelligence-agent",
+      "blueprintHash": "d984bb4ef9a486ff",
+      "createdAt": "2026-07-18T03:49:57.767Z",
+      "updatedAt": "2026-07-18T03:49:57.767Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:49:57.767Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_69d522b2-35f4-4e35-8173-e687a1de99d9",
+      "name": "kpi-monitor-agent",
+      "displayName": "KPI Monitor Agent",
+      "category": "qa",
+      "version": "1.0.0",
+      "owner": "growth-analytics-ops-department",
+      "description": "Tracks live KPIs against defined targets and alerts on deviation.",
+      "capabilities": [
+        "Track live KPIs against their defined targets continuously",
+        "Alert when a KPI deviates beyond its threshold",
+        "Distinguish noise from a genuine trend before alerting",
+        "Maintain the current KPI dashboard for operational visibility",
+        "Feed deviation context to operations for response"
+      ],
+      "dependencies": [
+        "analytics-agent",
+        "founder-strategy-agent",
+        "operations-manager-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "growth-analytics-ops",
+        "analytics",
+        "kpi",
+        "monitoring",
+        "alerting",
+        "growth-analytics-ops-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/kpi-monitor-agent.md",
+      "blueprintId": "kpi-monitor-agent",
+      "blueprintHash": "8e39c7624a1cb680",
+      "createdAt": "2026-07-18T03:49:57.803Z",
+      "updatedAt": "2026-07-18T03:49:57.803Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:49:57.803Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_696ac035-5150-481a-8b6b-bf3455670ebf",
+      "name": "revenue-analytics-agent",
+      "displayName": "Revenue Analytics Agent",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "growth-analytics-ops-department",
+      "description": "Analyzes revenue-specific metrics: MRR/ARR, cohorts, and unit economics.",
+      "capabilities": [
+        "Track MRR/ARR and their component movements (new, expansion, contraction, churn)",
+        "Run cohort analysis to understand retention and expansion by cohort",
+        "Analyze unit economics (CAC, LTV, payback) at a granular level",
+        "Explain revenue trend drivers, not just report the trend",
+        "Feed revenue signal to business intelligence and expansion strategy"
+      ],
+      "dependencies": [
+        "analytics-agent",
+        "business-intelligence-agent",
+        "expansion-strategy-agent",
+        "founder-strategy-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "growth-analytics-ops",
+        "analytics",
+        "revenue",
+        "cohorts",
+        "unit-economics",
+        "growth-analytics-ops-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/revenue-analytics-agent.md",
+      "blueprintId": "revenue-analytics-agent",
+      "blueprintHash": "42b9c64faec0d6af",
+      "createdAt": "2026-07-18T03:49:57.840Z",
+      "updatedAt": "2026-07-18T03:49:57.840Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:49:57.840Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_00c3106c-edb0-4938-8f6b-4b5e4930ed12",
+      "name": "operations-manager-agent",
+      "displayName": "Operations Manager Agent",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "growth-analytics-ops-department",
+      "description": "Coordinates day-to-day business-process execution across departments.",
+      "capabilities": [
+        "Coordinate day-to-day execution of recurring business processes across departments",
+        "Resolve operational blockers that cross a single department's authority",
+        "Respond to KPI deviations flagged by KPI monitoring",
+        "Prioritize process-optimization and automation work by operational impact",
+        "Report operational health to the COO"
+      ],
+      "dependencies": [
+        "automation-agent",
+        "founder-coo-agent",
+        "kpi-monitor-agent",
+        "process-optimization-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "growth-analytics-ops",
+        "operations",
+        "coordination",
+        "execution",
+        "growth-analytics-ops-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/operations-manager-agent.md",
+      "blueprintId": "operations-manager-agent",
+      "blueprintHash": "75c149f8bfabce57",
+      "createdAt": "2026-07-18T03:49:57.874Z",
+      "updatedAt": "2026-07-18T03:49:57.874Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:49:57.874Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_86f1e365-df60-4fd4-8814-fe979057d435",
+      "name": "process-optimization-agent",
+      "displayName": "Process Optimization Agent",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "growth-analytics-ops-department",
+      "description": "Analyzes and improves recurring business processes for cost, speed, and reliability.",
+      "capabilities": [
+        "Map recurring business processes end to end",
+        "Identify inefficiency, redundant steps and failure points",
+        "Design improved process versions with measurable expected impact",
+        "Hand automatable steps to the automation agent",
+        "Verify improved processes actually delivered the expected impact"
+      ],
+      "dependencies": [
+        "automation-agent",
+        "founder-coo-agent",
+        "operations-manager-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "growth-analytics-ops",
+        "operations",
+        "process-improvement",
+        "efficiency",
+        "growth-analytics-ops-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/process-optimization-agent.md",
+      "blueprintId": "process-optimization-agent",
+      "blueprintHash": "e3d9a887d4efb34f",
+      "createdAt": "2026-07-18T03:49:57.912Z",
+      "updatedAt": "2026-07-18T03:49:57.912Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:49:57.912Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_c26173c0-b4ac-4ae4-ba7d-7040e76d2090",
+      "name": "automation-agent",
+      "displayName": "Automation Agent",
+      "category": "devops",
+      "version": "1.0.0",
+      "owner": "growth-analytics-ops-department",
+      "description": "Builds and maintains automation for recurring operational and cross-department workflows.",
+      "capabilities": [
+        "Build automation for recurring operational workflows handed off from process optimization",
+        "Maintain existing automation as upstream processes change",
+        "Monitor automation reliability and fix failures before they cause a backlog",
+        "Document what is automated and its failure/fallback behavior",
+        "Report automation coverage and reliability to operations"
+      ],
+      "dependencies": [
+        "founder-coo-agent",
+        "operations-manager-agent",
+        "process-optimization-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "growth-analytics-ops",
+        "operations",
+        "automation",
+        "reliability",
+        "growth-analytics-ops-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/automation-agent.md",
+      "blueprintId": "automation-agent",
+      "blueprintHash": "de3a348b427d83c7",
+      "createdAt": "2026-07-18T03:49:57.947Z",
+      "updatedAt": "2026-07-18T03:49:57.947Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:49:57.947Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_6ed8e071-75cd-48fd-a894-415e2084ac21",
+      "name": "knowledge-manager-agent",
+      "displayName": "Knowledge Manager Agent",
+      "category": "documentation",
+      "version": "1.0.0",
+      "owner": "growth-analytics-ops-department",
+      "description": "Owns the executive team's operational knowledge base: SOPs, playbooks, and decision logs.",
+      "capabilities": [
+        "Curate SOPs and playbooks contributed across the executive team",
+        "Maintain a durable decision log distinct from day-to-day briefings",
+        "Organize the knowledge base for discoverability by topic and owner",
+        "Retire or flag knowledge-base entries that go stale",
+        "Incorporate synthesized insight from business intelligence into durable reference"
+      ],
+      "dependencies": [
+        "business-intelligence-agent",
+        "founder-executive-assistant-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "growth-analytics-ops",
+        "operations",
+        "knowledge-base",
+        "playbooks",
+        "growth-analytics-ops-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/knowledge-manager-agent.md",
+      "blueprintId": "knowledge-manager-agent",
+      "blueprintHash": "3bb257e42dd9bd19",
+      "createdAt": "2026-07-18T03:49:57.983Z",
+      "updatedAt": "2026-07-18T03:49:57.983Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:49:57.983Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_cfc8db1d-1b8b-4854-a342-d89a447067b1",
+      "name": "innovation-agent",
+      "displayName": "Innovation Agent",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "growth-analytics-ops-department",
+      "description": "Runs a structured ideation pipeline for new product and business bets.",
+      "capabilities": [
+        "Run a structured pipeline for generating new product and business bet ideas",
+        "Screen ideas against founder-fit, market and feasibility criteria before investing further",
+        "Design lightweight validation steps for promising ideas",
+        "Hand validated bets to the correct owner (CPO for product bets, CEO for business bets)",
+        "Maintain a record of screened ideas and why they were pursued or dropped"
+      ],
+      "dependencies": [
+        "founder-ceo-agent",
+        "founder-cpo-agent",
+        "founder-strategy-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "growth-analytics-ops",
+        "innovation",
+        "ideation",
+        "new-bets",
+        "growth-analytics-ops-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/innovation-agent.md",
+      "blueprintId": "innovation-agent",
+      "blueprintHash": "b9a650ddd2b5e85a",
+      "createdAt": "2026-07-18T03:49:58.022Z",
+      "updatedAt": "2026-07-18T03:49:58.022Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:49:58.022Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_b846e440-ff92-4f93-8bc5-c289a02f2d0c",
+      "name": "partnership-manager-agent",
+      "displayName": "Partnership Manager Agent",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "growth-analytics-ops-department",
+      "description": "Executes the operational partner lifecycle: outreach, management, and performance tracking.",
+      "capabilities": [
+        "Execute outreach to partnership candidates evaluated by the CRO",
+        "Onboard and manage approved partnerships operationally",
+        "Track partnership performance against the criteria it was approved on",
+        "Route partnership agreements to contract management for drafting",
+        "Recommend renewal, expansion, or sunset for existing partnerships"
+      ],
+      "dependencies": [
+        "contract-management-agent",
+        "founder-ceo-agent",
+        "founder-cro-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "growth-analytics-ops",
+        "partnerships",
+        "business-development",
+        "growth-analytics-ops-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/partnership-manager-agent.md",
+      "blueprintId": "partnership-manager-agent",
+      "blueprintHash": "87a61ad2977768e8",
+      "createdAt": "2026-07-18T03:49:58.061Z",
+      "updatedAt": "2026-07-18T03:49:58.061Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:49:58.061Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_84916556-5eee-47b1-8e23-6388c6c4b733",
+      "name": "expansion-strategy-agent",
+      "displayName": "Expansion Strategy Agent",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "growth-analytics-ops-department",
+      "description": "Plans expansion into new markets, segments, or geographies for the existing business.",
+      "capabilities": [
+        "Evaluate candidate markets, segments or geographies for expansion readiness",
+        "Build expansion plans with entry approach, resourcing and success criteria",
+        "Use revenue analytics to confirm the existing business can support expansion investment",
+        "Sequence expansion opportunities against strategic priority",
+        "Report expansion readiness and recommendations to the CEO"
+      ],
+      "dependencies": [
+        "founder-ceo-agent",
+        "founder-strategy-agent",
+        "revenue-analytics-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "growth-analytics-ops",
+        "expansion",
+        "market-entry",
+        "strategy",
+        "growth-analytics-ops-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/expansion-strategy-agent.md",
+      "blueprintId": "expansion-strategy-agent",
+      "blueprintHash": "c861e8d13bd46e19",
+      "createdAt": "2026-07-18T03:49:58.098Z",
+      "updatedAt": "2026-07-18T03:49:58.098Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:49:58.098Z",
           "action": "created"
         }
       ]

@@ -12,3 +12,4 @@ export * from "./executive.js";
 export * from "./sales-marketing.js";
 export * from "./customer-success.js";
 export * from "./finance-legal.js";
+export * from "./growth-analytics-ops.js";
