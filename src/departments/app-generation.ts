@@ -1,21 +1,37 @@
 import type { AgentSpec } from "./types.js";
 
 /**
- * App Generation Department — 9 agents that turn a Product Discovery Package
- * into a production-ready application: system architecture, database,
- * backend, AI integration, code, tests, docs and deployment. Generated
- * through the Agent Factory pipeline; never hand-written.
+ * App Generation Department — 10 agents that turn a Product Discovery
+ * Package into a production-ready application: system architecture,
+ * database, backend, AI integration, code, tests, docs and deployment.
+ * Generated through the Agent Factory pipeline; never hand-written.
  *
  * saas-foundation-agent is deliberately distinct from application-architect
  * and ux-designer/ui-designer: those design bespoke, project-specific
  * screens/flows from that project's own Product Discovery Package.
  * saas-foundation-agent instead outputs the same locked, domain-agnostic
- * 13-module SaaS baseline (Authentication, User Profile, Subscription &
+ * 13-module SaaS UI baseline (Authentication, User Profile, Subscription &
  * Billing, Payments, Dashboard, Notifications, AI Features, File Manager,
  * Search, Settings, Integrations, Support, Onboarding) for *any* SaaS idea,
  * every time, in fixed order, with zero domain-specific functionality —
  * a reusable reference solution-architect-app and the rest of the
  * department then build the bespoke, idea-specific product on top of.
+ *
+ * saas-business-engine-agent is the business-rules sibling of
+ * saas-foundation-agent, and is equally distinct from business-model-agent
+ * and pricing-strategy-agent: those do bespoke, market-research-backed
+ * strategic recommendations (actual pricing tiers, actual revenue-model
+ * choice) for one specific, already-scoped company. saas-business-engine-agent
+ * instead outputs the same locked, domain-agnostic 10-section SaaS business
+ * *rules engine* (pricing structure shape, subscription-lifecycle rules,
+ * payment/retry/tax handling, usage limits, revenue-model menu, user roles,
+ * team/workspace model, integration/notification/reporting rules) for any
+ * SaaS idea, every time — the reusable reference layer business-model-agent
+ * and pricing-strategy-agent then apply their bespoke, evidence-based
+ * numbers on top of. It explicitly never generates database, API, backend,
+ * security, testing or deployment concerns — those remain owned by
+ * database-architect, backend-architect, ai-architect, developer-agent,
+ * qa-engineer-app and deployment-agent respectively.
  */
 export const APP_GENERATION_DEPARTMENT: AgentSpec[] = [
   {
@@ -41,6 +57,30 @@ export const APP_GENERATION_DEPARTMENT: AgentSpec[] = [
     receivesFrom: ["founder"],
     sendsTo: ["solution-architect-app"],
     tags: ["app-generation", "architecture", "saas-foundation", "design-system"],
+  },
+  {
+    name: "saas-business-engine-agent",
+    displayName: "SaaS Business Engine Agent",
+    category: "architecture",
+    department: "app-generation",
+    summary: "Generates the universal, locked 10-section SaaS business rules engine for any SaaS idea — never domain-specific business logic.",
+    role: "The senior SaaS business architect who, given only a SaaS name/idea, generates the complete Universal SaaS Business Engine: the same 10 business-system sections in the same fixed order, every time, each with Purpose, Features, Business Rules, User Flow, Best Practices, Common Mistakes and Future Improvements — covering how the business itself runs, never how it looks or what it is domain-specifically for.",
+    responsibilities: [
+      "Generate the Universal SaaS Business Engine for the given SaaS idea: Pricing Strategy, Subscription Rules, Payment System, Usage Limits, Revenue Model, User Roles, Team & Workspace, Integrations, Notifications, Business Reports — in that exact order, every time",
+      "Produce Purpose, Features, Business Rules, User Flow, Best Practices, Common Mistakes and Future Improvements for every section, with zero section skipped, merged, reordered or invented",
+      "Keep every section's content domain-agnostic — never generate the SaaS idea's own domain-specific business logic; that belongs to the downstream architects and developer-agent",
+      "Never generate database, API, backend, security, testing or deployment concerns — those remain owned by database-architect, backend-architect, ai-architect, developer-agent, qa-engineer-app and deployment-agent",
+      "Hand the completed business engine to solution-architect-app as the standardized business-rules baseline layered under the idea-specific System Architecture Document",
+    ],
+    objectives: [
+      "The same 10 business sections, in the same order, are generated for every SaaS idea without exception",
+      "No section ever contains domain-specific business logic or implementation-layer detail (database/API/backend/security/testing/deployment) — only the universal SaaS business-rules baseline",
+      "Every section is complete: Purpose, Features, Business Rules, User Flow, Best Practices, Common Mistakes, Future Improvements, all present",
+    ],
+    reportsTo: "founder",
+    receivesFrom: ["founder"],
+    sendsTo: ["solution-architect-app"],
+    tags: ["app-generation", "architecture", "saas-business-engine", "business-rules"],
   },
   {
     name: "solution-architect-app",

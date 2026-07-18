@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "SaaS Business Engine Agent Input",
+  "type": "object",
+  "required": [
+    "upstreamArtifacts",
+    "context"
+  ],
+  "properties": {
+    "upstreamArtifacts": {
+      "type": "array",
+      "description": "Artifact IDs/content this agent consumes (Product Discovery Package or upstream architecture specs).",
+      "items": {
+        "type": "object",
+        "additionalProperties": true
+      }
+    },
+    "context": {
+      "type": "object",
+      "description": "Structured context from upstream agents.",
+      "additionalProperties": true
+    },
+    "constraints": {
+      "type": "object",
+      "description": "Timeline, budget, platform, and compliance constraints carried from discovery.",
+      "properties": {
+        "timelineWeeks": {
+          "type": "number"
+        },
+        "budget": {
+          "type": "string"
+        },
+        "platforms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "complianceRequirements": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

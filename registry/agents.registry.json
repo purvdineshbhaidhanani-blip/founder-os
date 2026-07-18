@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "updatedAt": "2026-07-18T08:55:46.173Z",
+  "updatedAt": "2026-07-18T09:00:09.349Z",
   "agents": [
     {
       "id": "agent_f448d3a8-b4eb-4ee9-985d-e1b5fc75dad2",
@@ -6724,6 +6724,45 @@
         {
           "version": "1.0.0",
           "timestamp": "2026-07-18T08:55:46.173Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_d770aea6-ae1e-48b5-b06b-e7afd62bdad9",
+      "name": "saas-business-engine-agent",
+      "displayName": "SaaS Business Engine Agent",
+      "category": "architecture",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Generates the universal, locked 10-section SaaS business rules engine for any SaaS idea — never domain-specific business logic.",
+      "capabilities": [
+        "Generate the Universal SaaS Business Engine for the given SaaS idea: Pricing Strategy, Subscription Rules, Payment System, Usage Limits, Revenue Model, User Roles, Team & Workspace, Integrations, Notifications, Business Reports — in that exact order, every time",
+        "Produce Purpose, Features, Business Rules, User Flow, Best Practices, Common Mistakes and Future Improvements for every section, with zero section skipped, merged, reordered or invented",
+        "Keep every section's content domain-agnostic — never generate the SaaS idea's own domain-specific business logic; that belongs to the downstream architects and developer-agent",
+        "Never generate database, API, backend, security, testing or deployment concerns — those remain owned by database-architect, backend-architect, ai-architect, developer-agent, qa-engineer-app and deployment-agent",
+        "Hand the completed business engine to solution-architect-app as the standardized business-rules baseline layered under the idea-specific System Architecture Document"
+      ],
+      "dependencies": [
+        "solution-architect-app"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "app-generation",
+        "architecture",
+        "saas-business-engine",
+        "business-rules"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/saas-business-engine-agent.md",
+      "blueprintId": "saas-business-engine-agent",
+      "blueprintHash": "e020c495870deafc",
+      "createdAt": "2026-07-18T09:00:09.349Z",
+      "updatedAt": "2026-07-18T09:00:09.349Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T09:00:09.349Z",
           "action": "created"
         }
       ]
