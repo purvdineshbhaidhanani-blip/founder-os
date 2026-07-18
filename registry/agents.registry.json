@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "updatedAt": "2026-07-18T03:35:43.264Z",
+  "updatedAt": "2026-07-18T03:40:43.354Z",
   "agents": [
     {
       "id": "agent_f448d3a8-b4eb-4ee9-985d-e1b5fc75dad2",
@@ -5276,6 +5276,428 @@
         {
           "version": "1.0.0",
           "timestamp": "2026-07-18T03:35:43.264Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_dbd05ecd-bedb-4227-9626-90b5a3a49652",
+      "name": "customer-support-agent",
+      "displayName": "Customer Support Agent",
+      "category": "documentation",
+      "version": "1.0.0",
+      "owner": "customer-success-department",
+      "description": "Resolves inbound support tickets: triage, response drafting, and escalation.",
+      "capabilities": [
+        "Triage inbound support tickets by severity and topic",
+        "Draft accurate, on-brand resolutions to common issues",
+        "Escalate issues outside its authority or knowledge to a human owner",
+        "Track response and resolution time against SLA targets",
+        "Flag recurring issues as candidates for help-center coverage"
+      ],
+      "dependencies": [
+        "feedback-intelligence-agent",
+        "founder-coo-agent",
+        "help-center-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "customer-success",
+        "support",
+        "tickets",
+        "triage",
+        "resolution",
+        "customer-success-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/customer-support-agent.md",
+      "blueprintId": "customer-support-agent",
+      "blueprintHash": "4a5cda18a05990cf",
+      "createdAt": "2026-07-18T03:40:43.067Z",
+      "updatedAt": "2026-07-18T03:40:43.067Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:40:43.067Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_d1f54eca-42f1-4479-96c8-7948b8a97517",
+      "name": "help-center-agent",
+      "displayName": "Help Center Agent",
+      "category": "documentation",
+      "version": "1.0.0",
+      "owner": "customer-success-department",
+      "description": "Owns the self-serve knowledge base: article authoring, gaps, and deflection.",
+      "capabilities": [
+        "Write and maintain clear, accurate self-serve knowledge-base articles",
+        "Identify knowledge-base gaps from recurring support tickets",
+        "Organize articles for discoverability (structure, search, tagging)",
+        "Retire or update articles that go stale or inaccurate",
+        "Track deflection rate — tickets avoided by self-serve resolution"
+      ],
+      "dependencies": [
+        "customer-support-agent",
+        "founder-coo-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "customer-success",
+        "support",
+        "knowledge-base",
+        "self-serve",
+        "documentation",
+        "customer-success-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/help-center-agent.md",
+      "blueprintId": "help-center-agent",
+      "blueprintHash": "74d09df094fde453",
+      "createdAt": "2026-07-18T03:40:43.103Z",
+      "updatedAt": "2026-07-18T03:40:43.103Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:40:43.103Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_ccc4c514-96c1-4afa-a6ce-6454d473fafe",
+      "name": "customer-success-agent",
+      "displayName": "Customer Success Agent",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "customer-success-department",
+      "description": "Owns ongoing account health, success plans, and expansion readiness for existing customers.",
+      "capabilities": [
+        "Track account health across existing customers on a continuous basis",
+        "Build and maintain a success plan per key account or segment",
+        "Coordinate with onboarding and retention on account lifecycle transitions",
+        "Identify accounts ready for expansion and hand them to revenue",
+        "Escalate at-risk accounts flagged by churn prediction"
+      ],
+      "dependencies": [
+        "churn-prediction-agent",
+        "customer-retention-agent",
+        "founder-cro-agent",
+        "onboarding-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "customer-success",
+        "account-health",
+        "expansion",
+        "customer-success-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/customer-success-agent.md",
+      "blueprintId": "customer-success-agent",
+      "blueprintHash": "92131cef825e6471",
+      "createdAt": "2026-07-18T03:40:43.140Z",
+      "updatedAt": "2026-07-18T03:40:43.140Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:40:43.140Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_6331dfb7-dc39-402d-b4c1-1a1e249e5401",
+      "name": "onboarding-agent",
+      "displayName": "Onboarding Agent",
+      "category": "documentation",
+      "version": "1.0.0",
+      "owner": "customer-success-department",
+      "description": "Owns new-customer onboarding: activation flow, milestones, and time-to-value.",
+      "capabilities": [
+        "Design and maintain the new-customer onboarding flow and milestones",
+        "Track each account's progress through onboarding in real time",
+        "Identify and resolve friction points slowing activation",
+        "Reduce time-to-first-value for new accounts",
+        "Hand fully onboarded accounts to customer success for ongoing management"
+      ],
+      "dependencies": [
+        "customer-success-agent",
+        "founder-cro-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "customer-success",
+        "onboarding",
+        "activation",
+        "customer-success-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/onboarding-agent.md",
+      "blueprintId": "onboarding-agent",
+      "blueprintHash": "029c6e339b6e6bc5",
+      "createdAt": "2026-07-18T03:40:43.177Z",
+      "updatedAt": "2026-07-18T03:40:43.177Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:40:43.177Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_24c849a0-e034-4164-b1fa-f2037fadeee4",
+      "name": "churn-prediction-agent",
+      "displayName": "Churn Prediction Agent",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "customer-success-department",
+      "description": "Models and scores churn risk from usage, support, and success signal.",
+      "capabilities": [
+        "Model churn risk from usage decline, support volume and health-score trends",
+        "Score every active account for churn risk on a continuous basis",
+        "Flag newly at-risk accounts to customer success and retention",
+        "Validate model accuracy against actual churn outcomes",
+        "Report churn risk trends across the customer base"
+      ],
+      "dependencies": [
+        "customer-insights-agent",
+        "customer-retention-agent",
+        "customer-success-agent",
+        "founder-cro-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "customer-success",
+        "churn",
+        "risk-scoring",
+        "customer-success-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/churn-prediction-agent.md",
+      "blueprintId": "churn-prediction-agent",
+      "blueprintHash": "d222e1c56dab18d6",
+      "createdAt": "2026-07-18T03:40:43.208Z",
+      "updatedAt": "2026-07-18T03:40:43.208Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:40:43.208Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_05fe85c1-71a9-4de2-bc7e-10cc7092eed8",
+      "name": "customer-retention-agent",
+      "displayName": "Customer Retention Agent",
+      "category": "planning",
+      "version": "1.0.0",
+      "owner": "customer-success-department",
+      "description": "Owns retention playbooks and save motions for at-risk and renewal-due accounts.",
+      "capabilities": [
+        "Design save-motion playbooks for common at-risk scenarios",
+        "Execute retention outreach on accounts flagged by churn prediction",
+        "Manage the renewal process and track renewal outcomes",
+        "Coordinate with customer success on account context before outreach",
+        "Report retention and renewal rates against target"
+      ],
+      "dependencies": [
+        "churn-prediction-agent",
+        "customer-success-agent",
+        "founder-cro-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "customer-success",
+        "retention",
+        "renewals",
+        "customer-success-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/customer-retention-agent.md",
+      "blueprintId": "customer-retention-agent",
+      "blueprintHash": "a36ecfc6ee94e086",
+      "createdAt": "2026-07-18T03:40:43.242Z",
+      "updatedAt": "2026-07-18T03:40:43.242Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:40:43.242Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_9943d915-1c4a-42c4-91ec-46b441a5e2d6",
+      "name": "feedback-intelligence-agent",
+      "displayName": "Feedback Intelligence Agent",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "customer-success-department",
+      "description": "Mines owned-channel customer feedback (support, success, NPS comments) into structured signal.",
+      "capabilities": [
+        "Aggregate feedback from support tickets, success notes and survey comments",
+        "Cluster feedback into themes and rank by frequency and severity",
+        "Distinguish product feedback from CX/process feedback",
+        "Route themed feedback to product and marketing as structured signal",
+        "Track whether recurring themes are acted on over time"
+      ],
+      "dependencies": [
+        "customer-insights-agent",
+        "customer-support-agent",
+        "founder-cmo-agent",
+        "founder-cpo-agent",
+        "survey-analysis-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "customer-success",
+        "feedback",
+        "voice-of-customer",
+        "customer-success-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/feedback-intelligence-agent.md",
+      "blueprintId": "feedback-intelligence-agent",
+      "blueprintHash": "484815a76c5d515c",
+      "createdAt": "2026-07-18T03:40:43.268Z",
+      "updatedAt": "2026-07-18T03:40:43.268Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:40:43.268Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_f84df5ee-9de7-4b77-92a0-d86fb102046b",
+      "name": "survey-analysis-agent",
+      "displayName": "Survey Analysis Agent",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "customer-success-department",
+      "description": "Designs, runs, and analyzes NPS/CSAT/CES surveys for structured customer sentiment.",
+      "capabilities": [
+        "Design NPS/CSAT/CES survey instruments with clear, unbiased questions",
+        "Manage survey distribution timing and target segments",
+        "Analyze quantitative scores and open-text responses for drivers",
+        "Track sentiment trends over time by segment",
+        "Route open-text comments to feedback intelligence for theming"
+      ],
+      "dependencies": [
+        "customer-insights-agent",
+        "customer-success-agent",
+        "feedback-intelligence-agent",
+        "founder-cmo-agent",
+        "founder-cpo-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "customer-success",
+        "surveys",
+        "nps",
+        "sentiment",
+        "customer-success-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/survey-analysis-agent.md",
+      "blueprintId": "survey-analysis-agent",
+      "blueprintHash": "c67309e8c94ae390",
+      "createdAt": "2026-07-18T03:40:43.296Z",
+      "updatedAt": "2026-07-18T03:40:43.296Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:40:43.296Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_8e167083-cf0c-4179-aba6-ae069d279a9f",
+      "name": "customer-insights-agent",
+      "displayName": "Customer Insights Agent",
+      "category": "research",
+      "version": "1.0.0",
+      "owner": "customer-success-department",
+      "description": "Synthesizes usage, feedback, and survey signal into a unified customer insight layer.",
+      "capabilities": [
+        "Synthesize usage, feedback and survey signal into unified customer insights",
+        "Segment the existing customer base by behavior and value",
+        "Surface insight that changes a product or marketing decision, not just data",
+        "Maintain a single reconciled view so product and marketing aren't working from conflicting numbers",
+        "Feed churn prediction with insight-derived risk signal"
+      ],
+      "dependencies": [
+        "churn-prediction-agent",
+        "feedback-intelligence-agent",
+        "founder-cmo-agent",
+        "founder-cpo-agent",
+        "survey-analysis-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "customer-success",
+        "insights",
+        "segmentation",
+        "customer-success-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/customer-insights-agent.md",
+      "blueprintId": "customer-insights-agent",
+      "blueprintHash": "da5229596fc7e097",
+      "createdAt": "2026-07-18T03:40:43.326Z",
+      "updatedAt": "2026-07-18T03:40:43.326Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:40:43.326Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_47214bcc-c917-4b4a-be23-9cf32f3fbc30",
+      "name": "community-manager-agent",
+      "displayName": "Community Manager Agent",
+      "category": "documentation",
+      "version": "1.0.0",
+      "owner": "customer-success-department",
+      "description": "Runs owned customer community spaces: moderation, engagement, and advocacy.",
+      "capabilities": [
+        "Moderate owned community spaces for tone and policy compliance",
+        "Drive engagement through prompts, discussions and recognition",
+        "Answer or route unanswered community questions",
+        "Identify power users and advocacy or ambassador opportunities",
+        "Surface community sentiment and recurring topics to feedback intelligence"
+      ],
+      "dependencies": [
+        "feedback-intelligence-agent",
+        "founder-cmo-agent",
+        "founder-cpo-agent"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "customer-success",
+        "community",
+        "engagement",
+        "advocacy",
+        "customer-success-department"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/community-manager-agent.md",
+      "blueprintId": "community-manager-agent",
+      "blueprintHash": "da256b1773623bcb",
+      "createdAt": "2026-07-18T03:40:43.354Z",
+      "updatedAt": "2026-07-18T03:40:43.354Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:40:43.354Z",
           "action": "created"
         }
       ]

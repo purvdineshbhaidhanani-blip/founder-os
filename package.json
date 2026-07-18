@@ -31,6 +31,7 @@
     "generate:product-discovery": "tsx src/departments/product-discovery-generate.ts",
     "generate:app-generation": "tsx src/departments/app-generation-generate.ts",
     "generate:sales-marketing": "tsx src/departments/sales-marketing-generate.ts",
+    "generate:customer-success": "tsx src/departments/customer-success-generate.ts",
     "generate:executive": "tsx src/departments/executive-generate.ts",
     "test": "vitest run",
     "test:watch": "vitest",

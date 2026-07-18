@@ -11,7 +11,8 @@ export type DepartmentName =
   | "foundation"
   | "product-discovery"
   | "app-generation"
-  | "sales-marketing";
+  | "sales-marketing"
+  | "customer-success";
 
 /**
  * Declarative description of one department agent. The factory turns each
