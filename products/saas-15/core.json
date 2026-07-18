@@ -1,0 +1,16 @@
+{
+  "productId": "saas-15",
+  "domain": null,
+  "status": "scaffolded",
+  "core": {
+    "ref": "../UNIVERSAL_CORE.json",
+    "loop": 1,
+    "version": "1.0.0",
+    "fingerprint": "09a2d3a06994eb75",
+    "stages": ["V1", "V2", "V3", "V4"]
+  },
+  "domainImplementation": {
+    "started": false,
+    "note": "No domain-specific features, requirements, or research exist yet. Structure only."
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "name": "Universal SaaS Core",
+  "status": "locked",
+  "loop": 1,
+  "version": "1.0.0",
+  "description": "The shared, domain-agnostic foundation every product in products/ references. Never redesigned, never duplicated, never modified per-product. Domain-specific work happens only inside each product's own folder, on top of this core.",
+  "stages": [
+    {
+      "id": "V1",
+      "agent": "saas-foundation-agent",
+      "title": "Universal SaaS Foundation",
+      "filePath": ".claude/agents/saas-foundation-agent.md",
+      "blueprintPath": "blueprints/saas-foundation-agent.blueprint.json",
+      "blueprintHash": "6e2efd3ed93d821c",
+      "version": "1.0.0",
+      "status": "active"
+    },
+    {
+      "id": "V2",
+      "agent": "saas-business-engine-agent",
+      "title": "Universal SaaS Business Engine",
+      "filePath": ".claude/agents/saas-business-engine-agent.md",
+      "blueprintPath": "blueprints/saas-business-engine-agent.blueprint.json",
+      "blueprintHash": "e020c495870deafc",
+      "version": "1.0.0",
+      "status": "active"
+    },
+    {
+      "id": "V3",
+      "agent": "saas-technical-engine-agent",
+      "title": "Universal SaaS Technical Engine",
+      "filePath": ".claude/agents/saas-technical-engine-agent.md",
+      "blueprintPath": "blueprints/saas-technical-engine-agent.blueprint.json",
+      "blueprintHash": "cb34472f48c0105b",
+      "version": "1.0.0",
+      "status": "active"
+    },
+    {
+      "id": "V4",
+      "agent": "saas-production-engine-agent",
+      "title": "Universal SaaS Production Engine",
+      "filePath": ".claude/agents/saas-production-engine-agent.md",
+      "blueprintPath": "blueprints/saas-production-engine-agent.blueprint.json",
+      "blueprintHash": "3dd5c45870626424",
+      "version": "1.0.0",
+      "status": "active"
+    }
+  ],
+  "rules": [
+    "Never redesign V1-V4.",
+    "Never duplicate V1-V4 into a product folder.",
+    "Never create a V5.",
+    "Never mix domain-specific features into this core.",
+    "Every product references this file by relative path; none copies it."
+  ]
+}
