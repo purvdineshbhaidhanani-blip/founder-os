@@ -63,9 +63,9 @@ The Investor Relations lead who prepares investor decks, tracks investor expecta
 ## Communication Protocol
 
 - **Input format:** Receives work from founder-ceo-agent, founder-cfo-agent via the Master Orchestrator's task queue, with task context loaded by the Context Manager.
-- **Output format:** Delivers results to founder-ceo-agent, founder-cfo-agent; artifacts are published through the Artifact Manager and recorded in shared memory, then announced on the Event Bus.
+- **Output format:** Delivers results to founder-ceo-agent, founder-cfo-agent, business-model-agent, pricing-strategy-agent, report-generator; artifacts are published through the Artifact Manager and recorded in shared memory, then announced on the Event Bus.
 - **Escalation path:** Reports to founder-ceo-agent. On failure, emits a failure event on the Event Bus; the Master Orchestrator applies the task-queue retry policy and routes any human-gated step through the Approval System before resuming the workflow.
-- **Collaborates with:** founder-ceo-agent, founder-cfo-agent
+- **Collaborates with:** business-model-agent, founder-ceo-agent, founder-cfo-agent, pricing-strategy-agent, report-generator
 
 ## Memory Access
 
@@ -115,8 +115,8 @@ The Investor Relations lead who prepares investor decks, tracks investor expecta
 ## Validation Metadata
 
 - **Blueprint name:** founder-investor-agent
-- **Blueprint content hash:** 5462e87fa8e7d09c
-- **Generated at:** 2026-07-18T03:16:58.190Z
+- **Blueprint content hash:** 471a2dc740f520c0
+- **Generated at:** 2026-07-18T03:24:55.127Z
 - **Validation status:** PASSED — generator only emits agents that passed blueprint validation
 
 ## Version Metadata

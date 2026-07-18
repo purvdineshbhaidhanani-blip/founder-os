@@ -10,6 +10,18 @@ import type { AgentSpec } from "./types.js";
  * to the founder). receivesFrom / sendsTo encode the executive collaboration
  * graph the blueprint builder compiles into each agent's communication
  * protocol.
+ *
+ * Integration (Batch 1 → existing Founder OS): each executive's `sendsTo`
+ * carries two kinds of edge — peer executive communication (unchanged) and
+ * downward supervision of already-registered operational agents. The blueprint
+ * builder folds `sendsTo` into `collaboratesWith`, which `registryManager`
+ * records as each executive's registry `dependencies` — so the supervision
+ * graph is sourced entirely from this file and regenerates idempotently. No
+ * existing agent's own spec, responsibilities or file is modified; supervision
+ * is expressed on the executive (upstream) side only. Agents named "(future)"
+ * in the integration brief are intentionally omitted until they exist. The
+ * authoritative map, contracts, ownership and cycle proof live in
+ * docs/EXECUTIVE_INTEGRATION.md.
  */
 export const EXECUTIVE_DEPARTMENT: AgentSpec[] = [
   // --------------------------------------------------------------- CEO
@@ -35,11 +47,17 @@ export const EXECUTIVE_DEPARTMENT: AgentSpec[] = [
     reportsTo: "founder",
     receivesFrom: ["founder", "founder-strategy-agent", "founder-risk-agent", "founder-cfo-agent"],
     sendsTo: [
+      // Peer executives
       "founder-coo-agent",
       "founder-cfo-agent",
       "founder-cmo-agent",
       "founder-cpo-agent",
       "founder-cro-agent",
+      // Supervises (existing Founder OS agents)
+      "master-cto-orchestrator",
+      "company-brain",
+      "workflow-manager",
+      "project-manager",
     ],
     tags: ["executive", "leadership", "strategy", "decision-making", "executive-department"],
     inputs: [
@@ -77,7 +95,17 @@ export const EXECUTIVE_DEPARTMENT: AgentSpec[] = [
     ],
     reportsTo: "founder-ceo-agent",
     receivesFrom: ["founder-ceo-agent", "founder-cpo-agent", "founder-cro-agent"],
-    sendsTo: ["founder-ceo-agent", "founder-executive-assistant-agent"],
+    sendsTo: [
+      // Peer executives
+      "founder-ceo-agent",
+      "founder-executive-assistant-agent",
+      // Supervises (existing Founder OS agents)
+      "workflow-engine",
+      "workflow-manager",
+      "project-manager",
+      "task-planner",
+      "monitoring-engineer",
+    ],
     tags: ["executive", "operations", "coordination", "execution", "executive-department"],
     inputs: [
       { name: "initiative_plans", description: "Approved initiatives from the CEO requiring operational execution", required: true, format: "markdown" },
@@ -115,7 +143,16 @@ export const EXECUTIVE_DEPARTMENT: AgentSpec[] = [
     ],
     reportsTo: "founder-ceo-agent",
     receivesFrom: ["founder-ceo-agent", "founder-coo-agent", "founder-investor-agent"],
-    sendsTo: ["founder-ceo-agent", "founder-investor-agent", "founder-risk-agent"],
+    sendsTo: [
+      // Peer executives
+      "founder-ceo-agent",
+      "founder-investor-agent",
+      "founder-risk-agent",
+      // Supervises (existing Founder OS agents)
+      "business-model-agent",
+      "pricing-strategy-agent",
+      "success-metrics-agent",
+    ],
     tags: ["executive", "finance", "budgeting", "capital-allocation", "executive-department"],
     inputs: [
       { name: "spending_reports", description: "Actual spend across departments and initiatives", required: true, format: "json" },
@@ -153,7 +190,16 @@ export const EXECUTIVE_DEPARTMENT: AgentSpec[] = [
     ],
     reportsTo: "founder-ceo-agent",
     receivesFrom: ["founder-ceo-agent", "founder-cpo-agent", "founder-cro-agent"],
-    sendsTo: ["founder-ceo-agent", "founder-cro-agent", "founder-cpo-agent"],
+    sendsTo: [
+      // Peer executives
+      "founder-ceo-agent",
+      "founder-cro-agent",
+      "founder-cpo-agent",
+      // Supervises (existing Founder OS agents)
+      "market-research-agent",
+      "target-audience-agent",
+      "trend-intelligence-agent",
+    ],
     tags: ["executive", "marketing", "gtm", "customer-acquisition", "executive-department"],
     inputs: [
       { name: "market_research", description: "Market and audience research relevant to positioning", required: true, format: "markdown" },
@@ -192,7 +238,19 @@ export const EXECUTIVE_DEPARTMENT: AgentSpec[] = [
     ],
     reportsTo: "founder-ceo-agent",
     receivesFrom: ["founder-ceo-agent", "founder-cmo-agent", "founder-coo-agent"],
-    sendsTo: ["founder-ceo-agent", "founder-coo-agent", "founder-cmo-agent"],
+    sendsTo: [
+      // Peer executives
+      "founder-ceo-agent",
+      "founder-coo-agent",
+      "founder-cmo-agent",
+      // Supervises (existing Founder OS agents)
+      "product-manager",
+      "feature-planning-agent",
+      "requirement-analyzer",
+      "user-story-generator",
+      "ui-designer",
+      "ux-designer",
+    ],
     tags: ["executive", "product", "strategy", "prioritization", "executive-department"],
     inputs: [
       { name: "customer_feedback", description: "Raw and synthesized customer feedback", required: true, format: "markdown" },
@@ -230,7 +288,15 @@ export const EXECUTIVE_DEPARTMENT: AgentSpec[] = [
     ],
     reportsTo: "founder-ceo-agent",
     receivesFrom: ["founder-ceo-agent", "founder-cmo-agent"],
-    sendsTo: ["founder-ceo-agent", "founder-cfo-agent", "founder-cmo-agent"],
+    sendsTo: [
+      // Peer executives
+      "founder-ceo-agent",
+      "founder-cfo-agent",
+      "founder-cmo-agent",
+      // Supervises (existing Founder OS agents)
+      "pricing-strategy-agent",
+      "business-model-agent",
+    ],
     tags: ["executive", "revenue", "sales", "business-development", "executive-department"],
     inputs: [
       { name: "sales_pipeline", description: "Current sales pipeline and deal stages", required: true, format: "json" },
@@ -268,7 +334,16 @@ export const EXECUTIVE_DEPARTMENT: AgentSpec[] = [
     ],
     reportsTo: "founder-ceo-agent",
     receivesFrom: ["founder-ceo-agent", "founder-risk-agent"],
-    sendsTo: ["founder-ceo-agent", "founder-risk-agent"],
+    sendsTo: [
+      // Peer executives
+      "founder-ceo-agent",
+      "founder-risk-agent",
+      // Supervises (existing Founder OS agents)
+      "competitor-intelligence",
+      "market-gap-intelligence",
+      "startup-intelligence",
+      "research-intelligence-agent",
+    ],
     tags: ["executive", "strategy", "planning", "foresight", "executive-department"],
     inputs: [
       { name: "market_research", description: "Market research feeding scenario assumptions", required: true, format: "markdown" },
@@ -306,7 +381,15 @@ export const EXECUTIVE_DEPARTMENT: AgentSpec[] = [
     ],
     reportsTo: "founder-ceo-agent",
     receivesFrom: ["founder-ceo-agent", "founder-cfo-agent"],
-    sendsTo: ["founder-ceo-agent", "founder-cfo-agent"],
+    sendsTo: [
+      // Peer executives
+      "founder-ceo-agent",
+      "founder-cfo-agent",
+      // Supervises (existing Founder OS agents)
+      "business-model-agent",
+      "pricing-strategy-agent",
+      "report-generator",
+    ],
     tags: ["executive", "fundraising", "investor-relations", "capital", "executive-department"],
     inputs: [
       { name: "financial_metrics", description: "Financial metrics from the CFO for investor reporting", required: true, format: "markdown" },
@@ -344,7 +427,16 @@ export const EXECUTIVE_DEPARTMENT: AgentSpec[] = [
     ],
     reportsTo: "founder-ceo-agent",
     receivesFrom: ["founder-ceo-agent", "founder-coo-agent", "founder-cfo-agent"],
-    sendsTo: ["founder-ceo-agent", "founder-strategy-agent"],
+    sendsTo: [
+      // Peer executives
+      "founder-ceo-agent",
+      "founder-strategy-agent",
+      // Supervises (existing Founder OS agents)
+      "security-engineer",
+      "reality-checker",
+      "qa-engineer",
+      "performance-engineer",
+    ],
     tags: ["executive", "risk", "resilience", "mitigation", "executive-department"],
     inputs: [
       { name: "operational_data", description: "Operational data relevant to risk exposure", required: true, format: "json" },
@@ -392,7 +484,20 @@ export const EXECUTIVE_DEPARTMENT: AgentSpec[] = [
       "founder-investor-agent",
       "founder-risk-agent",
     ],
-    sendsTo: ["founder-ceo-agent"],
+    sendsTo: [
+      // Coordinates every peer executive; department-head coordination is
+      // mediated through each executive that owns those heads (see
+      // docs/EXECUTIVE_INTEGRATION.md) rather than supervised directly here.
+      "founder-ceo-agent",
+      "founder-coo-agent",
+      "founder-cfo-agent",
+      "founder-cmo-agent",
+      "founder-cpo-agent",
+      "founder-cro-agent",
+      "founder-strategy-agent",
+      "founder-investor-agent",
+      "founder-risk-agent",
+    ],
     tags: ["executive", "coordination", "administration", "communication", "executive-department"],
     inputs: [
       { name: "executive_requests", description: "Ad hoc requests from any executive agent", required: true, format: "markdown" },

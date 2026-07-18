@@ -63,9 +63,9 @@ The Chief Revenue Officer who owns revenue targets, develops business developmen
 ## Communication Protocol
 
 - **Input format:** Receives work from founder-ceo-agent, founder-cmo-agent via the Master Orchestrator's task queue, with task context loaded by the Context Manager.
-- **Output format:** Delivers results to founder-ceo-agent, founder-cfo-agent, founder-cmo-agent; artifacts are published through the Artifact Manager and recorded in shared memory, then announced on the Event Bus.
+- **Output format:** Delivers results to founder-ceo-agent, founder-cfo-agent, founder-cmo-agent, pricing-strategy-agent, business-model-agent; artifacts are published through the Artifact Manager and recorded in shared memory, then announced on the Event Bus.
 - **Escalation path:** Reports to founder-ceo-agent. On failure, emits a failure event on the Event Bus; the Master Orchestrator applies the task-queue retry policy and routes any human-gated step through the Approval System before resuming the workflow.
-- **Collaborates with:** founder-ceo-agent, founder-cfo-agent, founder-cmo-agent
+- **Collaborates with:** business-model-agent, founder-ceo-agent, founder-cfo-agent, founder-cmo-agent, pricing-strategy-agent
 
 ## Memory Access
 
@@ -115,8 +115,8 @@ The Chief Revenue Officer who owns revenue targets, develops business developmen
 ## Validation Metadata
 
 - **Blueprint name:** founder-cro-agent
-- **Blueprint content hash:** 186e4be609c074df
-- **Generated at:** 2026-07-18T03:16:58.132Z
+- **Blueprint content hash:** ee63e6e7a87b23d4
+- **Generated at:** 2026-07-18T03:24:55.057Z
 - **Validation status:** PASSED — generator only emits agents that passed blueprint validation
 
 ## Version Metadata

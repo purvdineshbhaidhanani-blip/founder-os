@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "updatedAt": "2026-07-18T03:16:21.688Z",
+  "updatedAt": "2026-07-18T03:24:55.207Z",
   "agents": [
     {
       "id": "agent_f448d3a8-b4eb-4ee9-985d-e1b5fc75dad2",
@@ -4339,13 +4339,17 @@
         "Arbitrate conflicting priorities across the CFO, COO, CMO, CPO and CRO"
       ],
       "dependencies": [
+        "company-brain",
         "founder-cfo-agent",
         "founder-cmo-agent",
         "founder-coo-agent",
         "founder-cpo-agent",
         "founder-cro-agent",
         "founder-risk-agent",
-        "founder-strategy-agent"
+        "founder-strategy-agent",
+        "master-cto-orchestrator",
+        "project-manager",
+        "workflow-manager"
       ],
       "status": "active",
       "tags": [
@@ -4358,14 +4362,19 @@
       ],
       "filePath": "/home/user/founder-os/.claude/agents/founder-ceo-agent.md",
       "blueprintId": "founder-ceo-agent",
-      "blueprintHash": "1282ee7c376bc6cd",
+      "blueprintHash": "54347d544de53015",
       "createdAt": "2026-07-18T03:16:21.414Z",
-      "updatedAt": "2026-07-18T03:16:21.414Z",
+      "updatedAt": "2026-07-18T03:24:54.834Z",
       "updateHistory": [
         {
           "version": "1.0.0",
           "timestamp": "2026-07-18T03:16:21.414Z",
           "action": "created"
+        },
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:24:54.834Z",
+          "action": "regenerated"
         }
       ]
     },
@@ -4388,7 +4397,12 @@
         "founder-ceo-agent",
         "founder-cpo-agent",
         "founder-cro-agent",
-        "founder-executive-assistant-agent"
+        "founder-executive-assistant-agent",
+        "monitoring-engineer",
+        "project-manager",
+        "task-planner",
+        "workflow-engine",
+        "workflow-manager"
       ],
       "status": "active",
       "tags": [
@@ -4402,14 +4416,19 @@
       ],
       "filePath": "/home/user/founder-os/.claude/agents/founder-coo-agent.md",
       "blueprintId": "founder-coo-agent",
-      "blueprintHash": "6425065f77a25eb5",
+      "blueprintHash": "8be71f2107964786",
       "createdAt": "2026-07-18T03:16:21.454Z",
-      "updatedAt": "2026-07-18T03:16:21.454Z",
+      "updatedAt": "2026-07-18T03:24:54.894Z",
       "updateHistory": [
         {
           "version": "1.0.0",
           "timestamp": "2026-07-18T03:16:21.454Z",
           "action": "created"
+        },
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:24:54.894Z",
+          "action": "regenerated"
         }
       ]
     },
@@ -4429,10 +4448,13 @@
         "Flag financial risks to the CEO and Risk Officer with supporting data"
       ],
       "dependencies": [
+        "business-model-agent",
         "founder-ceo-agent",
         "founder-coo-agent",
         "founder-investor-agent",
-        "founder-risk-agent"
+        "founder-risk-agent",
+        "pricing-strategy-agent",
+        "success-metrics-agent"
       ],
       "status": "active",
       "tags": [
@@ -4446,14 +4468,19 @@
       ],
       "filePath": "/home/user/founder-os/.claude/agents/founder-cfo-agent.md",
       "blueprintId": "founder-cfo-agent",
-      "blueprintHash": "62b3d7c5220e93ef",
+      "blueprintHash": "a11c44d1e460b76e",
       "createdAt": "2026-07-18T03:16:21.490Z",
-      "updatedAt": "2026-07-18T03:16:21.490Z",
+      "updatedAt": "2026-07-18T03:24:54.937Z",
       "updateHistory": [
         {
           "version": "1.0.0",
           "timestamp": "2026-07-18T03:16:21.490Z",
           "action": "created"
+        },
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:24:54.937Z",
+          "action": "regenerated"
         }
       ]
     },
@@ -4475,7 +4502,10 @@
       "dependencies": [
         "founder-ceo-agent",
         "founder-cpo-agent",
-        "founder-cro-agent"
+        "founder-cro-agent",
+        "market-research-agent",
+        "target-audience-agent",
+        "trend-intelligence-agent"
       ],
       "status": "active",
       "tags": [
@@ -4489,14 +4519,19 @@
       ],
       "filePath": "/home/user/founder-os/.claude/agents/founder-cmo-agent.md",
       "blueprintId": "founder-cmo-agent",
-      "blueprintHash": "1c138af7919f8dd2",
+      "blueprintHash": "b42eb9431b463891",
       "createdAt": "2026-07-18T03:16:21.522Z",
-      "updatedAt": "2026-07-18T03:16:21.522Z",
+      "updatedAt": "2026-07-18T03:24:54.990Z",
       "updateHistory": [
         {
           "version": "1.0.0",
           "timestamp": "2026-07-18T03:16:21.522Z",
           "action": "created"
+        },
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:24:54.990Z",
+          "action": "regenerated"
         }
       ]
     },
@@ -4516,9 +4551,15 @@
         "Gather and synthesize customer feedback into actionable product decisions"
       ],
       "dependencies": [
+        "feature-planning-agent",
         "founder-ceo-agent",
         "founder-cmo-agent",
-        "founder-coo-agent"
+        "founder-coo-agent",
+        "product-manager",
+        "requirement-analyzer",
+        "ui-designer",
+        "user-story-generator",
+        "ux-designer"
       ],
       "status": "active",
       "tags": [
@@ -4532,14 +4573,19 @@
       ],
       "filePath": "/home/user/founder-os/.claude/agents/founder-cpo-agent.md",
       "blueprintId": "founder-cpo-agent",
-      "blueprintHash": "e219ccb07a365fd7",
+      "blueprintHash": "b4197b8a47864fbf",
       "createdAt": "2026-07-18T03:16:21.549Z",
-      "updatedAt": "2026-07-18T03:16:21.549Z",
+      "updatedAt": "2026-07-18T03:24:55.052Z",
       "updateHistory": [
         {
           "version": "1.0.0",
           "timestamp": "2026-07-18T03:16:21.549Z",
           "action": "created"
+        },
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:24:55.052Z",
+          "action": "regenerated"
         }
       ]
     },
@@ -4559,9 +4605,11 @@
         "Drive customer retention initiatives to reduce churn"
       ],
       "dependencies": [
+        "business-model-agent",
         "founder-ceo-agent",
         "founder-cfo-agent",
-        "founder-cmo-agent"
+        "founder-cmo-agent",
+        "pricing-strategy-agent"
       ],
       "status": "active",
       "tags": [
@@ -4575,14 +4623,19 @@
       ],
       "filePath": "/home/user/founder-os/.claude/agents/founder-cro-agent.md",
       "blueprintId": "founder-cro-agent",
-      "blueprintHash": "186e4be609c074df",
+      "blueprintHash": "ee63e6e7a87b23d4",
       "createdAt": "2026-07-18T03:16:21.574Z",
-      "updatedAt": "2026-07-18T03:16:21.574Z",
+      "updatedAt": "2026-07-18T03:24:55.086Z",
       "updateHistory": [
         {
           "version": "1.0.0",
           "timestamp": "2026-07-18T03:16:21.574Z",
           "action": "created"
+        },
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:24:55.086Z",
+          "action": "regenerated"
         }
       ]
     },
@@ -4602,8 +4655,12 @@
         "Present strategic options with explicit trade-offs to the CEO"
       ],
       "dependencies": [
+        "competitor-intelligence",
         "founder-ceo-agent",
-        "founder-risk-agent"
+        "founder-risk-agent",
+        "market-gap-intelligence",
+        "research-intelligence-agent",
+        "startup-intelligence"
       ],
       "status": "active",
       "tags": [
@@ -4617,14 +4674,19 @@
       ],
       "filePath": "/home/user/founder-os/.claude/agents/founder-strategy-agent.md",
       "blueprintId": "founder-strategy-agent",
-      "blueprintHash": "7b9cccc2ee579b67",
+      "blueprintHash": "7726da14e9056085",
       "createdAt": "2026-07-18T03:16:21.605Z",
-      "updatedAt": "2026-07-18T03:16:21.605Z",
+      "updatedAt": "2026-07-18T03:24:55.121Z",
       "updateHistory": [
         {
           "version": "1.0.0",
           "timestamp": "2026-07-18T03:16:21.605Z",
           "action": "created"
+        },
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:24:55.121Z",
+          "action": "regenerated"
         }
       ]
     },
@@ -4644,8 +4706,11 @@
         "Coordinate with the CFO on capital strategy and use-of-funds narrative"
       ],
       "dependencies": [
+        "business-model-agent",
         "founder-ceo-agent",
-        "founder-cfo-agent"
+        "founder-cfo-agent",
+        "pricing-strategy-agent",
+        "report-generator"
       ],
       "status": "active",
       "tags": [
@@ -4659,14 +4724,19 @@
       ],
       "filePath": "/home/user/founder-os/.claude/agents/founder-investor-agent.md",
       "blueprintId": "founder-investor-agent",
-      "blueprintHash": "5462e87fa8e7d09c",
+      "blueprintHash": "471a2dc740f520c0",
       "createdAt": "2026-07-18T03:16:21.641Z",
-      "updatedAt": "2026-07-18T03:16:21.641Z",
+      "updatedAt": "2026-07-18T03:24:55.151Z",
       "updateHistory": [
         {
           "version": "1.0.0",
           "timestamp": "2026-07-18T03:16:21.641Z",
           "action": "created"
+        },
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:24:55.151Z",
+          "action": "regenerated"
         }
       ]
     },
@@ -4689,7 +4759,11 @@
         "founder-ceo-agent",
         "founder-cfo-agent",
         "founder-coo-agent",
-        "founder-strategy-agent"
+        "founder-strategy-agent",
+        "performance-engineer",
+        "qa-engineer",
+        "reality-checker",
+        "security-engineer"
       ],
       "status": "active",
       "tags": [
@@ -4703,14 +4777,19 @@
       ],
       "filePath": "/home/user/founder-os/.claude/agents/founder-risk-agent.md",
       "blueprintId": "founder-risk-agent",
-      "blueprintHash": "c2f0df6ac4f0ff8b",
+      "blueprintHash": "40556edd0f4d991c",
       "createdAt": "2026-07-18T03:16:21.665Z",
-      "updatedAt": "2026-07-18T03:16:21.665Z",
+      "updatedAt": "2026-07-18T03:24:55.179Z",
       "updateHistory": [
         {
           "version": "1.0.0",
           "timestamp": "2026-07-18T03:16:21.665Z",
           "action": "created"
+        },
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:24:55.179Z",
+          "action": "regenerated"
         }
       ]
     },
@@ -4752,14 +4831,19 @@
       ],
       "filePath": "/home/user/founder-os/.claude/agents/founder-executive-assistant-agent.md",
       "blueprintId": "founder-executive-assistant-agent",
-      "blueprintHash": "051d41d15a67131a",
+      "blueprintHash": "0c096b6d6b20ce40",
       "createdAt": "2026-07-18T03:16:21.688Z",
-      "updatedAt": "2026-07-18T03:16:21.688Z",
+      "updatedAt": "2026-07-18T03:24:55.207Z",
       "updateHistory": [
         {
           "version": "1.0.0",
           "timestamp": "2026-07-18T03:16:21.688Z",
           "action": "created"
+        },
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T03:24:55.207Z",
+          "action": "regenerated"
         }
       ]
     }

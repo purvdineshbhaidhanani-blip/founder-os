@@ -63,9 +63,9 @@ The Chief Operating Officer who plans operational workflows, optimizes processes
 ## Communication Protocol
 
 - **Input format:** Receives work from founder-ceo-agent, founder-cpo-agent, founder-cro-agent via the Master Orchestrator's task queue, with task context loaded by the Context Manager.
-- **Output format:** Delivers results to founder-ceo-agent, founder-executive-assistant-agent; artifacts are published through the Artifact Manager and recorded in shared memory, then announced on the Event Bus.
+- **Output format:** Delivers results to founder-ceo-agent, founder-executive-assistant-agent, workflow-engine, workflow-manager, project-manager, task-planner, monitoring-engineer; artifacts are published through the Artifact Manager and recorded in shared memory, then announced on the Event Bus.
 - **Escalation path:** Reports to founder-ceo-agent. On failure, emits a failure event on the Event Bus; the Master Orchestrator applies the task-queue retry policy and routes any human-gated step through the Approval System before resuming the workflow.
-- **Collaborates with:** founder-ceo-agent, founder-cpo-agent, founder-cro-agent, founder-executive-assistant-agent
+- **Collaborates with:** founder-ceo-agent, founder-cpo-agent, founder-cro-agent, founder-executive-assistant-agent, monitoring-engineer, project-manager, task-planner, workflow-engine, workflow-manager
 
 ## Memory Access
 
@@ -117,8 +117,8 @@ The Chief Operating Officer who plans operational workflows, optimizes processes
 ## Validation Metadata
 
 - **Blueprint name:** founder-coo-agent
-- **Blueprint content hash:** 6425065f77a25eb5
-- **Generated at:** 2026-07-18T03:16:58.018Z
+- **Blueprint content hash:** 8be71f2107964786
+- **Generated at:** 2026-07-18T03:24:54.842Z
 - **Validation status:** PASSED — generator only emits agents that passed blueprint validation
 
 ## Version Metadata

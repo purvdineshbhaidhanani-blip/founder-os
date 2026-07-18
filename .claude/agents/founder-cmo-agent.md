@@ -64,9 +64,9 @@ The Chief Marketing Officer who defines go-to-market strategy, plans marketing c
 ## Communication Protocol
 
 - **Input format:** Receives work from founder-ceo-agent, founder-cpo-agent, founder-cro-agent via the Master Orchestrator's task queue, with task context loaded by the Context Manager.
-- **Output format:** Delivers results to founder-ceo-agent, founder-cro-agent, founder-cpo-agent; artifacts are published through the Artifact Manager and recorded in shared memory, then announced on the Event Bus.
+- **Output format:** Delivers results to founder-ceo-agent, founder-cro-agent, founder-cpo-agent, market-research-agent, target-audience-agent, trend-intelligence-agent; artifacts are published through the Artifact Manager and recorded in shared memory, then announced on the Event Bus.
 - **Escalation path:** Reports to founder-ceo-agent. On failure, emits a failure event on the Event Bus; the Master Orchestrator applies the task-queue retry policy and routes any human-gated step through the Approval System before resuming the workflow.
-- **Collaborates with:** founder-ceo-agent, founder-cpo-agent, founder-cro-agent
+- **Collaborates with:** founder-ceo-agent, founder-cpo-agent, founder-cro-agent, market-research-agent, target-audience-agent, trend-intelligence-agent
 
 ## Memory Access
 
@@ -116,8 +116,8 @@ The Chief Marketing Officer who defines go-to-market strategy, plans marketing c
 ## Validation Metadata
 
 - **Blueprint name:** founder-cmo-agent
-- **Blueprint content hash:** 1c138af7919f8dd2
-- **Generated at:** 2026-07-18T03:16:58.076Z
+- **Blueprint content hash:** b42eb9431b463891
+- **Generated at:** 2026-07-18T03:24:54.940Z
 - **Validation status:** PASSED — generator only emits agents that passed blueprint validation
 
 ## Version Metadata

@@ -63,7 +63,7 @@ The Executive Assistant who coordinates executive communications, manages priori
 ## Communication Protocol
 
 - **Input format:** Receives work from founder-ceo-agent, founder-coo-agent, founder-cfo-agent, founder-cmo-agent, founder-cpo-agent, founder-cro-agent, founder-strategy-agent, founder-investor-agent, founder-risk-agent via the Master Orchestrator's task queue, with task context loaded by the Context Manager.
-- **Output format:** Delivers results to founder-ceo-agent; artifacts are published through the Artifact Manager and recorded in shared memory, then announced on the Event Bus.
+- **Output format:** Delivers results to founder-ceo-agent, founder-coo-agent, founder-cfo-agent, founder-cmo-agent, founder-cpo-agent, founder-cro-agent, founder-strategy-agent, founder-investor-agent, founder-risk-agent; artifacts are published through the Artifact Manager and recorded in shared memory, then announced on the Event Bus.
 - **Escalation path:** Reports to founder-ceo-agent. On failure, emits a failure event on the Event Bus; the Master Orchestrator applies the task-queue retry policy and routes any human-gated step through the Approval System before resuming the workflow.
 - **Collaborates with:** founder-ceo-agent, founder-cfo-agent, founder-cmo-agent, founder-coo-agent, founder-cpo-agent, founder-cro-agent, founder-investor-agent, founder-risk-agent, founder-strategy-agent
 
@@ -115,8 +115,8 @@ The Executive Assistant who coordinates executive communications, manages priori
 ## Validation Metadata
 
 - **Blueprint name:** founder-executive-assistant-agent
-- **Blueprint content hash:** 051d41d15a67131a
-- **Generated at:** 2026-07-18T03:16:58.238Z
+- **Blueprint content hash:** 0c096b6d6b20ce40
+- **Generated at:** 2026-07-18T03:24:55.182Z
 - **Validation status:** PASSED — generator only emits agents that passed blueprint validation
 
 ## Version Metadata

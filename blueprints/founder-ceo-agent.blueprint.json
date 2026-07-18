@@ -111,16 +111,20 @@
   "model": "opus",
   "communicationProtocol": {
     "inputFormat": "Receives work from founder, founder-strategy-agent, founder-risk-agent, founder-cfo-agent via the Master Orchestrator's task queue, with task context loaded by the Context Manager.",
-    "outputFormat": "Delivers results to founder-coo-agent, founder-cfo-agent, founder-cmo-agent, founder-cpo-agent, founder-cro-agent; artifacts are published through the Artifact Manager and recorded in shared memory, then announced on the Event Bus.",
+    "outputFormat": "Delivers results to founder-coo-agent, founder-cfo-agent, founder-cmo-agent, founder-cpo-agent, founder-cro-agent, master-cto-orchestrator, company-brain, workflow-manager, project-manager; artifacts are published through the Artifact Manager and recorded in shared memory, then announced on the Event Bus.",
     "escalationPath": "Reports to founder. On failure, emits a failure event on the Event Bus; the Master Orchestrator applies the task-queue retry policy and routes any human-gated step through the Approval System before resuming the workflow.",
     "collaboratesWith": [
+      "company-brain",
       "founder-cfo-agent",
       "founder-cmo-agent",
       "founder-coo-agent",
       "founder-cpo-agent",
       "founder-cro-agent",
       "founder-risk-agent",
-      "founder-strategy-agent"
+      "founder-strategy-agent",
+      "master-cto-orchestrator",
+      "project-manager",
+      "workflow-manager"
     ]
   },
   "memoryAccess": {

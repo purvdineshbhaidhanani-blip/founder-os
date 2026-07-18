@@ -63,9 +63,9 @@ The Chief Financial Officer who tracks runway and burn, models financial scenari
 ## Communication Protocol
 
 - **Input format:** Receives work from founder-ceo-agent, founder-coo-agent, founder-investor-agent via the Master Orchestrator's task queue, with task context loaded by the Context Manager.
-- **Output format:** Delivers results to founder-ceo-agent, founder-investor-agent, founder-risk-agent; artifacts are published through the Artifact Manager and recorded in shared memory, then announced on the Event Bus.
+- **Output format:** Delivers results to founder-ceo-agent, founder-investor-agent, founder-risk-agent, business-model-agent, pricing-strategy-agent, success-metrics-agent; artifacts are published through the Artifact Manager and recorded in shared memory, then announced on the Event Bus.
 - **Escalation path:** Reports to founder-ceo-agent. On failure, emits a failure event on the Event Bus; the Master Orchestrator applies the task-queue retry policy and routes any human-gated step through the Approval System before resuming the workflow.
-- **Collaborates with:** founder-ceo-agent, founder-coo-agent, founder-investor-agent, founder-risk-agent
+- **Collaborates with:** business-model-agent, founder-ceo-agent, founder-coo-agent, founder-investor-agent, founder-risk-agent, pricing-strategy-agent, success-metrics-agent
 
 ## Memory Access
 
@@ -115,8 +115,8 @@ The Chief Financial Officer who tracks runway and burn, models financial scenari
 ## Validation Metadata
 
 - **Blueprint name:** founder-cfo-agent
-- **Blueprint content hash:** 62b3d7c5220e93ef
-- **Generated at:** 2026-07-18T03:16:58.048Z
+- **Blueprint content hash:** a11c44d1e460b76e
+- **Generated at:** 2026-07-18T03:24:54.899Z
 - **Validation status:** PASSED — generator only emits agents that passed blueprint validation
 
 ## Version Metadata

@@ -63,9 +63,9 @@ The Chief Product Officer who defines product vision, prioritizes features, vali
 ## Communication Protocol
 
 - **Input format:** Receives work from founder-ceo-agent, founder-cmo-agent, founder-coo-agent via the Master Orchestrator's task queue, with task context loaded by the Context Manager.
-- **Output format:** Delivers results to founder-ceo-agent, founder-coo-agent, founder-cmo-agent; artifacts are published through the Artifact Manager and recorded in shared memory, then announced on the Event Bus.
+- **Output format:** Delivers results to founder-ceo-agent, founder-coo-agent, founder-cmo-agent, product-manager, feature-planning-agent, requirement-analyzer, user-story-generator, ui-designer, ux-designer; artifacts are published through the Artifact Manager and recorded in shared memory, then announced on the Event Bus.
 - **Escalation path:** Reports to founder-ceo-agent. On failure, emits a failure event on the Event Bus; the Master Orchestrator applies the task-queue retry policy and routes any human-gated step through the Approval System before resuming the workflow.
-- **Collaborates with:** founder-ceo-agent, founder-cmo-agent, founder-coo-agent
+- **Collaborates with:** feature-planning-agent, founder-ceo-agent, founder-cmo-agent, founder-coo-agent, product-manager, requirement-analyzer, ui-designer, user-story-generator, ux-designer
 
 ## Memory Access
 
@@ -117,8 +117,8 @@ The Chief Product Officer who defines product vision, prioritizes features, vali
 ## Validation Metadata
 
 - **Blueprint name:** founder-cpo-agent
-- **Blueprint content hash:** e219ccb07a365fd7
-- **Generated at:** 2026-07-18T03:16:58.105Z
+- **Blueprint content hash:** b4197b8a47864fbf
+- **Generated at:** 2026-07-18T03:24:54.994Z
 - **Validation status:** PASSED — generator only emits agents that passed blueprint validation
 
 ## Version Metadata

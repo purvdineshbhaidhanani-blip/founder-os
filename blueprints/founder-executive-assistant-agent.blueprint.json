@@ -120,7 +120,7 @@
   "model": "sonnet",
   "communicationProtocol": {
     "inputFormat": "Receives work from founder-ceo-agent, founder-coo-agent, founder-cfo-agent, founder-cmo-agent, founder-cpo-agent, founder-cro-agent, founder-strategy-agent, founder-investor-agent, founder-risk-agent via the Master Orchestrator's task queue, with task context loaded by the Context Manager.",
-    "outputFormat": "Delivers results to founder-ceo-agent; artifacts are published through the Artifact Manager and recorded in shared memory, then announced on the Event Bus.",
+    "outputFormat": "Delivers results to founder-ceo-agent, founder-coo-agent, founder-cfo-agent, founder-cmo-agent, founder-cpo-agent, founder-cro-agent, founder-strategy-agent, founder-investor-agent, founder-risk-agent; artifacts are published through the Artifact Manager and recorded in shared memory, then announced on the Event Bus.",
     "escalationPath": "Reports to founder-ceo-agent. On failure, emits a failure event on the Event Bus; the Master Orchestrator applies the task-queue retry policy and routes any human-gated step through the Approval System before resuming the workflow.",
     "collaboratesWith": [
       "founder-ceo-agent",

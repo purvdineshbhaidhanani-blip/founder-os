@@ -63,9 +63,9 @@ The VP of Strategy who models strategic scenarios, analyzes competitive threats,
 ## Communication Protocol
 
 - **Input format:** Receives work from founder-ceo-agent, founder-risk-agent via the Master Orchestrator's task queue, with task context loaded by the Context Manager.
-- **Output format:** Delivers results to founder-ceo-agent, founder-risk-agent; artifacts are published through the Artifact Manager and recorded in shared memory, then announced on the Event Bus.
+- **Output format:** Delivers results to founder-ceo-agent, founder-risk-agent, competitor-intelligence, market-gap-intelligence, startup-intelligence, research-intelligence-agent; artifacts are published through the Artifact Manager and recorded in shared memory, then announced on the Event Bus.
 - **Escalation path:** Reports to founder-ceo-agent. On failure, emits a failure event on the Event Bus; the Master Orchestrator applies the task-queue retry policy and routes any human-gated step through the Approval System before resuming the workflow.
-- **Collaborates with:** founder-ceo-agent, founder-risk-agent
+- **Collaborates with:** competitor-intelligence, founder-ceo-agent, founder-risk-agent, market-gap-intelligence, research-intelligence-agent, startup-intelligence
 
 ## Memory Access
 
@@ -117,8 +117,8 @@ The VP of Strategy who models strategic scenarios, analyzes competitive threats,
 ## Validation Metadata
 
 - **Blueprint name:** founder-strategy-agent
-- **Blueprint content hash:** 7b9cccc2ee579b67
-- **Generated at:** 2026-07-18T03:16:58.159Z
+- **Blueprint content hash:** 7726da14e9056085
+- **Generated at:** 2026-07-18T03:24:55.090Z
 - **Validation status:** PASSED — generator only emits agents that passed blueprint validation
 
 ## Version Metadata
