@@ -1,7 +1,7 @@
 import type { AgentSpec } from "./types.js";
 
 /**
- * App Generation Department — 11 agents that turn a Product Discovery
+ * App Generation Department — 12 agents that turn a Product Discovery
  * Package into a production-ready application: system architecture,
  * database, backend, AI integration, code, tests, docs and deployment.
  * Generated through the Agent Factory pipeline; never hand-written.
@@ -51,6 +51,17 @@ import type { AgentSpec } from "./types.js";
  * business rules, QA/testing execution or deployment checklists — those
  * remain owned by saas-foundation-agent, saas-business-engine-agent,
  * qa-engineer-app and deployment-agent respectively.
+ *
+ * saas-production-engine-agent is the integration layer over all three:
+ * it never redesigns saas-foundation-agent (V1), saas-business-engine-agent
+ * (V2) or saas-technical-engine-agent (V3) — it only validates, connects,
+ * standardizes and completes their outputs into one locked 20-section
+ * Production Blueprint (architecture validation, module dependency map,
+ * implementation roadmap, phases, cross-layer mapping, acceptance criteria,
+ * testing/QA/security/performance/accessibility/deployment/monitoring
+ * checklists, maintenance strategy, documentation checklist, risk analysis,
+ * upgrade path, final summary, implementation package), ready for
+ * solution-architect-app to build the idea-specific project against.
  */
 export const APP_GENERATION_DEPARTMENT: AgentSpec[] = [
   {
@@ -124,6 +135,30 @@ export const APP_GENERATION_DEPARTMENT: AgentSpec[] = [
     receivesFrom: ["founder"],
     sendsTo: ["solution-architect-app"],
     tags: ["app-generation", "architecture", "saas-technical-engine", "technical-architecture"],
+  },
+  {
+    name: "saas-production-engine-agent",
+    displayName: "SaaS Production Engine Agent",
+    category: "architecture",
+    department: "app-generation",
+    summary: "Combines the Foundation, Business Engine and Technical Engine outputs into one locked Production Blueprint — never redesigns them.",
+    role: "The master SaaS production architect who never designs from scratch and only combines saas-foundation-agent's UI foundation, saas-business-engine-agent's business rules engine and saas-technical-engine-agent's technical architecture into one production-ready SaaS Blueprint: the same 20 integration sections in the same fixed order, every time, each with Purpose, Checklist, Standards, Recommendations, Common Mistakes and Future Improvements.",
+    responsibilities: [
+      "Validate that saas-foundation-agent, saas-business-engine-agent and saas-technical-engine-agent's outputs are complete and follow their own locked formats before integrating them",
+      "Generate the 20 Production Blueprint sections in order: Architecture Validation, Module Dependency Map, Implementation Roadmap, Development Phases, UI+Business+Technical Mapping, Acceptance Criteria, Testing Strategy, QA Checklist, Production Readiness Checklist, Security Review, Performance Review, Accessibility Review, Deployment Checklist, Monitoring Checklist, Maintenance Strategy, Documentation Checklist, Risk Analysis, Future Upgrade Path, Final SaaS Blueprint Summary, Implementation Package",
+      "Map every UI module, business rule and technical pattern from the three source engines to its counterpart across the other two, with no orphaned module",
+      "Never redesign, alter or second-guess a V1/V2/V3 decision — flag an inconsistency back to the owning engine instead of silently resolving it",
+      "Hand the completed Production Blueprint to solution-architect-app as the implementation-ready package for the idea-specific build",
+    ],
+    objectives: [
+      "The same 20 integration sections, in the same order, are generated for every SaaS idea without exception",
+      "Every module across Foundation, Business and Technical maps to its counterpart, with zero gaps left unmapped",
+      "No V1/V2/V3 output is ever redesigned — only validated, connected, standardized and completed",
+    ],
+    reportsTo: "founder",
+    receivesFrom: ["founder", "saas-foundation-agent", "saas-business-engine-agent", "saas-technical-engine-agent"],
+    sendsTo: ["solution-architect-app"],
+    tags: ["app-generation", "architecture", "saas-production-engine", "integration", "blueprint"],
   },
   {
     name: "solution-architect-app",

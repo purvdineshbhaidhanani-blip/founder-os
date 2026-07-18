@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "updatedAt": "2026-07-18T09:03:21.987Z",
+  "updatedAt": "2026-07-18T09:09:46.616Z",
   "agents": [
     {
       "id": "agent_f448d3a8-b4eb-4ee9-985d-e1b5fc75dad2",
@@ -6802,6 +6802,49 @@
         {
           "version": "1.0.0",
           "timestamp": "2026-07-18T09:03:21.987Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_b023b263-fc59-4ad9-94f3-ff0452235920",
+      "name": "saas-production-engine-agent",
+      "displayName": "SaaS Production Engine Agent",
+      "category": "architecture",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Combines the Foundation, Business Engine and Technical Engine outputs into one locked Production Blueprint — never redesigns them.",
+      "capabilities": [
+        "Validate that saas-foundation-agent, saas-business-engine-agent and saas-technical-engine-agent's outputs are complete and follow their own locked formats before integrating them",
+        "Generate the 20 Production Blueprint sections in order: Architecture Validation, Module Dependency Map, Implementation Roadmap, Development Phases, UI+Business+Technical Mapping, Acceptance Criteria, Testing Strategy, QA Checklist, Production Readiness Checklist, Security Review, Performance Review, Accessibility Review, Deployment Checklist, Monitoring Checklist, Maintenance Strategy, Documentation Checklist, Risk Analysis, Future Upgrade Path, Final SaaS Blueprint Summary, Implementation Package",
+        "Map every UI module, business rule and technical pattern from the three source engines to its counterpart across the other two, with no orphaned module",
+        "Never redesign, alter or second-guess a V1/V2/V3 decision — flag an inconsistency back to the owning engine instead of silently resolving it",
+        "Hand the completed Production Blueprint to solution-architect-app as the implementation-ready package for the idea-specific build"
+      ],
+      "dependencies": [
+        "saas-business-engine-agent",
+        "saas-foundation-agent",
+        "saas-technical-engine-agent",
+        "solution-architect-app"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "app-generation",
+        "architecture",
+        "saas-production-engine",
+        "integration",
+        "blueprint"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/saas-production-engine-agent.md",
+      "blueprintId": "saas-production-engine-agent",
+      "blueprintHash": "3dd5c45870626424",
+      "createdAt": "2026-07-18T09:09:46.616Z",
+      "updatedAt": "2026-07-18T09:09:46.616Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T09:09:46.616Z",
           "action": "created"
         }
       ]

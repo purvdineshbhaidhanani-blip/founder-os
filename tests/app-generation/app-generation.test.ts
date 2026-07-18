@@ -25,8 +25,8 @@ const SCAFFOLD_FILES = [
 ];
 
 describe("Loop 3 — App Generation Department (quick validation only, no full OS execution)", () => {
-  it("has exactly 11 agent specs", () => {
-    expect(APP_GENERATION_DEPARTMENT).toHaveLength(11);
+  it("has exactly 12 agent specs", () => {
+    expect(APP_GENERATION_DEPARTMENT).toHaveLength(12);
   });
 
   it("Factory proof: every spec produces a valid blueprint via buildDepartmentBlueprint + validateBlueprint", () => {
@@ -37,14 +37,14 @@ describe("Loop 3 — App Generation Department (quick validation only, no full O
     }
   });
 
-  it("Registry verification: all 11 agents have generated .claude/agents/ files", () => {
+  it("Registry verification: all 12 agents have generated .claude/agents/ files", () => {
     for (const name of APP_GENERATION_DEPARTMENT_AGENTS) {
       const path = join(ROOT, ".claude", "agents", `${name}.md`);
       expect(existsSync(path), `Missing .claude/agents/${name}.md`).toBe(true);
     }
   });
 
-  it("Registry verification: all 11 agents appear in registry/agents.registry.json with status active", () => {
+  it("Registry verification: all 12 agents appear in registry/agents.registry.json with status active", () => {
     const registry = JSON.parse(readFileSync(join(ROOT, "registry", "agents.registry.json"), "utf-8"));
     const entries: any[] = registry.agents ?? registry.entries ?? registry;
     for (const name of APP_GENERATION_DEPARTMENT_AGENTS) {
@@ -53,7 +53,7 @@ describe("Loop 3 — App Generation Department (quick validation only, no full O
     }
   });
 
-  it("Artifact verification: all 11 agents have the full per-agent scaffold folder", () => {
+  it("Artifact verification: all 12 agents have the full per-agent scaffold folder", () => {
     for (const name of APP_GENERATION_DEPARTMENT_AGENTS) {
       const agentDir = join(ROOT, "agents", name);
       for (const file of SCAFFOLD_FILES) {
@@ -62,10 +62,10 @@ describe("Loop 3 — App Generation Department (quick validation only, no full O
     }
   });
 
-  it("Runtime verification: department wires into AgentRuntime and all 11 agents become active", () => {
+  it("Runtime verification: department wires into AgentRuntime and all 12 agents become active", () => {
     const runtime = new AgentRuntime();
     const descriptors = loadAppGenerationDepartment(runtime);
-    expect(descriptors).toHaveLength(11);
+    expect(descriptors).toHaveLength(12);
     for (const name of APP_GENERATION_DEPARTMENT_AGENTS) {
       expect(runtime.get(name)?.status).toBe("active");
     }
@@ -75,7 +75,7 @@ describe("Loop 3 — App Generation Department (quick validation only, no full O
     const runtime = new AgentRuntime();
     loadAppGenerationDepartment(runtime);
     const byTag = runtime.discover({ tag: "app-generation", status: "active" });
-    expect(byTag.length).toBeGreaterThanOrEqual(11);
+    expect(byTag.length).toBeGreaterThanOrEqual(12);
     const architect = runtime.get("solution-architect-app");
     expect(architect?.category).toBe("architecture");
   });
