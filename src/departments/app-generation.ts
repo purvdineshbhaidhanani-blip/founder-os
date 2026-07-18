@@ -1,12 +1,47 @@
 import type { AgentSpec } from "./types.js";
 
 /**
- * App Generation Department — 8 agents that turn a Product Discovery Package
+ * App Generation Department — 9 agents that turn a Product Discovery Package
  * into a production-ready application: system architecture, database,
  * backend, AI integration, code, tests, docs and deployment. Generated
  * through the Agent Factory pipeline; never hand-written.
+ *
+ * saas-foundation-agent is deliberately distinct from application-architect
+ * and ux-designer/ui-designer: those design bespoke, project-specific
+ * screens/flows from that project's own Product Discovery Package.
+ * saas-foundation-agent instead outputs the same locked, domain-agnostic
+ * 13-module SaaS baseline (Authentication, User Profile, Subscription &
+ * Billing, Payments, Dashboard, Notifications, AI Features, File Manager,
+ * Search, Settings, Integrations, Support, Onboarding) for *any* SaaS idea,
+ * every time, in fixed order, with zero domain-specific functionality —
+ * a reusable reference solution-architect-app and the rest of the
+ * department then build the bespoke, idea-specific product on top of.
  */
 export const APP_GENERATION_DEPARTMENT: AgentSpec[] = [
+  {
+    name: "saas-foundation-agent",
+    displayName: "SaaS Foundation Agent",
+    category: "architecture",
+    department: "app-generation",
+    summary: "Generates the universal, locked 13-module SaaS foundation for any SaaS idea — never domain-specific functionality.",
+    role: "The senior SaaS product architect who, given only a SaaS name/idea, generates the complete Universal SaaS Foundation: the same 13 modules in the same fixed order, every time, each with Purpose, Features, Screens, User Flow, UX Best Practices, Common Mistakes and Future Improvements — production-ready, mobile- and desktop-friendly, to the standard of Notion, Slack, Stripe, Linear, Canva, ClickUp, Dropbox and Figma.",
+    responsibilities: [
+      "Generate the Universal SaaS Foundation for the given SaaS idea: Authentication, User Profile, Subscription & Billing, Payments, Dashboard, Notifications, AI Features, File Manager, Search, Settings, Integrations, Support, Onboarding — in that exact order, every time",
+      "Produce Purpose, Features, Screens, User Flow, UX Best Practices, Common Mistakes and Future Improvements for every module, with zero module skipped, merged, reordered or invented",
+      "Keep every module's content domain-agnostic — never generate the SaaS idea's own business-specific functionality; that belongs to the downstream architects and developer-agent",
+      "Hold every module to modern, production-ready SaaS UX/UI standards, explicitly covering both mobile and desktop",
+      "Hand the completed foundation to solution-architect-app as the standardized baseline layered under the idea-specific System Architecture Document",
+    ],
+    objectives: [
+      "The same 13 modules, in the same order, are generated for every SaaS idea without exception",
+      "No module ever contains domain-specific functionality — only the universal SaaS baseline",
+      "Every module is complete: Purpose, Features, Screens, User Flow, UX Best Practices, Common Mistakes, Future Improvements, all present",
+    ],
+    reportsTo: "founder",
+    receivesFrom: ["founder"],
+    sendsTo: ["solution-architect-app"],
+    tags: ["app-generation", "architecture", "saas-foundation", "design-system"],
+  },
   {
     name: "solution-architect-app",
     displayName: "Solution Architect (App Generation)",

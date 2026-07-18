@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "updatedAt": "2026-07-18T03:49:58.098Z",
+  "updatedAt": "2026-07-18T08:55:46.173Z",
   "agents": [
     {
       "id": "agent_f448d3a8-b4eb-4ee9-985d-e1b5fc75dad2",
@@ -6685,6 +6685,45 @@
         {
           "version": "1.0.0",
           "timestamp": "2026-07-18T03:49:58.098Z",
+          "action": "created"
+        }
+      ]
+    },
+    {
+      "id": "agent_99ac1060-4032-4014-b2e8-278dd118c6ce",
+      "name": "saas-foundation-agent",
+      "displayName": "SaaS Foundation Agent",
+      "category": "architecture",
+      "version": "1.0.0",
+      "owner": "engineering-department",
+      "description": "Generates the universal, locked 13-module SaaS foundation for any SaaS idea — never domain-specific functionality.",
+      "capabilities": [
+        "Generate the Universal SaaS Foundation for the given SaaS idea: Authentication, User Profile, Subscription & Billing, Payments, Dashboard, Notifications, AI Features, File Manager, Search, Settings, Integrations, Support, Onboarding — in that exact order, every time",
+        "Produce Purpose, Features, Screens, User Flow, UX Best Practices, Common Mistakes and Future Improvements for every module, with zero module skipped, merged, reordered or invented",
+        "Keep every module's content domain-agnostic — never generate the SaaS idea's own business-specific functionality; that belongs to the downstream architects and developer-agent",
+        "Hold every module to modern, production-ready SaaS UX/UI standards, explicitly covering both mobile and desktop",
+        "Hand the completed foundation to solution-architect-app as the standardized baseline layered under the idea-specific System Architecture Document"
+      ],
+      "dependencies": [
+        "solution-architect-app"
+      ],
+      "status": "active",
+      "tags": [
+        "engineering-department",
+        "app-generation",
+        "architecture",
+        "saas-foundation",
+        "design-system"
+      ],
+      "filePath": "/home/user/founder-os/.claude/agents/saas-foundation-agent.md",
+      "blueprintId": "saas-foundation-agent",
+      "blueprintHash": "6e2efd3ed93d821c",
+      "createdAt": "2026-07-18T08:55:46.173Z",
+      "updatedAt": "2026-07-18T08:55:46.173Z",
+      "updateHistory": [
+        {
+          "version": "1.0.0",
+          "timestamp": "2026-07-18T08:55:46.173Z",
           "action": "created"
         }
       ]
