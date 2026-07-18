@@ -1,7 +1,7 @@
 {
   "productId": "saas-01",
   "domain": "Freelancer Budgeting AI",
-  "status": "domain-assigned",
+  "status": "pipeline-complete",
   "discoveryDoc": "./discovery.md",
   "core": {
     "ref": "../UNIVERSAL_CORE.json",
@@ -15,8 +15,14 @@
       "V4"
     ]
   },
+  "pipelineOutputs": {
+    "foundation": "./pipeline/01-foundation.md",
+    "businessEngine": "./pipeline/02-business-engine.md",
+    "technicalEngine": "./pipeline/03-technical-engine.md",
+    "productionBlueprint": "./pipeline/04-production-blueprint.md"
+  },
   "domainImplementation": {
     "started": true,
-    "note": "Domain discovery locked (Loop 1). Universal SaaS Pipeline (V1-V4) in progress against this domain."
+    "note": "Universal SaaS Pipeline (V1-V4) complete against this domain. Production Blueprint handed off to solution-architect-app."
   }
 }
